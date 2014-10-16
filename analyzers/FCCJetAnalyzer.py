@@ -1,7 +1,7 @@
-from framework.analyzer import Analyzer
-from particles.physicsobjects import Jet, Particle
+from heppy.framework.analyzer import Analyzer
+from heppy_fcc.particles.physicsobjects import Jet, Particle
 
-class JetAnalyzer(Analyzer):
+class FCCJetAnalyzer(Analyzer):
 
     
     def process(self, event):

@@ -1,12 +1,13 @@
 import os
-import framework.config as cfg
+import heppy.framework.config as cfg
+from ROOT import gSystem
 
 # input component 
 # several input components can be declared,
 # and added to the list of selected components
 inputSample = cfg.Component(
     'albers_example',
-    files = ['albers.root'],
+    files = ['example.root'],
     )
 
 selectedComponents  = [inputSample]
@@ -15,7 +16,7 @@ selectedComponents  = [inputSample]
 
 # lepton analyzer for muons (type 4)
 muana = cfg.Analyzer(
-    'LeptonAnalyzer_1',
+    'FCCLeptonAnalyzer_1',
     id = 4,   # selected particle id
     pt = 10., # pt cut
     eta = 3., # eta cut 
@@ -24,7 +25,7 @@ muana = cfg.Analyzer(
 
 # lepton analyzer for electrons
 eleana = cfg.Analyzer(
-    'LeptonAnalyzer_2',
+    'FCCLeptonAnalyzer_2',
     id = 5,
     pt = 10.,
     eta = 3.,
@@ -33,13 +34,13 @@ eleana = cfg.Analyzer(
 
 # jet analyzer
 jetana = cfg.Analyzer(
-    'JetAnalyzer',
+    'FCCJetAnalyzer',
     verbose = False
     )
 
 # analyzer for tree production
 treeprod = cfg.Analyzer(
-    'JetTreeProducer',
+    'FCCJetTreeProducer',
     tree_name = 'tree',
     tree_title = 'a title'
     )
@@ -53,8 +54,8 @@ sequence = cfg.Sequence( [
     treeprod
     ] )
 
-inputSample.files.append('albers_2.root')
-inputSample.splitFactor = 2  # splitting the component in 2 chunks
+# inputSample.files.append('albers_2.root')
+# inputSample.splitFactor = 2  # splitting the component in 2 chunks
 
 # finalization of the configuration object. 
 config = cfg.Config( components = selectedComponents,

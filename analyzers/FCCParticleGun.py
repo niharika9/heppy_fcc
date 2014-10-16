@@ -1,12 +1,12 @@
-from framework.analyzer import Analyzer
-from particles.particle import Particle
+from heppy.framework.analyzer import Analyzer
+from heppy_fcc.particles.particle import Particle
 
 from ROOT import TLorentzVector
 
 import random
 import math
 
-class ParticleGun( Analyzer ):
+class FCCParticleGun( Analyzer ):
     """
     Random, single particle generator.
 

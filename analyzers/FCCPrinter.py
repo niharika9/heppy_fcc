@@ -1,6 +1,6 @@
-from framework.analyzer import Analyzer
+from heppy.framework.analyzer import Analyzer
 
-class Printer(Analyzer):
+class FCCPrinter(Analyzer):
 
     def process(self, event):
         print "printing event", event.iEv

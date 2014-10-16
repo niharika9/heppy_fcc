@@ -1,22 +1,24 @@
-Heppy : a python framework for high-energy physics data analysis
+Heppy-fcc : heppy adapter package for the FCC experiments
 ================================================================
 
 Prerequisites
 -------------
 
-**python 2.x, x>5**
+heppy : https://github.com/HEP-FCC/heppy
 
-**ROOT 5, with pyroot support**
+albers : https://github.com/HEP-FCC/albers
 
-Note that you need to ensure that ROOT was compiled with the same version of python as the one in your PATH.
+use albers to produce the example.root file and put it in the test/ directory
 
-Environment
------------
+Installation
+-
 
-From this directory, run the initialization script:
+Define the following variable:
+	export HEPPY_FCC=$PWD
 
-	source init.sh
+Put the following in your python path:
 
+    export PYTHONPATH=$HEPPY_FCC/..:$PYTHONPATH
 
 Examples
 --------
@@ -29,16 +31,3 @@ Read a root file and print each event:
 
 	multiloop.py  Trash   print_events_cfg.py
 
-Read a root file and create a simple tree:
-
-	multiloop.py  Trash2  simple_tree_cfg.py
-
-Todo list
----------
-
-* TODO organize subdirs / review dependencies
-* TODO run pylint
-  * make all modules lower case.
-* TODO add unittests whenever possible
-  * tests in same dir
-  * how to organize global test suite?

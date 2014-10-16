@@ -1,5 +1,5 @@
-from particles.pod import POD
-from particles.p4 import P4
+from heppy_fcc.particles.pod import POD
+from heppy_fcc.particles.p4 import P4
 
 class Jet(POD, P4):
     pass

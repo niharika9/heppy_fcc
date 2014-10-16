@@ -1,13 +1,13 @@
-from framework.analyzer import Analyzer
-from statistics.tree import Tree
-from analyzers.ntuple import *
+from heppy.framework.analyzer import Analyzer
+from heppy.statistics.tree import Tree
+from heppy_fcc.analyzers.ntuple import *
 
 from ROOT import TFile
 
-class JetTreeProducer(Analyzer):
+class FCCJetTreeProducer(Analyzer):
 
     def beginLoop(self):
-        super(JetTreeProducer, self).beginLoop()
+        super(FCCJetTreeProducer, self).beginLoop()
         self.rootfile = TFile('/'.join([self.dirName,
                                         'jet_tree.root']),
                               'recreate')

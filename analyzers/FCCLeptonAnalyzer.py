@@ -1,14 +1,14 @@
-from framework.analyzer import Analyzer
-from particles.physicsobjects import Particle
-from utils.deltar import inConeCollection
-from statistics.average import Average
+from heppy.framework.analyzer import Analyzer
+from heppy.utils.deltar import inConeCollection
+from heppy.statistics.average import Average
+from heppy_fcc.particles.physicsobjects import Particle
 
-class LeptonAnalyzer(Analyzer):
+class FCCLeptonAnalyzer(Analyzer):
 
     def beginLoop(self):
         # call the function of the base class defining self.counters
         # and self.averages
-        super(LeptonAnalyzer, self).beginLoop()
+        super(FCCLeptonAnalyzer, self).beginLoop()
         self.counters.addCounter('leptons')
         self.counters['leptons'].register('all events')
         self.counters['leptons'].register('at least 1 lepton')
