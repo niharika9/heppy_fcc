@@ -14,7 +14,7 @@ Installation
 -
 
 Define the following variable:
-	export HEPPY_FCC=$PWD
+    export HEPPY_FCC=$PWD
 
 Put the following in your python path:
 
@@ -25,9 +25,9 @@ Examples
 
 Several examples are provided in the test/ directory:
 
-	cd test/
+    cd test/
 
 Read a root file and print each event:
 
-	multiloop.py  Trash   print_events_cfg.py
+    multiloop.py  Trash   simple_analysis_cfg.py -N 1000
 
