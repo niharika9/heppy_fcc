@@ -47,19 +47,26 @@ Instead, it was decided to keep the design of typical full frameworks for high-e
    * a common python event, created at the beginning of the processing of each albers EDM event, and read/modified by the analyzers.
 the python event allows you to build the information you want into your event, and allows the analyzers to communicate. At the end of the processing of a given EDM event, the python event can be filled into a flat tree using a specific kind of analyzer, [[https://github.com/HEP-FCC/heppy/blob/master/analyzers/SimpleTreeProducer.py][like this one]]. 
 
-[[https://github.com/HEP-FCC/heppy/tree/master][The official version of the code]] contains the following packages:
+*The code consists of two packages:*
+
+[[https://github.com/HEP-FCC/heppy/tree/master][The core package]] contains the following packages:
    * [[https://github.com/HEP-FCC/heppy/tree/master/framework][framework]] : Core modules: python configuration system, the looper, the python event, etc.
-   * [[https://github.com/HEP-FCC/heppy/tree/master/statistics][statistics]] : modules for counting and averaging, histogramming, tree production.
-   * [[https://github.com/HEP-FCC/heppy/tree/master/utils][utils]] : miscellaneous utilities, like deltaR matching tools.
-   * [[https://github.com/HEP-FCC/heppy/tree/master/particles][particles]] : python physics objects.
+   * [[https://github.com/HEP-FCC/heppy/tree/master/analyzers][analyzers]] : Generic analyzers
+   * [[https://github.com/HEP-FCC/heppy/tree/master/statistics][statistics]] : Modules for counting and averaging, histogramming, tree production.
+   * [[https://github.com/HEP-FCC/heppy/tree/master/utils][utils]] : Miscellaneous utilities, like deltaR matching tools.
+It also contains a [[https://github.com/HEP-FCC/heppy/tree/master/scripts][scripts]] directory.
+
+[[https://github.com/HEP-FCC/heppy_fcc/tree/master][The FCC-specific package]] contains the following packages:
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/analyzers][analyzers]] : FCC-specific analyzers
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/particles][particles]] : python physics objects for the FCC.
 
 The code is documented. To get more information on a given class, use the python docstring functionality, for example:
 <verbatim>
 python
-from framework.looper import Looper
+from heppy.framework.looper import Looper
 help(Looper)
 </verbatim>
-Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/framework/multiloop.py][multiloop.py]] (no need to understand this code :-) ).
+Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/scripts/heppy_loop.py][heppy_loop.py]] (no need to understand this code :-) ).
 
 ---+++ The data / MC plotting system 
 
@@ -87,7 +94,7 @@ To install albers:
 git clone https://github.com/HEP-FCC/albers.git
 cd albers 
 </pre>
-and follow the instructions in the README.md file. 
+and follow the installation instructions in the README.md file (don't run the read and write programs, instructions to do so are in the next paragraph).
 
 Now create the input root file:
 <pre>
@@ -119,28 +126,36 @@ If all the above is working, you're ready for analysis in python and can proceed
 
 ---+++ heppy
 
-Go back to your tutorial directory, =HeppyTutorial=, and install heppy:
+Go back to your tutorial directory, =HeppyTutorial=, and install the core heppy package:
 <pre>
 git clone https://github.com/HEP-FCC/heppy.git
 cd heppy
-source init.sh
 </pre>
+Follow the instructions in the README.md file.
 
-Prepare to read an albers file:
+Go back to your tutorial directory, =HeppyTutorial=, and install the specific heppy_fcc package:
+<pre>
+git clone https://github.com/HEP-FCC/heppy_fcc.git
+cd heppy_fcc
+</pre>
+Follow the installation instructions in the README.md file, but do not try to run yet. 
+
+First, prepare to read an albers file:
 <pre>
 cd test
-ln -s $ALBERS/examples/example.root albers.root
+ln -s $ALBERS/examples/example.root 
 </pre>
+
 
 ---++ Running the ntuplizer
 
 ---+++ Understanding the configuration file
 
-Have a detailed look at the configuration file, [[https://github.com/HEP-FCC/heppy/blob/master/test/print_events_cfg.py][print_events_cfg.py]]. 
+Have a detailed look at the configuration file, [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
 
 Load it in python: 
 <verbatim>
-python -i print_events_cfg.py
+python -i simple_analysis_cfg.py
 </verbatim>
 
 Get info on one of the analyzers:
@@ -159,38 +174,40 @@ help(muana)
 
 ---+++ Finding existing analysis code
 
-Run the multiloop script, with only 1 event:
+Open [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
+The configuration fragments for the analyzers look like: 
 <pre>
-multiloop.py Trash print_events_cfg.py -N 1 -f 
+# lepton analyzer for muons (type 4)
+from heppy_fcc.analyzers.FCCLeptonAnalyzer import FCCLeptonAnalyzer
+muana = cfg.Analyzer(
+    FCCLeptonAnalyzer,
+    'muons',
+    id = 4,   # selected particle id
+    pt = 10., # pt cut
+    eta = 3., # eta cut 
+    coll_name = 'muons' # will create a list of leptons with this name in the event
+    )
 </pre>
-At the beginning of the log, you can see such lines:
-<verbatim>
-loading class <class 'LeptonAnalyzer.LeptonAnalyzer'>
-  from <open file '/Users/cbernet/Code/FCC/heppy/analyzers/LeptonAnalyzer.py', mode 'U' at 0x108e13810>
-found class <class 'LeptonAnalyzer.LeptonAnalyzer'>
-loading class <class 'JetAnalyzer.JetAnalyzer'>
-  from <open file '/Users/cbernet/Code/FCC/heppy/analyzers/JetAnalyzer.py', mode 'U' at 0x108e13810>
-loading class <class 'JetTreeProducer.JetTreeProducer'>
-  from <open file '/Users/cbernet/Code/FCC/heppy/analyzers/JetTreeProducer.py', mode 'U' at 0x108e13810>
-</verbatim>
-These python classes are found and loaded automatically, based on the class names defined for each analyzer in the config file. 
+The first argument is a class object coming from [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]]. The framework will use this class object to create an instance of this class. 
 
-Have a look at the [[https://github.com/HEP-FCC/heppy/blob/master/analyzers/LeptonAnalyzer.py][LeptonAnalyzer.py]] module, and study the code. Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
+The second argument, ='muons'=, is an instance label. This argument is optional, and is used in case several analyzers of the same class are requested. 
+
+Have a look at the [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]] module, and study the code. Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
 
 
 ---+++ Running interactively on one component
 
 Run:  
 <pre>
-multiloop.py Trash print_events_cfg.py -N 1000
+heppy_loop.py Out simple_analysis_cfg.py -N 1000
 </pre>
 
 You should see a healhy printout with at the end:  
 <pre>
-number of events processed: 100
+number of events processed: 1000
 </pre>
 
-In the ouput =Trash= directory, you can find a component directory, =albers_example=.
+In the ouput =Out= directory, you can find a component directory, =albers_example=.
 Investigate the contents of this component directory, and of all directories within.
 Have a look at the text files, but ignore the =.pck= files
 
@@ -199,7 +216,7 @@ Fire up root (here we choose to use ipython + pyroot), and check the main output
 <verbatim>
 ipython 
 from ROOT import TFile 
-f = TFile('Trash/albers_example/JetTreeProducer/jet_tree.root')
+f = TFile('Out/albers_example/FCCJetTreeProducer/jet_tree.root')
 f.ls()
 t = f.Get('tree')
 t.Print()
@@ -210,14 +227,14 @@ t.Draw('lep1_iso')
 
 Copy your input file: 
 <pre>
-cp albers.root albers_2.root
+cp example.root example_2.root
 </pre>
 
-Edit [[https://github.com/HEP-FCC/heppy/blob/master/test/print_events_cfg.py][print_events_cfg.py]]
+Edit [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]
 and add the following lines, after the creation of the inputSample component object, 
 and before the creation of the config object.  
 <pre>
-inputSample.files.append('albers_2.root') # adding a file to the component
+inputSample.files.append('example_2.root')
 inputSample.splitFactor = 2  # splitting the component in 2 chunks
 </pre>
 
@@ -226,7 +243,7 @@ and print the =config= object.
 
 Run again: 
 <verbatim>
-multiloop.py Multi print_events_cfg.py -N 1000
+heppy_loop.py Multi simple_analysis_cfg.py -N 1000
 </verbatim>
 
 In the =Multi= output directory, you have chunks. 
@@ -242,7 +259,7 @@ The first command checks that all chunks terminated correctly.
 The second command adds the root files (with hadd), the cut-flow counters, and the averages. 
 For example, you can see that this cut flow counter has been added correctly:
 <verbatim>
-cat albers_example/LeptonAnalyzer_1/leptons.txt 
+cat albers_example/FCCLeptonAnalyzer_1/leptons.txt 
 </verbatim>
 
 %T% To do multiprocessing, you can also define several components corresponding to the samples you need to process. Each of these components can have its own split factor. 
@@ -251,56 +268,8 @@ cat albers_example/LeptonAnalyzer_1/leptons.txt
 
 %T% When debugging your code, make sure to have only one thread. 
 
----+++ Running on all components on LSF, using pybatch.py
+---+++ Running on all components on LSF. 
 
-=pybatch.py= is a script similar to multiloop, that you get from =CMGTools/Production=. 
-Just run it in help mode to make sure you have it, and to see how to use it:
-<verbatim>
-pybatch.py -h
-</verbatim>
-
-Now, edit  [[https://github.com/CERN-PH-CMG/cmg-cmssw/tree/HEAD/CMGTools/ZJetsTutorial/cfg/diMu_2012_cfg.py?view=markup][diMu_2012_cfg.py]] and set:
-<verbatim>
-test = 0
-</verbatim>
-
-Load the cfg in python again, and check the full list of samples on which you're going to run. 
-you're going to run more than 600 jobs on LSF. After all, we're analyzing 10 fb-1 of 2012 data, together with massive MC samples... we're talking about more than a 100 million events. 
-To check the exact number of events, do:
-<verbatim>
-python -i diMu_2012_cfg.py
-entries = [x.dataset_entries for x in allsamples]
-sum(entries)/1e6
-</verbatim>
-I'm getting 131 milion events. 
-
-Fear not, and start the jobs: 
-<verbatim>
-pybatch.py -o BigProd diMu_2012_cfg.py  -b 'bsub -q 8nh -J BigProd < batchScript.sh'
-</verbatim>
-
-Check your jobs using =bjobs= and =bpeek= as usual. 
-If you manage to get several hundred jobs running at the same time on LSF, which is often the case, it should take between 1 and 3 hours to complete the production. 
-
-Sometimes, your jobs will get stuck with:
-<verbatim>
-121114 19:01:14 14234 Xrd: XrdClientMessage::ReadRaw: Failed to read header (8 bytes).
-121114 19:01:14 14234 Xrd: XrdClientMessage::ReadRaw: Failed to read header (8 bytes).
-121114 19:01:14 14234 Xrd: XrdClientMessage::ReadRaw: Failed to read header (8 bytes).
-</verbatim>
-That's an eos issue, and not a real problem as eos always recovers at some point.  
-It is going to delay the job a little bit but it will eventually complete. 
-
-When all jobs are done, check with =chunkOutCheck.py=. 
-If some of them are missing, resubmit them. Just go to the corresponding chunk directory, 
-and send =batchScript.sh= to LSF in the usual way:
-<verbatim>
-bsub -q 8nh -J Resub < batchScript.sh
-</verbatim>
-
-When all jobs are ok, add them with =haddChunks.py=, and redo the mass plot. 
-
-%T% If you need it, the output of my own big production is here: =/eos/cms/store/cmst3/user/cbern/BigProd.tgz=
-
+To be written. 
 
 -- Main.ColinBernet - 08 Oct 2014
