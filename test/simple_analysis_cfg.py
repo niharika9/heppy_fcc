@@ -1,5 +1,7 @@
 import os
 import heppy.framework.config as cfg
+from heppy.framework.eventsalbers import Events
+
 from ROOT import gSystem
 
 # input component 
@@ -15,8 +17,10 @@ selectedComponents  = [inputSample]
 # analyzers
 
 # lepton analyzer for muons (type 4)
+from heppy_fcc.analyzers.FCCLeptonAnalyzer import FCCLeptonAnalyzer
 muana = cfg.Analyzer(
-    'FCCLeptonAnalyzer_1',
+    FCCLeptonAnalyzer,
+    'muons',
     id = 4,   # selected particle id
     pt = 10., # pt cut
     eta = 3., # eta cut 
@@ -25,7 +29,8 @@ muana = cfg.Analyzer(
 
 # lepton analyzer for electrons
 eleana = cfg.Analyzer(
-    'FCCLeptonAnalyzer_2',
+    FCCLeptonAnalyzer,
+    'electrons',
     id = 5,
     pt = 10.,
     eta = 3.,
@@ -33,14 +38,16 @@ eleana = cfg.Analyzer(
     )
 
 # jet analyzer
+from heppy_fcc.analyzers.FCCJetAnalyzer import FCCJetAnalyzer
 jetana = cfg.Analyzer(
-    'FCCJetAnalyzer',
+    FCCJetAnalyzer,
     verbose = False
     )
 
 # analyzer for tree production
+from heppy_fcc.analyzers.FCCJetTreeProducer import FCCJetTreeProducer
 treeprod = cfg.Analyzer(
-    'FCCJetTreeProducer',
+    FCCJetTreeProducer,
     tree_name = 'tree',
     tree_title = 'a title'
     )
@@ -59,4 +66,5 @@ sequence = cfg.Sequence( [
 
 # finalization of the configuration object. 
 config = cfg.Config( components = selectedComponents,
-                     sequence = sequence )
+                     sequence = sequence,
+                     events_class = Events )

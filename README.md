@@ -29,5 +29,5 @@ Several examples are provided in the test/ directory:
 
 Read a root file and print each event:
 
-    multiloop.py  Trash   simple_analysis_cfg.py -N 1000
+    heppy_loop.py  Trash   simple_analysis_cfg.py -N 1000
 
