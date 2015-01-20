@@ -1,17 +1,8 @@
 from heppy.framework.analyzer import Analyzer
 from heppy.utils.deltar import inConeCollection
 from heppy.statistics.average import Average
-from heppy_fcc.particles.physicsobjects import Particle as CCParticle
+from heppy_fcc.particles.physicsobjects import Particle 
 
-class Particle(object):
-    def __init__(self, obj):
-        self.obj = obj
-    def eta(self):
-        return self.obj.read().Core.P4.Eta
-    def phi(self):
-        return self.obj.read().Core.P4.Phi
-    def __getattr__(self, name):
-        return getattr(self.obj, name)
 
 class FCCLeptonAnalyzer(Analyzer):
 

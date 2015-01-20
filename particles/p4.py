@@ -1,5 +1,8 @@
 class P4(object):
-
+    '''
+    Directly exposes P4 functions for a Handle pointing to a POD
+    with a Core.P4 POD inside. 
+    '''
     def pt(self):
         return self.read().Core.P4.Pt
     def eta(self):

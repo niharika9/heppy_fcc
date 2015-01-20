@@ -1,11 +1,16 @@
 import copy
 
-class POD(object):
-    '''Extends the cmg::PhysicsObject functionalities.'''
+class Handle(object):
+    '''Extends the Handle functionalities.
+
+    This class wraps a C++ Handle.
+    The user can call all functions of the C++ Handle,
+    and can also attach new attributes to objects from this class.
+    '''
 
     def __init__(self, handle):
         self.handle = handle
-        super(POD, self).__init__()
+        super(Handle, self).__init__()
 
     def __copy__(self):
         '''Very dirty trick, the handle is deepcopied...'''
@@ -21,9 +26,9 @@ class POD(object):
 
     def __eq__(self,other):
         if( hasattr(other, 'handle') ):
-            # the two python PODs have the same C++ POD
+            # the two python Handles have the same C++ Handle
             return self.handle == other.handle
         else:
-            # can compare a python POD with a cpp POD directly
+            # can compare a python Handle with a cpp Handle directly
             return self.handle == other 
 

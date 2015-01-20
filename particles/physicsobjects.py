@@ -1,10 +1,10 @@
-from heppy_fcc.particles.pod import POD
+from heppy_fcc.particles.handle import Handle
 from heppy_fcc.particles.p4 import P4
 
-class Jet(POD, P4):
+class Jet(Handle, P4):
     pass
 
-class Particle(POD, P4):
+class Particle(Handle, P4):
     def __str__(self):
         tmp = '{className} : id = {id:3} pt = {pt:5.1f}, eta = {eta:5.2f}, phi = {phi:5.2f}, mass = {mass:5.2f}'
         return tmp.format(
