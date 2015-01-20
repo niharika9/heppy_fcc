@@ -1,14 +1,24 @@
 from heppy.framework.analyzer import Analyzer
 from heppy.utils.deltar import inConeCollection
 from heppy.statistics.average import Average
-from heppy_fcc.particles.physicsobjects import Particle
+from heppy_fcc.particles.physicsobjects import Particle as CCParticle
+
+class Particle(object):
+    def __init__(self, obj):
+        self.obj = obj
+    def eta(self):
+        return self.obj.P4.Eta
+    def phi(self):
+        return self.obj.P4.Phi
+    def __getattr__(self, name):
+        return getattr(self.obj, name)
 
 class FCCLeptonAnalyzer(Analyzer):
 
-    def beginLoop(self):
+    def beginLoop(self, setup):
         # call the function of the base class defining self.counters
         # and self.averages
-        super(FCCLeptonAnalyzer, self).beginLoop()
+        super(FCCLeptonAnalyzer, self).beginLoop(setup)
         self.counters.addCounter('leptons')
         self.counters['leptons'].register('all events')
         self.counters['leptons'].register('at least 1 lepton')
@@ -20,17 +30,17 @@ class FCCLeptonAnalyzer(Analyzer):
         self.counters['leptons'].inc('all events')
         # just a shortcut
         store = event.input
-        # access particles, filter out particles with ID as specified in the config file,
+        # access particles, filter out particles with Type as specified in the config file,
         # and store in the event
-        particles = map(Particle, store.get("GenParticle"))
-        leptons = [ptc for ptc in particles if abs(ptc.ID()) == self.cfg_ana.id ]
+        particles = [ Particle(ptc.read().Core) for ptc in store.get("GenParticle")]
+        leptons = [ptc for ptc in particles if abs(ptc.Type) == self.cfg_ana.id ]
         # kinematic selection and ID
         leptons = [lep for lep in leptons if self.kine_sel(lep) and self.id_sel(lep)]
 
         # isolation
         for lepton in leptons:
             lepton.incone = inConeCollection(lepton, particles, deltaRMax=1.)
-            lepton.iso = sum( ptc.pt() for ptc in lepton.incone)
+            lepton.iso = sum( ptc.P4.Pt for ptc in lepton.incone)
             self.averages['lepton_iso'].add(lepton.iso)
             
         if(len(leptons)>0):
@@ -47,7 +57,7 @@ class FCCLeptonAnalyzer(Analyzer):
         event.leptons.extend(leptons) 
         
     def kine_sel(self, particle):
-        p4 = particle.P4()
+        p4 = particle.P4
         if( p4.Pt > self.cfg_ana.pt and \
             abs(p4.Eta) < self.cfg_ana.eta ):
             return True
@@ -55,9 +65,9 @@ class FCCLeptonAnalyzer(Analyzer):
             return False
 
     def id_sel(self, lepton):
-        if lepton.ID() == 4:
+        if lepton.Type == 4:
             return self.electron_id_sel(lepton)
-        elif lepton.ID() == 5:
+        elif lepton.Type == 5:
             return self.muon_id_sel(muon)
 
     # the following is temporary:

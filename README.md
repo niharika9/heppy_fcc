@@ -4,21 +4,21 @@ Heppy-fcc : heppy adapter package for the FCC experiments
 Prerequisites
 -------------
 
+Install the following packages: 
+
 heppy : https://github.com/HEP-FCC/heppy
 
-albers : https://github.com/HEP-FCC/albers
+fcc-edm : https://github.com/HEP-FCC/fcc-edm
 
-use albers to produce the example.root file and put it in the test/ directory
 
 Installation
--
+------------
 
-Define the following variable:
-    export HEPPY_FCC=$PWD
+Every time you want to use the package set up your environment by sourcing
+the following script:
 
-Put the following in your python path:
+    source init_macos.sh
 
-    export PYTHONPATH=$HEPPY_FCC/..:$PYTHONPATH
 
 Examples
 --------
@@ -29,5 +29,5 @@ Several examples are provided in the test/ directory:
 
 Read a root file and print each event:
 
-    multiloop.py  Trash   simple_analysis_cfg.py -N 1000
+    heppy_loop.py  Trash  simple_analysis_cfg.py -N 1000
 
