@@ -15,10 +15,11 @@ def bookParticle( tree, pName ):
     var(tree, '{pName}_mass'.format(pName=pName))
 
 def fillParticle( tree, pName, particle ):
-    fill(tree, '{pName}_pt'.format(pName=pName), particle.P4().Pt )
-    fill(tree, '{pName}_eta'.format(pName=pName), particle.P4().Eta )
-    fill(tree, '{pName}_phi'.format(pName=pName), particle.P4().Phi )
-    fill(tree, '{pName}_mass'.format(pName=pName), particle.P4().Mass )
+    core = particle.read().Core
+    fill(tree, '{pName}_pt'.format(pName=pName), core.P4.Pt )
+    fill(tree, '{pName}_eta'.format(pName=pName), core.P4.Eta )
+    fill(tree, '{pName}_phi'.format(pName=pName), core.P4.Phi )
+    fill(tree, '{pName}_mass'.format(pName=pName), core.P4.Mass )
     
 # jet
 

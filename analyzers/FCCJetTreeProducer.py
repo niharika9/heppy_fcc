@@ -6,8 +6,8 @@ from ROOT import TFile
 
 class FCCJetTreeProducer(Analyzer):
 
-    def beginLoop(self):
-        super(FCCJetTreeProducer, self).beginLoop()
+    def beginLoop(self, setup):
+        super(FCCJetTreeProducer, self).beginLoop(setup)
         self.rootfile = TFile('/'.join([self.dirName,
                                         'jet_tree.root']),
                               'recreate')

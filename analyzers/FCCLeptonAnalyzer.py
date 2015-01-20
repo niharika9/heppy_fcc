@@ -7,9 +7,9 @@ class Particle(object):
     def __init__(self, obj):
         self.obj = obj
     def eta(self):
-        return self.obj.P4.Eta
+        return self.obj.read().Core.P4.Eta
     def phi(self):
-        return self.obj.P4.Phi
+        return self.obj.read().Core.P4.Phi
     def __getattr__(self, name):
         return getattr(self.obj, name)
 
@@ -23,7 +23,7 @@ class FCCLeptonAnalyzer(Analyzer):
         self.counters['leptons'].register('all events')
         self.counters['leptons'].register('at least 1 lepton')
         self.counters['leptons'].register('lepton iso < 0.1')
-        self.averages.add('lepton_iso', Average('lepton isolation'))
+        self.averages.add('lepton_iso', Average('lepton_isolation'))
         
     def process(self, event):
 
@@ -32,15 +32,16 @@ class FCCLeptonAnalyzer(Analyzer):
         store = event.input
         # access particles, filter out particles with Type as specified in the config file,
         # and store in the event
-        particles = [ Particle(ptc.read().Core) for ptc in store.get("GenParticle")]
-        leptons = [ptc for ptc in particles if abs(ptc.Type) == self.cfg_ana.id ]
+        particles = map(Particle, store.get("GenParticle"))
+        leptons = [ptc for ptc in particles
+                   if abs(ptc.read().Core.Type) == self.cfg_ana.id ]
         # kinematic selection and ID
         leptons = [lep for lep in leptons if self.kine_sel(lep) and self.id_sel(lep)]
 
         # isolation
         for lepton in leptons:
             lepton.incone = inConeCollection(lepton, particles, deltaRMax=1.)
-            lepton.iso = sum( ptc.P4.Pt for ptc in lepton.incone)
+            lepton.iso = sum( ptc.read().Core.P4.Pt for ptc in lepton.incone)
             self.averages['lepton_iso'].add(lepton.iso)
             
         if(len(leptons)>0):
@@ -57,7 +58,7 @@ class FCCLeptonAnalyzer(Analyzer):
         event.leptons.extend(leptons) 
         
     def kine_sel(self, particle):
-        p4 = particle.P4
+        p4 = particle.read().Core.P4
         if( p4.Pt > self.cfg_ana.pt and \
             abs(p4.Eta) < self.cfg_ana.eta ):
             return True
@@ -65,9 +66,10 @@ class FCCLeptonAnalyzer(Analyzer):
             return False
 
     def id_sel(self, lepton):
-        if lepton.Type == 4:
+        the_type = lepton.read().Core.Type
+        if the_type == 4:
             return self.electron_id_sel(lepton)
-        elif lepton.Type == 5:
+        elif the_type == 5:
             return self.muon_id_sel(muon)
 
     # the following is temporary:

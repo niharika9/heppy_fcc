@@ -4,7 +4,7 @@ Heppy-fcc : heppy adapter package for the FCC experiments
 Prerequisites
 -------------
 
-Install the following packages: 
+Install the following packages in this order: 
 
 albers-core : https://github.com/HEP-FCC/albers-core
 

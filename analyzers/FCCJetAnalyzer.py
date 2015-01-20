@@ -18,9 +18,9 @@ class FCCJetAnalyzer(Analyzer):
         for jet in event.jets:
             jet.particles = [] # attaching empty list of particles to the jet object
             for assoc in jetparticles:
-                if jet == assoc.Jet():
-                    jet.particles.append( assoc.Particle() )
-                    event.unclustered_particles.remove( assoc.Particle() )
+                if jet == assoc.read().Jet:
+                    jet.particles.append( assoc.read().Particle )
+                    event.unclustered_particles.remove( assoc.read().Particle )
             if (self.cfg_ana.verbose):
                 print 'jet',jet.P4().Pt, jet.P4().Eta
                 for ptc in jet.particles:
@@ -29,7 +29,8 @@ class FCCJetAnalyzer(Analyzer):
             print 'number of unclustered particles:',len(event.unclustered_particles)
         # sorting jets by pt.
         # first create a collection of tuples (jet, jet_pt)
-        indexedjets = zip(event.jets, [jet.P4().Pt for jet in event.jets])
+        indexedjets = zip(event.jets, [jet.read().Core.P4.Pt for
+                                       jet in event.jets])
         # sorting this collection according to the second field in the tuple
         indexedjets.sort(key = lambda x: x[1], reverse=True)
         # unzipping. The two lines below are equivalent,

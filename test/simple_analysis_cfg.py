@@ -54,8 +54,8 @@ treeprod = cfg.Analyzer(
 sequence = cfg.Sequence( [
     muana,
     eleana,
-#    jetana,
-#    treeprod
+    jetana,
+    treeprod
     ] )
 
 # inputSample.files.append('albers_2.root')
