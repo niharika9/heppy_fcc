@@ -212,7 +212,7 @@ Fire up root (here we choose to use ipython + pyroot), and check the main output
 <verbatim>
 ipython 
 from ROOT import TFile 
-f = TFile('Out/albers_example/FCCJetTreeProducer/jet_tree.root')
+f = TFile('Out/albers_example/heppy_fcc.analyzers.FCCJetTreeProducer.FCCJetTreeProducer_1/jet_tree.root')
 f.ls()
 t = f.Get('tree')
 t.Print()
@@ -255,7 +255,7 @@ The first command checks that all chunks terminated correctly.
 The second command adds the root files (with hadd), the cut-flow counters, and the averages. 
 For example, you can see that this cut flow counter has been added correctly:
 <verbatim>
-cat albers_example/FCCLeptonAnalyzer_1/leptons.txt 
+cat albers_example/mu/leptons.txt 
 </verbatim>
 
 %T% To do multiprocessing, you can also define several components corresponding to the samples you need to process. Each of these components can have its own split factor. 
