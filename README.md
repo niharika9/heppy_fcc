@@ -6,10 +6,11 @@ Prerequisites
 
 Install the following packages: 
 
-heppy : https://github.com/HEP-FCC/heppy
+albers-core : https://github.com/HEP-FCC/albers-core
 
 fcc-edm : https://github.com/HEP-FCC/fcc-edm
 
+heppy : https://github.com/HEP-FCC/heppy
 
 Installation
 ------------
@@ -30,4 +31,3 @@ Several examples are provided in the test/ directory:
 Read a root file and print each event:
 
     heppy_loop.py  Trash  simple_analysis_cfg.py -N 1000
-

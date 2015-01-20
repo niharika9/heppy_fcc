@@ -42,7 +42,7 @@ If you decide to run several processes, you can split a single component in as m
 
 The ntuplizer is based on python, pyroot, and the albers event data model (EDM). The analysis could be a simple python macro based on ROOT and albers.
 Instead, it was decided to keep the design of typical full frameworks for high-energy physics (e.g. CMS, ATLAS, FCC), and to implement it in python. This design boils down to:
-   * a python configuration system, similar to the one we use in HEP full frameworks. 
+   * a python configuration system, similar to the one we use in HEP full frameworks like Gaudi. 
    * a Looper which allows to access the albers EDM events and runs a sequence of analyzers on each event. 
    * a common python event, created at the beginning of the processing of each albers EDM event, and read/modified by the analyzers.
 the python event allows you to build the information you want into your event, and allows the analyzers to communicate. At the end of the processing of a given EDM event, the python event can be filled into a flat tree using a specific kind of analyzer, [[https://github.com/HEP-FCC/heppy/blob/master/analyzers/SimpleTreeProducer.py][like this one]]. 
@@ -66,11 +66,7 @@ python
 from heppy.framework.looper import Looper
 help(Looper)
 </verbatim>
-Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/scripts/multiloop.py][multiloop.py]] (no need to understand this code :-) ).
-
----+++ The data / MC plotting system 
-
-To be integrated + doc needed
+Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/scripts/heppy_loop.py][heppy_loop.py]] (no need to understand this code :-) ).
 
 ---++ Installation
 
@@ -147,9 +143,9 @@ ln -s $ALBERS/examples/example.root
 </pre>
 
 
----++ Running the ntuplizer
+---++ Exercises
 
----+++ Understanding the configuration file
+---+++ 1- Understanding the configuration file
 
 Have a detailed look at the configuration file, [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
 
@@ -172,33 +168,34 @@ help(muana)
 
 %T% In the future, when you use this event processing system in your analysis, always make sure that all ingredients (components, analyzers) are defined correctly by loading your configuration in python before even trying to run.
 
----+++ Finding existing analysis code
+---+++ 2- Finding existing analysis code
 
-Run the multiloop script, with only 1 event:
+Open [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
+The configuration fragments for the analyzers look like: 
 <pre>
-multiloop.py Trash simple_analysis_cfg.py -N 1 -f 
+# lepton analyzer for muons (type 4)
+from heppy_fcc.analyzers.FCCLeptonAnalyzer import FCCLeptonAnalyzer
+muana = cfg.Analyzer(
+    FCCLeptonAnalyzer,
+    'muons',
+    id = 4,   # selected particle id
+    pt = 10., # pt cut
+    eta = 3., # eta cut 
+    coll_name = 'muons' # will create a list of leptons with this name in the event
+    )
 </pre>
-At the beginning of the log, you can see such lines:
-<verbatim>
-loading class <class 'FCCLeptonAnalyzer.FCCLeptonAnalyzer'>
-  from <open file '/Users/cbernet/Tmp/HeppyTutorial/heppy_fcc/analyzers/FCCLeptonAnalyzer.py', mode 'U' at 0x108b808a0>
-found class <class 'FCCLeptonAnalyzer.FCCLeptonAnalyzer'>
-loading class <class 'FCCJetAnalyzer.FCCJetAnalyzer'>
-  from <open file '/Users/cbernet/Tmp/HeppyTutorial/heppy_fcc/analyzers/FCCJetAnalyzer.py', mode 'U' at 0x108b808a0>
-loading class <class 'FCCJetTreeProducer.FCCJetTreeProducer'>
-  from <open file '/Users/cbernet/Tmp/HeppyTutorial/heppy_fcc/analyzers/FCCJetTreeProducer.py', mode 'U' at 0x108b808a0>
-<heppy.framework.looper.Looper object at 0x10fd53d50>
-</verbatim>
-These python classes are found and loaded automatically, based on the class names defined for each analyzer in the config file. 
+The first argument is a class object coming from [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]]. The framework will use this class object to create an instance of this class. 
+
+The second argument, ='muons'=, is an instance label. This argument is optional, and is used in case several analyzers of the same class are requested. 
 
 Have a look at the [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]] module, and study the code. Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
 
 
----+++ Running interactively on one component
+---+++ 3- Running interactively on one component
 
 Run:  
 <pre>
-multiloop.py Out simple_analysis_cfg.py -N 1000
+heppy_loop.py Out simple_analysis_cfg.py -N 1000
 </pre>
 
 You should see a healhy printout with at the end:  
@@ -222,7 +219,7 @@ t.Print()
 t.Draw('lep1_iso')
 </verbatim>
 
----+++ Multiprocessing on a single machine
+---+++ 4- Multiprocessing on a single machine
 
 Copy your input file: 
 <pre>
@@ -242,7 +239,7 @@ and print the =config= object.
 
 Run again: 
 <verbatim>
-multiloop.py Multi simple_analysis_cfg.py -N 1000
+heppy_loop.py Multi simple_analysis_cfg.py -N 1000
 </verbatim>
 
 In the =Multi= output directory, you have chunks. 
@@ -263,12 +260,9 @@ cat albers_example/FCCLeptonAnalyzer_1/leptons.txt
 
 %T% To do multiprocessing, you can also define several components corresponding to the samples you need to process. Each of these components can have its own split factor. 
 
-%T% Check the number of processors on your machine, and define the number of threads accordingly. 
+%T% Check the number of processors on your machine (=cat /proc/cpuinfo=), and define the number of threads accordingly. 
 
 %T% When debugging your code, make sure to have only one thread. 
 
----+++ Running on all components on LSF. 
-
-To be written. 
 
 -- Main.ColinBernet - 08 Oct 2014
