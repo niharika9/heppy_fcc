@@ -1,0 +1,2 @@
+export HEPPY_FCC=$PWD
+export PYTHONPATH=$HEPPY_FCC/..:$ALBERS/python:$PYTHONPATH

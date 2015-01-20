@@ -18,7 +18,7 @@ Installation
 Every time you want to use the package set up your environment by sourcing
 the following script:
 
-    source init_macos.sh
+    source init.sh
 
 
 Examples
@@ -30,4 +30,5 @@ Several examples are provided in the test/ directory:
 
 Read a root file and print each event:
 
-    heppy_loop.py  Trash  simple_analysis_cfg.py -N 1000
+    ${FCCEDM}/bin/fccedm-write
+    heppy_loop.py  Output simple_analysis_cfg.py -N 1000
