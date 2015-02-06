@@ -27,16 +27,19 @@ class Cylinder(object):
         
     
 class Material(object):
+    #TODO colors have nothing to do here, put them in the display package
+    #TODO use pastel, bright colors for the detector
+    colors = dict(CMS_ECAL=2, CMS_HCAL=4, void=0) 
     def __init__(self, name, x0, lambdaI):
         self.name = name
         self.x0 = x0
-        self.lambdaI = lambdaI 
+        self.lambdaI = lambdaI
+        self.color = self.__class__.colors[name]
 
         
 material_CMS_ECAL = Material('CMS_ECAL', 8.9e-3, 0.25)
 material_CMS_HCAL = Material('CMS_HCAL', None, 0.17)
 material_void = Material('void', 0., 0.)
-
 
 class DetectorElement(object):
     def __init__(self, name, volume, material, field):
@@ -45,13 +48,11 @@ class DetectorElement(object):
         self.material = material
         self.field = field
 
-    
 class Detector(object):
     def __init__(self):
         self.elements = dict()
         
-        
-        
+                
 class CMS(Detector):
     def __init__(self):
         super(CMS, self).__init__()
