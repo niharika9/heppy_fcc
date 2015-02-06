@@ -12,6 +12,8 @@ class FCCJetAnalyzer(Analyzer):
         event.jets = map(Jet, store.get("GenJet"))
         # looking for associated particles
         jetparticles = store.get("GenJetParticle")
+        if jetparticles == None:
+            jetparticles = []
         particles = map(Particle, store.get("GenParticle"))
         # copying the list of particles (the objects in the list are NOT copied)
         event.unclustered_particles = list(particles) 

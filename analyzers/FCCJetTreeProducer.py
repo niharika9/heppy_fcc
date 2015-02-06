@@ -27,7 +27,7 @@ class FCCJetTreeProducer(Analyzer):
         self.tree.tree.Fill()
         
         
-    def write(self):
+    def write(self, setup):
         self.rootfile.Write()
         self.rootfile.Close()
         

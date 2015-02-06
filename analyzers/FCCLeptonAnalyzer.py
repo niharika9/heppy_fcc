@@ -61,7 +61,7 @@ class FCCLeptonAnalyzer(Analyzer):
         if the_type == 4:
             return self.electron_id_sel(lepton)
         elif the_type == 5:
-            return self.muon_id_sel(muon)
+            return self.muon_id_sel(lepton)
 
     # the following is temporary:
     # all leptons are considered to be identified for now
