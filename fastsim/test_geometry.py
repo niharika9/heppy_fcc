@@ -3,20 +3,19 @@ from geometry import *
 
 class TestCylinder(unittest.TestCase):
     def test_sub(self):
-        cyl1 = Cylinder('cyl1', 1, 2)
-        cyl2 = Cylinder('cyl2', 0.7, 1.5)
-        subcyl = cyl1 - cyl2
-        self.assertEqual(subcyl.name, 'cyl1-cyl2')
-        self.assertEqual(subcyl.irad, 0.7)
-        self.assertEqual(subcyl.orad, 1.)
-        self.assertEqual(subcyl.iz, 1.5)
-        self.assertEqual(subcyl.oz, 2.)
-        # trying to subtract a cylinder with larger R
-        self.assertRaises(ValueError, cyl1.__sub__, Cylinder('cyl3', 1.1, 2.))
-        # trying to subtract a cylinder with larger z
-        self.assertRaises(ValueError, cyl1.__sub__, Cylinder('cyl3', 0.9, 2.1))
-        # trying to subtract a cylinder with non-zero inner dimensions
-        self.assertRaises(ValueError, cyl1.__sub__, Cylinder('cyl3', 0.9, 2.1, 1., 1.))
+        cyl1 = SurfaceCylinder('cyl1', 1, 2)
+        cyl2 = SurfaceCylinder('cyl2', 0.7, 1.5)
+        subcyl = VolumeCylinder( 'subcyl', cyl1, cyl2 ) 
+        self.assertEqual(subcyl.inner.rad, 0.7)
+        self.assertEqual(subcyl.outer.rad, 1.)
+        self.assertEqual(subcyl.inner.z, 1.5)
+        self.assertEqual(subcyl.outer.z, 2.)
+        # inner cylinder larger than the outer one 
+        self.assertRaises(ValueError,
+                          VolumeCylinder, 'test', cyl2, cyl1 )
+        # forgot name 
+        self.assertRaises(ValueError,
+                          VolumeCylinder, cyl2, cyl1 )
 
 
 class TestCMS(unittest.TestCase):

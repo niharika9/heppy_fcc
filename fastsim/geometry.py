@@ -1,40 +1,34 @@
 import copy
 
+#TODO propagator (separate module)
 
-class Cylinder(object):
+class SurfaceCylinder(object):
+    def __init__(self, name, rad, z):
+        self.name = name
+        self.rad = rad
+        self.z = z
+   
+class VolumeCylinder(object):
     '''Implement sub even for pipes, and consistency test: all space must be filled.'''
     
-    def __init__(self, name, orad, oz, irad=0., iz=0.):
+    def __init__(self, name, outer, inner=None):
+        if not isinstance(name, basestring):
+            raise ValueError('first parameter must be a string')
         self.name = name
-        self.irad = irad
-        self.orad = orad
-        self.iz = iz
-        self.oz = oz
-
-    def __sub__(self, other):
-        if other.irad > 1e-9 or other.iz > 1e-9:
-            raise ValueError('inner radius and z of subtracted cylinder must be 0.')
-        if other.orad > self.orad:
-            raise ValueError('outer radius of subtracted cylinder must be smaller')
-        if other.oz > self.oz :
-            raise ValueError('outer z of subtracted cylinder must be smaller')
-        orad = self.orad
-        oz = self.oz
-        irad = other.orad
-        iz = other.oz
-        return Cylinder('-'.join([self.name, other.name]),
-                        orad, oz, irad, iz)
-        
+        self.outer = outer
+        self.inner = inner
+        if inner is not None: 
+            if inner.rad > outer.rad:
+                raise ValueError('outer radius of subtracted cylinder must be smaller')
+            if inner.z > outer.z :
+                raise ValueError('outer z of subtracted cylinder must be smaller')
+ 
     
 class Material(object):
-    #TODO colors have nothing to do here, put them in the display package
-    #TODO use pastel, bright colors for the detector
-    colors = dict(CMS_ECAL=2, CMS_HCAL=4, void=0) 
     def __init__(self, name, x0, lambdaI):
         self.name = name
         self.x0 = x0
         self.lambdaI = lambdaI
-        self.color = self.__class__.colors[name]
 
         
 material_CMS_ECAL = Material('CMS_ECAL', 8.9e-3, 0.25)
@@ -56,11 +50,12 @@ class Detector(object):
 class CMS(Detector):
     def __init__(self):
         super(CMS, self).__init__()
-        tracker = Cylinder('tracker', 1.3, 2.)
-        oecal = Cylinder('oecal', 1.8, 2.4)
-        ohcal = Cylinder('ohcal', 2.9, 3.5)
-        ecal = oecal - tracker
-        hcal = ohcal - oecal
+        otracker = SurfaceCylinder('tracker', 1.3, 2.)
+        oecal = SurfaceCylinder('oecal', 1.8, 2.4)
+        ohcal = SurfaceCylinder('ohcal', 2.9, 3.5)
+        tracker = VolumeCylinder('tracker', otracker )
+        ecal = VolumeCylinder( 'ecal', oecal, tracker.outer )
+        hcal = VolumeCylinder( 'hcal', ohcal, ecal.outer )
         field = 3.8
         self.elements['tracker'] = DetectorElement('tracker', tracker, material_void, field)
         self.elements['ecal'] = DetectorElement('ecal', ecal, material_CMS_ECAL, field)
