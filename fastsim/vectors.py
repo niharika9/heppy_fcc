@@ -1,4 +1,5 @@
 
-from ROOT import TVector3
+from ROOT import TVector3, TLorentzVector
 
-Point = TVector3
+LorentzVector = TLorentzVector
+Point = TVector3 

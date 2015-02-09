@@ -1,17 +1,22 @@
 from vectors import Point
+from math import sqrt, sin
 
 class StraightLinePropagator(object):        
     
     def propagate(self, particle, cylinder):
-        point = Point(1,1,1)
         udir = particle.p4.Vect().Unit()
+        theta = udir.Theta()
         origin = particle.vertex
         if udir.Z():
-            length = (cylinder.oz - origin.Z())/udir.Z()
+            destz = cylinder.z if udir.Z() > 0. else -cylinder.z
+            length = (destz - origin.Z())/udir.Z()
+            assert(length>=0)
             destination = origin + udir * length
-            print length
-            print destination.X(), destination.Y(), destination.Z()
-        particle.points[cylinder.name] = point
+            rdest = destination.Perp()
+            if rdest > cylinder.rad:
+                length -= (rdest-cylinder.rad) / sin(theta)
+                destination = origin + udir * length
+        particle.points[cylinder.name] = destination
 
 straight_line = StraightLinePropagator()
 
