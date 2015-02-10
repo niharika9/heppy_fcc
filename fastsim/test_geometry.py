@@ -21,7 +21,8 @@ class TestCylinder(unittest.TestCase):
 class TestCMS(unittest.TestCase):
     def test_geom(self):
         cms = CMS()
-        print cms.elements
-
+        for cyl in cms.cylinders():
+            print cyl.rad
+        
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,5 @@
-from ROOT import TCanvas
+from ROOT import TCanvas, TH1, TH2F
+import operator
 
 class Display(object):
     
