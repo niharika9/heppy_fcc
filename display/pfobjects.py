@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     slprop = StraightLinePropagator()
     
-    for ptc in particles(1, 0., 0., 0., math.pi, 10, 50):
+    for ptc in particles(20, 0., 0., 0., math.pi, 10, 50):
         print ptc
         slprop.propagate([ptc], cms.cylinders() )
         gtraj = GTrajectory(ptc)
