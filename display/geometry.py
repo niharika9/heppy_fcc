@@ -54,10 +54,10 @@ class GDetectorElement(object):
                     shape.SetFillStyle(1001)
 
     def draw(self, projection):
-        if projection == 'rhophi':
+        if projection == 'xy':
             for circle in self.circles:
                 circle.Draw('same')
-        elif projection == 'rhoz':
+        elif projection in ['xz', 'yz']:
             for box in self.boxes:
                 box.Draw('samel')
         else:

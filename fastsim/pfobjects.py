@@ -1,6 +1,7 @@
 from vectors import Point
 from collections import OrderedDict
 
+
 class Cluster(object):
     def __init(self, energy, position, layer):
         self.energy = energy
@@ -19,7 +20,11 @@ class Particle(Trajectory):
         self.p4 = p4
         self.vertex = vertex
         self.charge = charge
+        self.helix = None
         super(Particle, self).__init__(p4.Vect(), vertex)
+
+    def set_helix(self, helix):
+        self.helix = helix
         
     def __str__(self):
         return '{classname}: {charge} {mass:5.2f} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(
@@ -33,3 +38,4 @@ class Particle(Trajectory):
         
 class Track(Trajectory):
     pass
+    

@@ -4,13 +4,14 @@ import math
 
 from pfobjects import Particle
 
-def particles(nptcs, charge, mass, thetamin, thetamax, emin, emax ):
+def particles(nptcs, charge, mass, thetamin, thetamax, emin, emax, vertex=None ):
     ngenerated = 0
     while ngenerated<nptcs: 
         theta = random.uniform(thetamin, thetamax)
         phi = random.uniform(-math.pi, math.pi)
         energy = random.uniform(emin, emax)
-        vertex = Point(0, 0, 0)
+        if vertex is None:
+            vertex = Point(0, 0, 0)
         momentum = math.sqrt(energy**2 - mass**2)
         costheta = math.cos(theta)
         sintheta = math.sin(theta)
