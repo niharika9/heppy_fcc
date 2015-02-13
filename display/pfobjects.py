@@ -51,19 +51,24 @@ class GHelixTrajectory(GTrajectory):
                              helix.center_xy.Y(),
                              helix.rho, helix.phi_min, helix.phi_max)
         self.helix_xy.SetFillStyle(0)
-        max_time = 2e-8
-        npoints = 50
+        #TODO this is patchy,need to access the last point, whatever its name
+        max_time = description.helix.time_at_z(description.points['hcal_out'].Z())
+        npoints = 100
+        
+        self.graphline_xy = TGraph(npoints)
         self.graphline_yz = TGraph(npoints)
         self.graphline_xz = TGraph(npoints)
         for i, time in enumerate(np.linspace(0, max_time, npoints)):
             point = helix.point_at_time(time)
+            self.graphline_xy.SetPoint(i, point.X(), point.Y())
             self.graphline_yz.SetPoint(i, point.Z(), point.Y())
             self.graphline_xz.SetPoint(i, point.Z(), point.X())
         super(GHelixTrajectory, self).__init__(description)
         
     def draw(self, projection):
         if projection == 'xy':
-            self.helix_xy.Draw("onlysame")
+            # self.helix_xy.Draw("onlysame")
+            self.graphline_xy.Draw("lsame")
         elif projection == 'yz':
             self.graphline_yz.Draw("lsame")
         elif projection == 'xz':
@@ -90,11 +95,12 @@ if __name__ == '__main__':
     # display.views['yz'].zoom(-1,1,-1,1)
     # display.views['xz'].zoom(-1,1,-1,1)
 
-    colors = [1, 2, 3, 4, 8]
+    colors = range(10) 
     
     slprop = StraightLinePropagator()
     helixprop = HelixPropagator()
-    for i, ptc in enumerate( particles(5, 1, 0.3, math.pi/4., math.pi/4., 0.5, 1, Point(0,0,0))):
+    for i, ptc in enumerate( particles(10, -1, 0.5, math.pi/5., 4*math.pi/5.,
+                                       1., 10., Point(0,0,0))):
         # print ptc
         # ptc.p4.SetPhi(0.)
         is_neutral = abs(ptc.charge)<0.5
@@ -105,7 +111,8 @@ if __name__ == '__main__':
             TrajClass = GHelixTrajectory
         prop.propagate([ptc], cms.cylinders() )
         gtraj = TrajClass(ptc)
-        gtraj.set_color( colors[i] )
+        gtraj.set_color( colors[i]+1 )
+            
         display.register(gtraj,1)
             
 

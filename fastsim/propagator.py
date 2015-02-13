@@ -1,7 +1,10 @@
 from vectors import Point
 import math
+import copy
 from ROOT import TVector2, TVector3
 from scipy import constants
+from geotools import circle_intersection
+from heppy.utils.deltar import deltaPhi
 
 class Helix(object):
     def __init__(self, field, charge, p4, origin):
@@ -11,7 +14,7 @@ class Helix(object):
         self.origin = origin
         self.rho = p4.Perp() / (abs(charge)*field) * 1e9/constants.c
         self.v_over_omega = p4.Vect()
-        self.v_over_omega *= 1./(abs(charge)*field)*1e9/constants.c
+        self.v_over_omega *= 1./(charge*field)*1e9/constants.c
         self.omega = charge*field*constants.c**2 / (p4.M()*p4.Gamma()*1e9)
         # self.omega = charge*field*constants.c / (p4.M()*p4.Gamma())
         momperp_xy = TVector3(-p4.Y(), p4.X(), 0.).Unit()
@@ -27,18 +30,44 @@ class Helix(object):
         self.phi_min = self.phi0 * 180 / math.pi
         self.phi_max = self.phi_min + 360.
 
-    def point_at_time(self, time):
-        z = constants.c * self.udir.Z() * time + self.origin.Z()
-        x = self.origin.X() + self.v_over_omega.Y() * (1-math.cos(self.omega*time)) \
-            + self.v_over_omega.X() * math.sin(self.omega*time)
-        y = self.origin.Y() - self.v_over_omega.X() * (1-math.cos(self.omega*time)) \
-            + self.v_over_omega.Y() * math.sin(self.omega*time)
-        # if time == 1e-8:
-        #    import pdb; pdb.set_trace()
-        return TVector3(x, y, z)
+    def vz(self):
+        return self.p4.Beta() * constants.c * self.udir.Z()
 
+    def vperp(self):
+        return self.p4.Beta() * constants.c * self.udir.Perp()
+
+    def polar_at_time(self, time):
+        z = self.vz() * time + self.origin.Z()
+        rho = self.rho
+        phi = - self.omega * time + self.phi0
+        return rho, z, phi
+
+    def time_at_phi(self, phi):
+        time = deltaPhi(self.phi0, phi) / self.omega
+        return time
+
+    def phi(self, x, y):
+        xy = TVector3(x,y,0)
+        xy -= self.center_xy
+        return xy.Phi()
+        
+    def point_from_polar(self, polar):
+        rho,z,phi = polar
+        xy = self.center_xy + self.rho * TVector3(math.cos(phi), math.sin(phi), 0)
+        return TVector3(xy.X(), xy.Y(), z)
+        
+    def point_at_time(self, time):
+        z = self.vz() * time + self.origin.Z()
+        x = self.origin.X() + \
+            self.v_over_omega.Y() * (1-math.cos(self.omega*time)) \
+            + self.v_over_omega.X() * math.sin(self.omega*time)
+        y = self.origin.Y() - \
+            self.v_over_omega.X() * (1-math.cos(self.omega*time)) \
+            + self.v_over_omega.Y() * math.sin(self.omega*time)
+        return TVector3(x, y, z)
+    
     def time_at_z(self, z):
-        dest_time = (z - self.origin.Z())/(self.udir.Z()*constants.c)
+        dest_time = (z - self.origin.Z())/self.vz()
         return dest_time
         
 class Info(object):
@@ -94,6 +123,24 @@ class HelixPropagator(Propagator):
         particle.set_helix(helix)
         is_looper = helix.extreme_point_xy.Mag() < cylinder.rad
         is_positive = particle.p4.Z() > 0.
+        if not is_looper:
+            xm, ym, xp, yp = circle_intersection(helix.center_xy.X(),
+                                                 helix.center_xy.Y(),
+                                                 helix.rho,
+                                                 cylinder.rad)
+            # particle.points[cylinder.name+'_m'] = Point(xm,ym,0)
+            # particle.points[cylinder.name+'_p'] = Point(xp,yp,0)
+            phi_m = helix.phi(xm, ym)
+            phi_p = helix.phi(xp, yp)
+            dest_time = helix.time_at_phi(phi_p)
+            destination = helix.point_at_time(dest_time)
+            if destination.Z()*helix.udir.Z()<0.:
+                dest_time = helix.time_at_phi(phi_m)
+                destination = helix.point_at_time(dest_time)
+            if abs(destination.Z())<cylinder.z:
+                particle.points[cylinder.name] = destination
+            else:
+                is_looper = True
         if is_looper:
             # extrapolating to endcap
             destz = cylinder.z if helix.udir.Z() > 0. else -cylinder.z
@@ -101,6 +148,8 @@ class HelixPropagator(Propagator):
             destination = helix.point_at_time(dest_time)
             # destz = cylinder.z if positive else -cylinder.z
             particle.points[cylinder.name] = destination
+
+            
         info = Info()
         info.is_positive = is_positive
         info.is_looper = is_looper

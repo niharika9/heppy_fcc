@@ -1,6 +1,7 @@
 import math
 
 def circle_intersection(x1, y1, r1, r2):
+    '''Intersections between a circle 1 and a circle 2 centred at origin.'''
     A = (r2**2 - r1**2 + x1**2 + y1**2) / (2*x1)
     B = y1/x1
     a = 1 + B**2
@@ -41,3 +42,4 @@ if __name__ == '__main__':
     mp = TMarker(results[2], results[3], 21)
     mm.Draw('same')
     mp.Draw('same')
+    can.Update()
