@@ -14,11 +14,9 @@ def circle_intersection(x1, y1, r1, r2):
     ym = ( -b - math.sqrt(delta) ) / (2*a)
     xp = math.sqrt(r2**2 - yp**2)
     if abs((xp-x1)**2 + (yp-y1)**2 - r1**2) > 1e-9:
-        print 'switch p'
         xp = -xp
     xm = math.sqrt(r2**2 - ym**2)
     if abs((xm-x1)**2 + (ym-y1)**2 - r1**2) > 1e-9:
-        print 'switch m'
         xm = -xm
     return xm, ym, xp, yp
     
@@ -30,7 +28,7 @@ if __name__ == '__main__':
     can = TCanvas("can","", 600, 600)
     suph = TH2F("suph", "", 10, -5, 5, 10, -5, 5)
     suph.Draw()
-    x1, y1, r1, r2 = 1.8, 0., 1., 1.
+    x1, y1, r1, r2 = 1.8, 0., 1., 2.
     results = circle_intersection(x1, y1, r1, r2)
     c1 = TEllipse(x1, y1, r1)
     c1.Draw('same')

@@ -1,5 +1,7 @@
 import os
 import heppy.framework.config as cfg
+import logging
+logging.basicConfig(level=logging.WARNING)
 
 # input component 
 # several input components can be declared,
@@ -49,9 +51,16 @@ treeprod = cfg.Analyzer(
     tree_title = 'a title'
     )
 
+from heppy_fcc.analyzers.PFSim import PFSim
+pfsim = cfg.Analyzer(
+    PFSim,
+    verbose = True
+)
+
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
+    pfsim,
     muana,
     eleana,
     jetana,

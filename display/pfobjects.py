@@ -77,43 +77,41 @@ class GHelixTrajectory(GTrajectory):
             raise ValueError('implement drawing for projection ' + projection )
         super(GHelixTrajectory, self).draw(projection)
         
+
+class GTrajectories(list):
+    
+    def __init__(self, particles):
+        for ptc in particles:
+            is_neutral = abs(ptc.charge)<0.5
+            TrajClass = GStraightTrajectory if is_neutral else GHelixTrajectory
+            gtraj = TrajClass(ptc)
+            self.append(gtraj)
+            display.register(gtraj,1)
+
+    def draw(self, projection):
+        for traj in self:
+            traj.draw(projection)
         
 if __name__ == '__main__':
     import math
     from heppy_fcc.fastsim.geometry import CMS
+    from heppy_fcc.fastsim.simulator import Simulator
     from heppy_fcc.fastsim.vectors import Point
-    from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
     from heppy_fcc.fastsim.toyevents import particles
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
     
     cms = CMS()
-    gcms = GDetector(cms)
-
-    display = Display()
-    display.register(gcms, 0)
-    # display.views['yz'].zoom(-1,1,-1,1)
-    # display.views['xz'].zoom(-1,1,-1,1)
-
-    colors = range(10) 
+    simulator = Simulator(cms)
     
-    slprop = StraightLinePropagator()
-    helixprop = HelixPropagator()
-    for i, ptc in enumerate( particles(10, -1, 0.5, math.pi/5., 4*math.pi/5.,
-                                       1., 10., Point(0,0,0))):
-        # print ptc
-        # ptc.p4.SetPhi(0.)
-        is_neutral = abs(ptc.charge)<0.5
-        prop = slprop
-        TrajClass = GStraightTrajectory
-        if not is_neutral:
-            prop = helixprop
-            TrajClass = GHelixTrajectory
-        prop.propagate([ptc], cms.cylinders() )
-        gtraj = TrajClass(ptc)
-        gtraj.set_color( colors[i]+1 )
-            
-        display.register(gtraj,1)
-            
-
+    simulator = Simulator(cms)
+    particles = list( particles(5, 1, 0.5, math.pi/5., 4*math.pi/5.,
+                                10., 10., Point(0.5,0.5,0)) )
+    simulator.simulate(particles)
+    
+    display = Display()
+    gcms = GDetector(cms)
+    display.register(gcms, 0)
+    gtrajectories = GTrajectories(particles)
+    display.register(gtrajectories,1)
     display.draw()

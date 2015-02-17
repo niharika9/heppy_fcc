@@ -12,9 +12,13 @@ class Display(object):
             )
 
     def register(self, obj, layer):
-        for view in self.views.values():
-            view.register(obj, layer)
-        
+        elems = [obj]
+        if hasattr(obj, '__iter__'):
+            elems = obj
+        for elem in elems: 
+            for view in self.views.values():
+                view.register(elem, layer)
+            
     def draw(self):
         for view in self.views.values():
             view.draw()
