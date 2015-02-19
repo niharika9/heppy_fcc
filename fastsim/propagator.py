@@ -90,6 +90,7 @@ class StraightLinePropagator(Propagator):
         if udir.Z():
             destz = cylinder.z if udir.Z() > 0. else -cylinder.z
             length = (destz - origin.Z())/math.cos(theta)
+            # import pdb; pdb.set_trace()
             assert(length>=0)
             destination = origin + udir * length
             rdest = destination.Perp()

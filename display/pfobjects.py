@@ -1,6 +1,42 @@
-from ROOT import TPolyLine, TGraph, TArc
+from ROOT import TPolyLine, TGraph, TArc, TEllipse
 import numpy as np
 import operator
+
+class Blob(object):
+    def __init__(self, cluster):
+        radius = cluster.size
+        print radius
+        color = 4
+        max_energy = cluster.__class__.max_energy
+        pos = cluster.position
+        self.contour_xy = TEllipse(pos.X(), pos.Y(), radius)
+        self.contour_yz = TEllipse(pos.Z(), pos.Y(), radius)   
+        self.contour_xz = TEllipse(pos.Z(), pos.X(), radius)
+        contours = [self.contour_xy, self.contour_yz, self.contour_xz]
+        iradius = radius * cluster.energy / max_energy 
+        self.inner_xy = TEllipse(pos.X(), pos.Y(), iradius)
+        self.inner_yz = TEllipse(pos.Z(), pos.Y(), iradius)   
+        self.inner_xz = TEllipse(pos.Z(), pos.X(), iradius)
+        inners = [self.inner_xy, self.inner_yz, self.inner_xz]
+        for contour in contours:
+            contour.SetLineColor(color)
+            contour.SetFillStyle(0)
+        for inner in inners: 
+            inner.SetFillColor(color)
+            
+    def draw(self, projection, opt=''):
+        if projection == 'xy':
+            self.contour_xy.Draw(opt+"psame")
+            self.inner_xy.Draw(opt+"psame")
+        elif projection == 'yz':
+            self.contour_yz.Draw(opt+"psame")
+            self.inner_yz.Draw(opt+"psame")
+        elif projection == 'xz':
+            self.contour_xz.Draw(opt+"psame")            
+            self.inner_xz.Draw(opt+"psame")            
+        else:
+            raise ValueError('implement drawing for projection ' + projection )
+        
 
 class GTrajectory(object):
     def __init__(self, description):
@@ -11,7 +47,7 @@ class GTrajectory(object):
         self.graph_xz = TGraph(npoints)
         self.graphs = [self.graph_xy, self.graph_yz, self.graph_xz]
         def set_marker_style(graph):
-            graph.SetMarkerStyle(8)
+            graph.SetMarkerStyle(4)
             graph.SetMarkerSize(0.5)
         set_marker_style(self.graph_xy)
         set_marker_style(self.graph_yz)
@@ -20,6 +56,7 @@ class GTrajectory(object):
             self.graph_xy.SetPoint( i, point.X(), point.Y() )
             self.graph_yz.SetPoint(i, point.Z(), point.Y() )
             self.graph_xz.SetPoint(i, point.Z(), point.X() )
+        self.blobs = map(Blob, self.desc.clusters.values())            
 
     def set_color(self, color):
         for graph in self.graphs:
@@ -34,7 +71,9 @@ class GTrajectory(object):
             self.graph_xz.Draw(opt+"psame")            
         else:
             raise ValueError('implement drawing for projection ' + projection )
-
+        for blob in self.blobs: 
+            blob.draw(projection, opt)
+            
 class GStraightTrajectory(GTrajectory):
     def __init__(self, description):
         super(GStraightTrajectory, self).__init__(description)
@@ -52,7 +91,7 @@ class GHelixTrajectory(GTrajectory):
                              helix.rho, helix.phi_min, helix.phi_max)
         self.helix_xy.SetFillStyle(0)
         #TODO this is patchy,need to access the last point, whatever its name
-        max_time = description.helix.time_at_z(description.points['hcal_out'].Z())
+        max_time = description.helix.time_at_z(description.points.values()[-1].Z())
         npoints = 100
         
         self.graphline_xy = TGraph(npoints)
@@ -86,7 +125,7 @@ class GTrajectories(list):
             TrajClass = GStraightTrajectory if is_neutral else GHelixTrajectory
             gtraj = TrajClass(ptc)
             self.append(gtraj)
-            display.register(gtraj,1)
+            # display.register(gtraj,1)
 
     def draw(self, projection):
         for traj in self:
@@ -104,7 +143,6 @@ if __name__ == '__main__':
     cms = CMS()
     simulator = Simulator(cms)
     
-    simulator = Simulator(cms)
     particles = list( particles(5, 1, 0.5, math.pi/5., 4*math.pi/5.,
                                 10., 10., Point(0.5,0.5,0)) )
     simulator.simulate(particles)

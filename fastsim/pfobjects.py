@@ -3,9 +3,15 @@ from collections import OrderedDict
 
 
 class Cluster(object):
-    def __init(self, energy, position, layer):
+
+    max_energy = 0.
+    
+    def __init__(self, energy, position, size, layer):
         self.energy = energy
+        if self.energy > self.__class__.max_energy:
+            self.__class__.max_energy = self.energy
         self.position = position
+        self.size = size
         self.layer = layer
 
         
@@ -14,13 +20,16 @@ class Trajectory(object):
         self.p3 = p3
         self.points = OrderedDict()
         self.points['vertex'] = vertex
-    
+
+        
 class Particle(Trajectory):
-    def __init__(self, p4, vertex, charge):
+    def __init__(self, p4, vertex, charge, pdgid=None):
         self.p4 = p4
         self.vertex = vertex
         self.charge = charge
+        self.pdgid = pdgid
         self.helix = None
+        self.clusters = dict()
         super(Particle, self).__init__(p4.Vect(), vertex)
 
     def set_helix(self, helix):

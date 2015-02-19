@@ -1,5 +1,6 @@
 from ROOT import TCanvas, TH1, TH2F
 import operator
+from heppy_fcc.fastsim.pfobjects import Cluster
 
 class Display(object):
     
@@ -11,13 +12,17 @@ class Display(object):
             xz = ViewPane("xz", "xz", 100, -5, 5, 100, -5, 5)
             )
 
-    def register(self, obj, layer):
+    def register(self, obj, layer, clearable=True):
         elems = [obj]
         if hasattr(obj, '__iter__'):
             elems = obj
         for elem in elems: 
             for view in self.views.values():
-                view.register(elem, layer)
+                view.register(elem, layer, clearable)
+
+    def clear(self):
+        for view in self.views.values():
+            view.clear()
             
     def draw(self):
         for view in self.views.values():
@@ -39,12 +44,18 @@ class ViewPane(object):
         self.hist.Draw()
         self.hist.SetStats(False)
         self.registered = dict()
+        self.locked = dict()
         self.__class__.nviews += 1 
         
-    def register(self, obj, layer):
+    def register(self, obj, layer, clearable=True):
         self.registered[obj] = layer
+        if not clearable:
+            self.locked[obj] = layer
         #TODO might need to keep track of views in objects
-        
+
+    def clear(self):
+        self.registered = dict(self.locked.items())
+                
     def draw(self):
         self.canvas.cd()
         for obj, layer in sorted(self.registered.items(),
