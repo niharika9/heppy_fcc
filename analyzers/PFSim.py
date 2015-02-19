@@ -26,7 +26,6 @@ class PFSimOutput(object):
     def __init__(self):
         self.genparticles_stable = []
         
-        
 class PFSim(Analyzer):
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +36,7 @@ class PFSim(Analyzer):
         self.init_display()        
         
     def init_display(self):
-        self.display = Display()
+        self.display = Display(['xy'])
         self.gcms = GDetector(self.cms)
         self.display.register(self.gcms, layer=0, clearable=False)
         self.is_display = True
@@ -56,7 +55,8 @@ class PFSim(Analyzer):
                 pyptc = Particle(ptc) 
                 output.genparticles_stable.append( pyptc )
                 pfsim_particles.append(pfsimparticle(ptc))
-                print pyptc
+                if self.cfg_ana.verbose:
+                    print pyptc
         if self.cfg_ana.verbose:
             print 'stable/all particles = {s}/{a}'.format(s=len(output.genparticles_stable),
                                                           a=len(edm_particles))

@@ -4,13 +4,13 @@ from heppy_fcc.fastsim.pfobjects import Cluster
 
 class Display(object):
     
-    def __init__(self):
+    def __init__(self, views=None):
         ViewPane.nviews = 0
-        self.views = dict(
-            xy = ViewPane("xy", "xy", 100, -5, 5, 100, -5, 5),
-            yz = ViewPane("yz", "yz", 100, -5, 5, 100, -5, 5),
-            xz = ViewPane("xz", "xz", 100, -5, 5, 100, -5, 5)
-            )
+        if not views:
+            views = ['xy', 'yz', xz]
+        self.views = dict()
+        for view in views:
+            self.views[view] = ViewPane("xy", "xy", 100, -5, 5, 100, -5, 5)
 
     def register(self, obj, layer, clearable=True):
         elems = [obj]

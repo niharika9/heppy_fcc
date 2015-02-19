@@ -5,7 +5,7 @@ import operator
 class Blob(object):
     def __init__(self, cluster):
         radius = cluster.size
-        print radius
+        # print radius
         color = 4
         max_energy = cluster.__class__.max_energy
         pos = cluster.position

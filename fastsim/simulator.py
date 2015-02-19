@@ -89,7 +89,7 @@ class Simulator(object):
         # TODO really dirty! need some kind of detector definition
         self.make_cluster(ptc, 'ecal', frac_ecal)
         self.make_cluster(ptc, 'hcal', 1-frac_ecal)
-        print frac_ecal, 1-frac_ecal
+        # print frac_ecal, 1-frac_ecal
 
     def reconstruct_charged_hadron(self, ptc):
         # create reconstructed ECAL and HCAL deposits

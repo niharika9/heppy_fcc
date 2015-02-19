@@ -40,13 +40,18 @@ config = cfg.Config(
     events_class = Events
 )
 
-def process(iev):
-    loop.process(iev)
-    display.draw()
-
+    
 if __name__ == '__main__':
     from heppy.framework.looper import Looper
     import sys
+
+    def process(iev):
+        loop.process(iev)
+        display.draw()
+
+    def next():
+        loop.process(loop.iEvent+1)
+        display.draw()
 
     iev = int(sys.argv[1])
     loop = Looper( 'looper',

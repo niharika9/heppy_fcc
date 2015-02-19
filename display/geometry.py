@@ -36,7 +36,6 @@ class GDetectorElement(object):
             dz = self.desc.volume.inner.z
             radius = self.desc.volume.inner.rad
             self.boxes.append( TBox(-dz, -radius, dz, radius) ) 
-        print self.desc.material.name
         color = COLORS[self.desc.material.name]
         oc = self.circles[0]
         ob = self.boxes[0]
