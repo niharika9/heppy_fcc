@@ -8,8 +8,8 @@ from ROOT import TColor, kRed, kBlue
 
 
 COLORS = dict(
-    CMS_ECAL = kRed-10,
-    CMS_HCAL = kBlue-10,
+    ECAL = kRed-10,
+    HCAL = kBlue-10,
     void = None
 ) 
 
@@ -36,23 +36,28 @@ class GDetectorElement(object):
             dz = self.desc.volume.inner.z
             radius = self.desc.volume.inner.rad
             self.boxes.append( TBox(-dz, -radius, dz, radius) ) 
-            
+        print self.desc.material.name
         color = COLORS[self.desc.material.name]
-        if color:
-            oc = self.circles[0]
-            ob = self.boxes[0]
-            for shape in [oc, ob]:
+        oc = self.circles[0]
+        ob = self.boxes[0]
+        for shape in [oc, ob]:
+            if color: 
                 shape.SetFillColor(color)
                 shape.SetFillStyle(1001)
-                shape.SetLineColor(1)
-                shape.SetLineStyle(1)                
-            if len(self.circles)==2:
-                ic = self.circles[1]
-                ib = self.boxes[1]
-                for shape in [ic, ib]:
+            else:
+                shape.SetFillStyle(0)
+            shape.SetLineColor(1)
+            shape.SetLineStyle(1)                
+        if len(self.circles)==2:
+            ic = self.circles[1]
+            ib = self.boxes[1]
+            for shape in [ic, ib]:
+                if color:
                     shape.SetFillColor(0)
                     shape.SetFillStyle(1001)
-
+                else:
+                    shape.SetFillStyle(0)
+                
     def draw(self, projection):
         if projection == 'xy':
             for circle in self.circles:

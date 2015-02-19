@@ -28,14 +28,13 @@ class PFSimOutput(object):
         
         
 class PFSim(Analyzer):
-    def beginLoop(self, setup):
-        # call the function of the base class defining self.counters
-        # and self.averages
-        super(PFSim, self).beginLoop(setup)
+
+    def __init__(self, *args, **kwargs):
+        super(PFSim, self).__init__(*args, **kwargs)
         self.cms = CMS()
         self.simulator = Simulator(self.cms)
         self.is_display = False
-        self.init_display()
+        self.init_display()        
         
     def init_display(self):
         self.display = Display()

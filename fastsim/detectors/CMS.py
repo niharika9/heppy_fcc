@@ -7,7 +7,7 @@ class ECAL(DetectorElement):
 
     def __init__(self):
         volume = VolumeCylinder('ecal', 1.89, 2.59, 1.30, 2. )
-        mat = material.Material('CMS_ECAL', 8.9e-3, 0.25)
+        mat = material.Material('ECAL', 8.9e-3, 0.25)
         super(ECAL, self).__init__('ecal', volume,  mat)
 
     def energy_resolution(self, ptc):
@@ -29,7 +29,7 @@ class HCAL(DetectorElement):
 
     def __init__(self):
         volume = VolumeCylinder('hcal', 2.9, 3.6, 1.9, 2.6 )
-        mat = material.Material('CMS_HCAL', None, 0.17)
+        mat = material.Material('HCAL', None, 0.17)
         super(HCAL, self).__init__('ecal', volume, mat)
 
     def energy_resolution(self, ptc):
