@@ -75,15 +75,15 @@ class Info(object):
 
 class Propagator(object):
 
-    def propagate(self, particles, cylinders):
+    def propagate(self, particles, *args, **kwargs):
         for ptc in particles:
             for cyl in cylinders:
-                self.propagate_one(ptc, cyl)
+                self.propagate_one(ptc, *args, **kwargs)
                 
                 
 class StraightLinePropagator(Propagator):        
 
-    def propagate_one(self, particle, cylinder):
+    def propagate_one(self, particle, cylinder, dummy=None):
         udir = particle.p4.Vect().Unit()
         theta = udir.Theta()
         origin = particle.vertex
@@ -117,8 +117,7 @@ class StraightLinePropagator(Propagator):
         
 class HelixPropagator(Propagator):
     
-    def propagate_one(self, particle, cylinder, debug_info=None):
-        field = 4. 
+    def propagate_one(self, particle, cylinder, field, debug_info=None):
         helix = Helix(field, particle.charge, particle.p4,
                       particle.vertex)
         particle.set_helix(helix)

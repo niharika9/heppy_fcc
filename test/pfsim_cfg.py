@@ -45,7 +45,9 @@ if __name__ == '__main__':
     from heppy.framework.looper import Looper
     import sys
 
-    def process(iev):
+    def process(iev=None):
+        if iev is None:
+            iev = loop.iEvent
         loop.process(iev)
         display.draw()
 
@@ -61,5 +63,8 @@ if __name__ == '__main__':
                    timeReport = False,
                    quiet = True)
 
-    display = loop.analyzers[0].display
+    pfsim = loop.analyzers[0]
+    display = pfsim.display
+    simulator = pfsim.simulator
+    detector = simulator.detector
     process(iev)

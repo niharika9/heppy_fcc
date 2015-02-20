@@ -6,13 +6,14 @@ class Cluster(object):
 
     max_energy = 0.
     
-    def __init__(self, energy, position, size, layer):
+    def __init__(self, energy, position, size, layer, particle=None):
         self.energy = energy
         if self.energy > self.__class__.max_energy:
             self.__class__.max_energy = self.energy
         self.position = position
         self.size = size
         self.layer = layer
+        self.particle = particle
 
         
 class Trajectory(object):

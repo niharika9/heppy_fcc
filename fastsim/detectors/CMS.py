@@ -17,9 +17,9 @@ class ECAL(DetectorElement):
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid)
         if pdgid==22 or pdgid==11:
-            return 0.07
+            return 0.05
         else:
-            return 0.2
+            return 0.07
 
     def space_resolution(self, ptc):
         pass
@@ -37,7 +37,7 @@ class HCAL(DetectorElement):
         return 1.1/ math.sqrt(E) 
 
     def cluster_size(self, ptc):
-        return 0.3
+        return 0.2
 
     def space_resolution(self, ptc):
         pass
@@ -66,7 +66,7 @@ class CMS(Detector):
         self.elements['tracker'] = Tracker()
         self.elements['ecal'] = ECAL()
         self.elements['hcal'] = HCAL()
-        self.elements['field'] = Field(3.8)
+        self.elements['field'] = Field(8.)
 
 
 if __name__ == '__main__':

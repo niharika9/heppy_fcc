@@ -16,7 +16,22 @@ class Simulator(object):
     def propagate(self, ptc):
         is_neutral = abs(ptc.charge)<0.5
         prop = self.prop_straight if is_neutral else self.prop_helix
-        prop.propagate([ptc], self.detector.cylinders() )
+        prop.propagate([ptc], self.detector.cylinders(),
+                       self.detector.elements['field'].magnitude)
+
+    def make_cluster(self, ptc, detname, fraction=1., size=None):
+        detector = self.detector.elements[detname]
+        propagator = self.prop_helix if ptc.charge!=0 else self.prop_straight
+        propagator.propagate_one(ptc,
+                                 detector.volume.inner,
+                                 self.detector.elements['field'].magnitude )
+        if size is None:
+            size = detector.cluster_size(ptc)
+        cylname = detector.volume.inner.name
+        ptc.clusters[cylname] = Cluster(ptc.p4.E()*fraction,
+                                        ptc.points[cylname],
+                                        size,
+                                        cylname, ptc)
 
     def simulate_photon(self, ptc):
         # true deposit:
@@ -25,12 +40,8 @@ class Simulator(object):
         ecal = self.detector.elements['ecal']
         self.prop_straight.propagate_one(ptc,
                                          ecal.volume.inner)
-        cluster_size = ecal.cluster_size(ptc)
-        cylname = ecal.volume.inner.name
-        ptc.clusters[cylname] = Cluster(ptc.p4.E(),
-                                        ptc.points[cylname],
-                                        cluster_size,
-                                        cylname)
+        
+        self.make_cluster(ptc, 'ecal')
 
     def reconstruct_photon(self, ptc):
         # create reconstructed EM deposit
@@ -47,12 +58,7 @@ class Simulator(object):
         ecal = self.detector.elements['ecal']
         self.prop_helix.propagate_one(ptc,
                                       ecal.volume.inner)
-        cluster_size = ecal.cluster_size(ptc)
-        cylname = ecal.volume.inner.name
-        ptc.clusters[cylname] = Cluster(ptc.p4.E(),
-                                        ptc.points[cylname],
-                                        cluster_size,
-                                        cylname)
+        self.make_cluster(ptc, 'ecal')
 
     def reconstruct_electron(self, ptc):
         # create reconstructed EM deposit
@@ -60,18 +66,6 @@ class Simulator(object):
         # smear energy EM        
         pass
 
-    def make_cluster(self, ptc, detname, fraction=1., size=None):
-        detector = self.detector.elements[detname]
-        propagator = self.prop_helix if ptc.charge!=0 else self.prop_straight
-        propagator.propagate_one(ptc,
-                                 detector.volume.inner)
-        if size is None:
-            size = detector.cluster_size(ptc)
-        cylname = detector.volume.inner.name
-        ptc.clusters[cylname] = Cluster(ptc.p4.E()*fraction,
-                                             ptc.points[cylname],
-                                             size,
-                                             cylname)
         
     
     def simulate_charged_hadron(self, ptc):
@@ -85,9 +79,12 @@ class Simulator(object):
         # else
         #    helix extrap to HCAL
         #    HCAL deposit = E
-        frac_ecal = random.uniform(0., 1.)
-        # TODO really dirty! need some kind of detector definition
-        self.make_cluster(ptc, 'ecal', frac_ecal)
+        start_ecal = random.uniform(0., 1.)>0.8
+        frac_ecal = 0.
+        if start_ecal:
+            frac_ecal = random.uniform(0., 1.)
+            # TODO really dirty! need some kind of detector definition
+            self.make_cluster(ptc, 'ecal', frac_ecal)
         self.make_cluster(ptc, 'hcal', 1-frac_ecal)
         # print frac_ecal, 1-frac_ecal
 
@@ -123,11 +120,11 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(5, 211, math.pi/3., 2*math.pi/3.,
-                               10., 10.) )
+    particles = list(particles(3, 211, 0, math.pi,
+                               5., 10.) )
     simulator.simulate(particles)
 
-    display = Display()
+    display = Display(['xy', 'ECAL_thetaphi'])
     gcms = GDetector(cms)
     display.register(gcms, 0)
     gtrajectories = GTrajectories(particles)

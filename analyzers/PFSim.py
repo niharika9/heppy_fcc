@@ -30,15 +30,15 @@ class PFSim(Analyzer):
 
     def __init__(self, *args, **kwargs):
         super(PFSim, self).__init__(*args, **kwargs)
-        self.cms = CMS()
-        self.simulator = Simulator(self.cms)
+        self.detector = CMS()
+        self.simulator = Simulator(self.detector)
         self.is_display = False
         self.init_display()        
         
     def init_display(self):
-        self.display = Display(['xy'])
-        self.gcms = GDetector(self.cms)
-        self.display.register(self.gcms, layer=0, clearable=False)
+        self.display = Display(['xy','ECAL_thetaphi'])
+        self.gdetector = GDetector(self.detector)
+        self.display.register(self.gdetector, layer=0, clearable=False)
         self.is_display = True
         
     def process(self, event):

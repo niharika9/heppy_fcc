@@ -1,5 +1,6 @@
 from ROOT import TCanvas, TH1, TH2F
 import operator
+import math
 from heppy_fcc.fastsim.pfobjects import Cluster
 
 class Display(object):
@@ -10,7 +11,14 @@ class Display(object):
             views = ['xy', 'yz', xz]
         self.views = dict()
         for view in views:
-            self.views[view] = ViewPane("xy", "xy", 100, -5, 5, 100, -5, 5)
+            if view in ['xy', 'yz', 'xz']:
+                self.views[view] = ViewPane(view, view,
+                                            100, -5, 5, 100, -5, 5)
+            elif 'thetaphi' in view:
+                self.views[view] = ViewPane(view, view,
+                                            100, -math.pi/2, math.pi/2,
+                                            100, -math.pi, math.pi,
+                                            600, 1200)
 
     def register(self, obj, layer, clearable=True):
         elems = [obj]
@@ -31,10 +39,9 @@ class Display(object):
 
 class ViewPane(object):
     nviews = 0
-    def __init__(self, name, projection, nx, xmin, xmax, ny, ymin, ymax):
+    def __init__(self, name, projection, nx, xmin, xmax, ny, ymin, ymax,
+                 dx=600, dy=600):
         self.projection = projection
-        dx = 600
-        dy = 600
         tx = 50 + self.__class__.nviews * (dx+10) 
         ty = 50
         self.canvas = TCanvas(name, name, tx, ty, dx, dy)
@@ -66,4 +73,10 @@ class ViewPane(object):
     def zoom(self, xmin, xmax, ymin, ymax):
         self.hist.GetXaxis().SetRangeUser(xmin, xmax)
         self.hist.GetYaxis().SetRangeUser(ymin, ymax)
+        self.canvas.Update()
+
+    def unzoom(self):
+        self.hist.GetXaxis().UnZoom()
+        self.hist.GetYaxis().UnZoom()
+        self.canvas.Modified()
         self.canvas.Update()

@@ -1,28 +1,44 @@
 from ROOT import TPolyLine, TGraph, TArc, TEllipse
 import numpy as np
 import operator
+import math
 
 class Blob(object):
     def __init__(self, cluster):
-        radius = cluster.size
-        # print radius
-        color = 4
-        max_energy = cluster.__class__.max_energy
+        self.cluster = cluster
         pos = cluster.position
+        radius = cluster.size
+        thetaphiradius = math.atan(cluster.size / pos.Mag())
+        # print radius
+        color = 1
+        if cluster.particle:
+            if cluster.particle.pdgid == 22 or cluster.particle.pdgid == 11:
+                color = 2
+            else:
+                color = 4
+        max_energy = cluster.__class__.max_energy
         self.contour_xy = TEllipse(pos.X(), pos.Y(), radius)
         self.contour_yz = TEllipse(pos.Z(), pos.Y(), radius)   
         self.contour_xz = TEllipse(pos.Z(), pos.X(), radius)
-        contours = [self.contour_xy, self.contour_yz, self.contour_xz]
-        iradius = radius * cluster.energy / max_energy 
+        self.contour_thetaphi = TEllipse(math.pi/2. - pos.Theta(), pos.Phi(),
+                                         thetaphiradius)
+        contours = [self.contour_xy, self.contour_yz, self.contour_xz,
+                    self.contour_thetaphi]
+        iradius = radius * cluster.energy / max_energy
+        ithetaphiradius = thetaphiradius * cluster.energy / max_energy
         self.inner_xy = TEllipse(pos.X(), pos.Y(), iradius)
         self.inner_yz = TEllipse(pos.Z(), pos.Y(), iradius)   
         self.inner_xz = TEllipse(pos.Z(), pos.X(), iradius)
-        inners = [self.inner_xy, self.inner_yz, self.inner_xz]
+        self.inner_thetaphi = TEllipse(math.pi/2. - pos.Theta(), pos.Phi(),
+                                       ithetaphiradius)
+        inners = [self.inner_xy, self.inner_yz, self.inner_xz,
+                  self.inner_thetaphi]
         for contour in contours:
             contour.SetLineColor(color)
             contour.SetFillStyle(0)
         for inner in inners: 
             inner.SetFillColor(color)
+            inner.SetFillStyle(1001)
             
     def draw(self, projection, opt=''):
         if projection == 'xy':
@@ -33,7 +49,11 @@ class Blob(object):
             self.inner_yz.Draw(opt+"psame")
         elif projection == 'xz':
             self.contour_xz.Draw(opt+"psame")            
-            self.inner_xz.Draw(opt+"psame")            
+            self.inner_xz.Draw(opt+"psame")
+        elif 'thetaphi' in projection:
+            if self.cluster.layer == 'ecal_in':
+                self.contour_thetaphi.Draw(opt+"psame")            
+                self.inner_thetaphi.Draw(opt+"psame")        
         else:
             raise ValueError('implement drawing for projection ' + projection )
         
@@ -45,17 +65,23 @@ class GTrajectory(object):
         self.graph_xy = TGraph(npoints)
         self.graph_yz = TGraph(npoints)
         self.graph_xz = TGraph(npoints)
-        self.graphs = [self.graph_xy, self.graph_yz, self.graph_xz]
+        self.graph_thetaphi = TGraph(npoints)
+        self.graphs = [self.graph_xy, self.graph_yz, self.graph_xz, self.graph_thetaphi]
         def set_marker_style(graph):
-            graph.SetMarkerStyle(4)
-            graph.SetMarkerSize(0.5)
+            graph.SetMarkerStyle(2)
+            graph.SetMarkerSize(0.7)
         set_marker_style(self.graph_xy)
         set_marker_style(self.graph_yz)
         set_marker_style(self.graph_xz)
+        set_marker_style(self.graph_thetaphi)
         for i, point in enumerate(self.desc.points.values()):
             self.graph_xy.SetPoint( i, point.X(), point.Y() )
             self.graph_yz.SetPoint(i, point.Z(), point.Y() )
             self.graph_xz.SetPoint(i, point.Z(), point.X() )
+            tppoint = point
+            if i == 0:
+                tppoint = description.p4.Vect()
+            self.graph_thetaphi.SetPoint(i, math.pi/2. - tppoint.Theta(), tppoint.Phi() )
         self.blobs = map(Blob, self.desc.clusters.values())            
 
     def set_color(self, color):
@@ -63,16 +89,18 @@ class GTrajectory(object):
             graph.SetMarkerColor(color)
         
     def draw(self, projection, opt=''):
+        for blob in self.blobs: 
+            blob.draw(projection, opt)
         if projection == 'xy':
             self.graph_xy.Draw(opt+"psame")
         elif projection == 'yz':
             self.graph_yz.Draw(opt+"psame")
         elif projection == 'xz':
-            self.graph_xz.Draw(opt+"psame")            
+            self.graph_xz.Draw(opt+"psame")
+        elif 'thetaphi' in projection:
+            self.graph_thetaphi.Draw(opt+"psame")            
         else:
             raise ValueError('implement drawing for projection ' + projection )
-        for blob in self.blobs: 
-            blob.draw(projection, opt)
             
 class GStraightTrajectory(GTrajectory):
     def __init__(self, description):
@@ -82,8 +110,7 @@ class GStraightTrajectory(GTrajectory):
         super(GStraightTrajectory, self).draw(projection, 'l')
    
 
-class GHelixTrajectory(GTrajectory):
-    
+class GHelixTrajectory(GTrajectory):    
     def __init__(self, description):
         helix = description.helix
         self.helix_xy = TArc(helix.center_xy.X(),
@@ -93,18 +120,23 @@ class GHelixTrajectory(GTrajectory):
         #TODO this is patchy,need to access the last point, whatever its name
         max_time = description.helix.time_at_z(description.points.values()[-1].Z())
         npoints = 100
-        
         self.graphline_xy = TGraph(npoints)
         self.graphline_yz = TGraph(npoints)
         self.graphline_xz = TGraph(npoints)
+        self.graphline_thetaphi = TGraph(npoints)
         for i, time in enumerate(np.linspace(0, max_time, npoints)):
             point = helix.point_at_time(time)
             self.graphline_xy.SetPoint(i, point.X(), point.Y())
             self.graphline_yz.SetPoint(i, point.Z(), point.Y())
             self.graphline_xz.SetPoint(i, point.Z(), point.X())
+            tppoint = point
+            if i == 0:
+                tppoint = description.p4.Vect()
+            self.graphline_thetaphi.SetPoint(i, math.pi/2.-tppoint.Theta(), tppoint.Phi())
         super(GHelixTrajectory, self).__init__(description)
         
     def draw(self, projection):
+        super(GHelixTrajectory, self).draw(projection)
         if projection == 'xy':
             # self.helix_xy.Draw("onlysame")
             self.graphline_xy.Draw("lsame")
@@ -112,9 +144,10 @@ class GHelixTrajectory(GTrajectory):
             self.graphline_yz.Draw("lsame")
         elif projection == 'xz':
             self.graphline_xz.Draw("lsame")
+        elif 'thetaphi' in projection:
+            self.graphline_thetaphi.Draw("lsame")            
         else:
             raise ValueError('implement drawing for projection ' + projection )
-        super(GHelixTrajectory, self).draw(projection)
         
 
 class GTrajectories(list):

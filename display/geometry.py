@@ -64,6 +64,8 @@ class GDetectorElement(object):
         elif projection in ['xz', 'yz']:
             for box in self.boxes:
                 box.Draw('samel')
+        elif 'thetaphi' in projection:
+            pass
         else:
             raise ValueError('implement drawing for projection ' + projection )
 
