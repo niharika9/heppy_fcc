@@ -120,11 +120,11 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(3, 211, 0, math.pi,
+    particles = list(particles(5, 211, 0, math.pi,
                                5., 10.) )
     simulator.simulate(particles)
 
-    display = Display(['xy', 'ECAL_thetaphi'])
+    display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])
     gcms = GDetector(cms)
     display.register(gcms, 0)
     gtrajectories = GTrajectories(particles)

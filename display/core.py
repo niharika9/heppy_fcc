@@ -18,7 +18,7 @@ class Display(object):
                 self.views[view] = ViewPane(view, view,
                                             100, -math.pi/2, math.pi/2,
                                             100, -math.pi, math.pi,
-                                            600, 1200)
+                                            500, 1000)
 
     def register(self, obj, layer, clearable=True):
         elems = [obj]

@@ -36,7 +36,7 @@ class PFSim(Analyzer):
         self.init_display()        
         
     def init_display(self):
-        self.display = Display(['xy','ECAL_thetaphi'])
+        self.display = Display(['xy','yz', 'ECAL_thetaphi', 'HCAL_thetaphi'])
         self.gdetector = GDetector(self.detector)
         self.display.register(self.gdetector, layer=0, clearable=False)
         self.is_display = True

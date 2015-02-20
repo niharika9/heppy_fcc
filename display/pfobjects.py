@@ -50,10 +50,14 @@ class Blob(object):
         elif projection == 'xz':
             self.contour_xz.Draw(opt+"psame")            
             self.inner_xz.Draw(opt+"psame")
-        elif 'thetaphi' in projection:
+        elif projection == 'ECAL_thetaphi':
             if self.cluster.layer == 'ecal_in':
                 self.contour_thetaphi.Draw(opt+"psame")            
-                self.inner_thetaphi.Draw(opt+"psame")        
+                self.inner_thetaphi.Draw(opt+"psame")
+        elif projection == 'HCAL_thetaphi':
+            if self.cluster.layer == 'hcal_in':
+                self.contour_thetaphi.Draw(opt+"psame")            
+                self.inner_thetaphi.Draw(opt+"psame")            
         else:
             raise ValueError('implement drawing for projection ' + projection )
         
