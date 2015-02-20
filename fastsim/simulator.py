@@ -57,7 +57,8 @@ class Simulator(object):
         # EM deposit all energy
         ecal = self.detector.elements['ecal']
         self.prop_helix.propagate_one(ptc,
-                                      ecal.volume.inner)
+                                      ecal.volume.inner,
+                                      self.detector.elements['field'].magnitude )
         self.make_cluster(ptc, 'ecal')
 
     def reconstruct_electron(self, ptc):

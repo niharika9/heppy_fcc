@@ -1,4 +1,4 @@
-from ROOT import TPolyLine, TGraph, TArc, TEllipse
+from ROOT import TPolyLine, TGraph, TArc, TEllipse, kGray
 import numpy as np
 import operator
 import math
@@ -63,7 +63,7 @@ class Blob(object):
         
 
 class GTrajectory(object):
-    def __init__(self, description):
+    def __init__(self, description, linestyle=1, linecolor=1):
         self.desc = description
         npoints = len(self.desc.points)
         self.graph_xy = TGraph(npoints)
@@ -71,13 +71,15 @@ class GTrajectory(object):
         self.graph_xz = TGraph(npoints)
         self.graph_thetaphi = TGraph(npoints)
         self.graphs = [self.graph_xy, self.graph_yz, self.graph_xz, self.graph_thetaphi]
-        def set_marker_style(graph):
+        def set_graph_style(graph):
             graph.SetMarkerStyle(2)
             graph.SetMarkerSize(0.7)
-        set_marker_style(self.graph_xy)
-        set_marker_style(self.graph_yz)
-        set_marker_style(self.graph_xz)
-        set_marker_style(self.graph_thetaphi)
+            graph.SetLineStyle(linestyle)
+            graph.SetLineColor(linecolor)
+        set_graph_style(self.graph_xy)
+        set_graph_style(self.graph_yz)
+        set_graph_style(self.graph_xz)
+        set_graph_style(self.graph_thetaphi)
         for i, point in enumerate(self.desc.points.values()):
             self.graph_xy.SetPoint( i, point.X(), point.Y() )
             self.graph_yz.SetPoint(i, point.Z(), point.Y() )
@@ -108,7 +110,8 @@ class GTrajectory(object):
             
 class GStraightTrajectory(GTrajectory):
     def __init__(self, description):
-        super(GStraightTrajectory, self).__init__(description)
+        super(GStraightTrajectory, self).__init__(description,
+                                                  linestyle=2, linecolor=1)
 
     def draw(self, projection):
         super(GStraightTrajectory, self).draw(projection, 'l')
