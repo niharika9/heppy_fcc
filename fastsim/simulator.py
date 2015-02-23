@@ -13,18 +13,22 @@ class Simulator(object):
         self.particles = None
         Cluster.max_energy = 0.
 
-    def propagate(self, ptc):
+    def propagator(self, ptc):
         is_neutral = abs(ptc.charge)<0.5
-        prop = self.prop_straight if is_neutral else self.prop_helix
-        prop.propagate([ptc], self.detector.cylinders(),
-                       self.detector.elements['field'].magnitude)
+        return self.prop_straight if is_neutral else self.prop_helix
+        
+    def propagate(self, ptc):
+        '''propagate the particle to all dector cylinders'''
+        self.propagator(ptc).propagate([ptc], self.detector.cylinders(),
+                                       self.detector.elements['field'].magnitude)
 
     def make_cluster(self, ptc, detname, fraction=1., size=None):
+        '''adds a cluster in a given detector, with a given fraction of 
+        the particle energy.'''
         detector = self.detector.elements[detname]
-        propagator = self.prop_helix if ptc.charge!=0 else self.prop_straight
-        propagator.propagate_one(ptc,
-                                 detector.volume.inner,
-                                 self.detector.elements['field'].magnitude )
+        self.propagator(ptc).propagate_one(ptc,
+                                           detector.volume.inner,
+                                           self.detector.elements['field'].magnitude )
         if size is None:
             size = detector.cluster_size(ptc)
         cylname = detector.volume.inner.name
@@ -68,7 +72,6 @@ class Simulator(object):
         pass
 
         
-    
     def simulate_charged_hadron(self, ptc):
         # helix extrap to ECAL
         # estimate crossed ECAL material (straight extrap)
@@ -82,10 +85,20 @@ class Simulator(object):
         #    HCAL deposit = E
         ecal = self.detector.elements['ecal']
         path_length = ecal.material.path_length(ptc)
-        
-        start_ecal = random.uniform(0., 1.)>0.8
+        self.propagator(ptc).propagate_one(ptc,
+                                           ecal.volume.inner,
+                                           self.detector.elements['field'].magnitude)
+        # print ptc.points
+        time_ecal_inner = ptc.helix.time_at_z(ptc.points['ecal_in'].Z())
+        deltat = ptc.helix.deltat(path_length)
+        time_decay = time_ecal_inner + deltat
+        point_decay = ptc.helix.point_at_time(time_decay)
+        ptc.points['ecal_decay'] = point_decay
+        # print time_ecal_inner
+        # start_ecal = random.uniform(0., 1.)>0.8
         frac_ecal = 0.
-        if start_ecal:
+        if ecal.volume.contains(point_decay):
+        # if start_ecal:
             frac_ecal = random.uniform(0., 1.)
             # TODO really dirty! need some kind of detector definition
             self.make_cluster(ptc, 'ecal', frac_ecal)
@@ -124,7 +137,7 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(1, 211, 1, 2,
+    particles = list(particles(100, 211, 1, 2,
                                5., 5.) )
     simulator.simulate(particles)
 

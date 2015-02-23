@@ -6,7 +6,7 @@ import math
 class ECAL(DetectorElement):
 
     def __init__(self):
-        volume = VolumeCylinder('ecal', 1.89, 2.59, 1.30, 2. )
+        volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
         mat = material.Material('ECAL', 8.9e-3, 0.25)
         super(ECAL, self).__init__('ecal', volume,  mat)
 

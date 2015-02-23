@@ -22,4 +22,12 @@ class VolumeCylinder(object):
             if irad is None or iz is None:
                 raise ValueError('must specify both irad and iz.')    
             self.inner = SurfaceCylinder('_'.join([self.name, 'in']), irad, iz)
- 
+
+    def contains(self, point):
+        perp = point.Perp()
+        if point.Z()<self.inner.z:
+            return perp >= self.inner.rad and perp < self.outer.rad
+        elif point.Z()<self.outer.z:
+            return perp < self.outer.rad
+        else:
+            return False
