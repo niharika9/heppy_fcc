@@ -80,6 +80,9 @@ class Simulator(object):
         # else
         #    helix extrap to HCAL
         #    HCAL deposit = E
+        ecal = self.detector.elements['ecal']
+        path_length = ecal.material.path_length(ptc)
+        
         start_ecal = random.uniform(0., 1.)>0.8
         frac_ecal = 0.
         if start_ecal:
@@ -121,8 +124,8 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(5, 211, 0, math.pi,
-                               5., 10.) )
+    particles = list(particles(1, 211, 1, 2,
+                               5., 5.) )
     simulator.simulate(particles)
 
     display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])

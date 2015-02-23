@@ -1,12 +1,13 @@
 import operator
+import numpy as np
 
 class DetectorElement(object):
+
     def __init__(self, name, volume, material):
         self.name = name
         self.volume = volume
         self.material = material
-
-        
+    
 class Detector(object):
     #TODO validate geometry consistency (no hole, no overlapping volumes)
     def __init__(self):
@@ -14,6 +15,7 @@ class Detector(object):
         self._cylinders = []
         
     def cylinders(self):
+        '''Return list of cylinders sorted by increasing radius.'''
         if len(self._cylinders):
             return self._cylinders
         for element in self.elements.values():

@@ -33,6 +33,13 @@ class Particle(Trajectory):
         self.clusters = dict()
         super(Particle, self).__init__(p4.Vect(), vertex)
 
+    def is_em(self):
+        kind = abs(self.pdgid)
+        if kind==11 or kind==22:
+            return True
+        else:
+            return False
+        
     def set_helix(self, helix):
         self.helix = helix
         
