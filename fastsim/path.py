@@ -3,8 +3,11 @@ from scipy import constants
 from ROOT import TVector3
 from heppy.utils.deltar import deltaPhi
 
-class StraightLine(object):
-    
+class Path(object):
+    '''Path followed by a particle in 3D space. 
+    Assumes constant speed magnitude both along the z axis and in the transverse plane.
+    '''
+        
     def __init__(self, p4, origin):
         self.p4 = p4
         self.udir = p4.Vect().Unit()
@@ -16,26 +19,34 @@ class StraightLine(object):
         return dest_time
 
     def deltat(self, path_length):
+        '''Time needed to follow a given path length'''
         return path_length / self.speed
 
     def point_at_time(self, time):
+        '''Returns the 3D point on the path at a given time'''
         return self.origin + self.udir * self.speed * time
         
     def vz(self):
+        '''Speed magnitude along z axis'''
         return self.p4.Beta() * constants.c * self.udir.Z()
 
+    def vperp(self):
+        '''Speed magnitude in the transverse plane'''
+        return self.p4.Beta() * constants.c * self.udir.Perp()
+
     
-class Helix(object):
+class StraightLine(Path):
+    pass
+    
+    
+class Helix(Path):
     def __init__(self, field, charge, p4, origin):
+        super(Helix, self).__init__(p4, origin)
         self.charge = charge
-        self.p4 = p4
-        self.udir = p4.Vect().Unit()
-        self.origin = origin
         self.rho = p4.Perp() / (abs(charge)*field) * 1e9/constants.c
         self.v_over_omega = p4.Vect()
         self.v_over_omega *= 1./(charge*field)*1e9/constants.c
         self.omega = charge*field*constants.c**2 / (p4.M()*p4.Gamma()*1e9)
-        # self.omega = charge*field*constants.c / (p4.M()*p4.Gamma())
         momperp_xy = TVector3(-p4.Y(), p4.X(), 0.).Unit()
         origin_xy = TVector3(origin.X(), origin.Y(), 0.)
         self.center_xy = origin_xy - charge * momperp_xy * self.rho
@@ -48,12 +59,6 @@ class Helix(object):
         self.phi0 = center_to_origin.Phi()
         self.phi_min = self.phi0 * 180 / math.pi
         self.phi_max = self.phi_min + 360.
-
-    def vz(self):
-        return self.p4.Beta() * constants.c * self.udir.Z()
-
-    def vperp(self):
-        return self.p4.Beta() * constants.c * self.udir.Perp()
 
     def polar_at_time(self, time):
         z = self.vz() * time + self.origin.Z()
@@ -85,19 +90,15 @@ class Helix(object):
             + self.v_over_omega.Y() * math.sin(self.omega*time)
         return TVector3(x, y, z)
     
-    def time_at_z(self, z):
-        dest_time = (z - self.origin.Z())/self.vz()
-        return dest_time
-
     def path_length(self, deltat):
         '''ds2 = dx2+dy2+dz2 = [w2rho2 + vz2] dt2'''
         return math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)*deltat
 
-    def deltat(self, path_length):
-        #TODO: shouldn't this just use beta????
-        d1 = path_length / (self.p4.Beta()*constants.c)
-        # d2 = path_length / math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)
-        return d1
+    # def deltat(self, path_length):
+    #     #TODO: shouldn't this just use beta????
+    #     d1 = path_length / (self.p4.Beta()*constants.c)
+    #     # d2 = path_length / math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)
+    #     return d1
         
     
 if __name__ == '__main__':
