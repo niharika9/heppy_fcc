@@ -29,7 +29,7 @@ class Particle(Trajectory):
         self.vertex = vertex
         self.charge = charge
         self.pdgid = pdgid
-        self.helix = None
+        self.path = None
         self.clusters = dict()
         super(Particle, self).__init__(p4.Vect(), vertex)
 
@@ -40,8 +40,8 @@ class Particle(Trajectory):
         else:
             return False
         
-    def set_helix(self, helix):
-        self.helix = helix
+    def set_path(self, path):
+        self.path = path
         
     def __str__(self):
         return '{classname}: {charge} {mass:5.2f} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(

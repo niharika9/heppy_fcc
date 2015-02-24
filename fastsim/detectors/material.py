@@ -9,7 +9,6 @@ class Material(object):
     def path_length(self, ptc):
         '''path before decay within material'''
         freepath = self.x0 if ptc.is_em() else self.lambdaI
-        print freepath
         return np.random.exponential(freepath)
 
 void = Material('void', 0, 0)

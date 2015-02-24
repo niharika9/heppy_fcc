@@ -119,13 +119,13 @@ class GStraightTrajectory(GTrajectory):
 
 class GHelixTrajectory(GTrajectory):    
     def __init__(self, description):
-        helix = description.helix
+        helix = description.path
         self.helix_xy = TArc(helix.center_xy.X(),
                              helix.center_xy.Y(),
                              helix.rho, helix.phi_min, helix.phi_max)
         self.helix_xy.SetFillStyle(0)
         #TODO this is patchy,need to access the last point, whatever its name
-        max_time = description.helix.time_at_z(description.points.values()[-1].Z())
+        max_time = helix.time_at_z(description.points.values()[-1].Z())
         npoints = 100
         self.graphline_xy = TGraph(npoints)
         self.graphline_yz = TGraph(npoints)

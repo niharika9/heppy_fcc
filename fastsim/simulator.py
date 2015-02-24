@@ -72,38 +72,22 @@ class Simulator(object):
         pass
 
         
-    def simulate_charged_hadron(self, ptc):
-        # helix extrap to ECAL
-        # estimate crossed ECAL material (straight extrap)
-        # shower probability
-        # if shower,
-        #    decide on ECAL fraction
-        #    straight extrap to HCAL
-        #    HCAL deposit = (1-fecal)*E
-        # else
-        #    helix extrap to HCAL
-        #    HCAL deposit = E
+    def simulate_hadron(self, ptc):
         ecal = self.detector.elements['ecal']
         path_length = ecal.material.path_length(ptc)
         self.propagator(ptc).propagate_one(ptc,
                                            ecal.volume.inner,
                                            self.detector.elements['field'].magnitude)
-        # print ptc.points
-        time_ecal_inner = ptc.helix.time_at_z(ptc.points['ecal_in'].Z())
-        deltat = ptc.helix.deltat(path_length)
+        time_ecal_inner = ptc.path.time_at_z(ptc.points['ecal_in'].Z())
+        deltat = ptc.path.deltat(path_length)
         time_decay = time_ecal_inner + deltat
-        point_decay = ptc.helix.point_at_time(time_decay)
+        point_decay = ptc.path.point_at_time(time_decay)
         ptc.points['ecal_decay'] = point_decay
-        # print time_ecal_inner
-        # start_ecal = random.uniform(0., 1.)>0.8
         frac_ecal = 0.
         if ecal.volume.contains(point_decay):
-        # if start_ecal:
-            frac_ecal = random.uniform(0., 1.)
-            # TODO really dirty! need some kind of detector definition
+            frac_ecal = random.uniform(0., 0.7)
             self.make_cluster(ptc, 'ecal', frac_ecal)
         self.make_cluster(ptc, 'hcal', 1-frac_ecal)
-        # print frac_ecal, 1-frac_ecal
 
     def reconstruct_charged_hadron(self, ptc):
         # create reconstructed ECAL and HCAL deposits
@@ -122,7 +106,7 @@ class Simulator(object):
             elif abs(ptc.pdgid) == 13:
                 self.simulate_muon(ptc)
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
-                self.simulate_charged_hadron(ptc)
+                self.simulate_hadron(ptc)
             
                 
 if __name__ == '__main__':
@@ -137,7 +121,7 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(100, 211, 1, 2,
+    particles = list(particles(1, 130, 1, 2,
                                5., 5.) )
     simulator.simulate(particles)
 

@@ -3,6 +3,28 @@ from scipy import constants
 from ROOT import TVector3
 from heppy.utils.deltar import deltaPhi
 
+class StraightLine(object):
+    
+    def __init__(self, p4, origin):
+        self.p4 = p4
+        self.udir = p4.Vect().Unit()
+        self.origin = origin
+        self.speed = self.p4.Beta() * constants.c
+
+    def time_at_z(self, z):
+        dest_time = (z - self.origin.Z())/self.vz()
+        return dest_time
+
+    def deltat(self, path_length):
+        return path_length / self.speed
+
+    def point_at_time(self, time):
+        return self.origin + self.udir * self.speed * time
+        
+    def vz(self):
+        return self.p4.Beta() * constants.c * self.udir.Z()
+
+    
 class Helix(object):
     def __init__(self, field, charge, p4, origin):
         self.charge = charge
@@ -72,8 +94,11 @@ class Helix(object):
         return math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)*deltat
 
     def deltat(self, path_length):
-        return path_length / math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)
-
+        #TODO: shouldn't this just use beta????
+        d1 = path_length / (self.p4.Beta()*constants.c)
+        # d2 = path_length / math.sqrt(self.omega**2 * self.rho**2 + self.vz()**2)
+        return d1
+        
     
 if __name__ == '__main__':
 
@@ -82,4 +107,4 @@ if __name__ == '__main__':
     p4.SetPtEtaPhiM(1, 0, 0, 5.11e-4)
     helix = Helix(3.8, 1, p4, TVector3(0,0,0))
     length = helix.path_length(1e-9)
-    print length, helix.deltat(length)
+    helix.deltat(length)

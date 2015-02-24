@@ -3,8 +3,7 @@ import math
 import copy
 from ROOT import TVector3
 from geotools import circle_intersection
-from heppy.utils.deltar import deltaPhi
-from helix import Helix
+from path import Helix, StraightLine
 
 class Info(object):
     pass
@@ -20,19 +19,19 @@ class Propagator(object):
 class StraightLinePropagator(Propagator):        
 
     def propagate_one(self, particle, cylinder, dummy=None):
-        udir = particle.p4.Vect().Unit()
-        theta = udir.Theta()
-        origin = particle.vertex
-        if udir.Z():
-            destz = cylinder.z if udir.Z() > 0. else -cylinder.z
-            length = (destz - origin.Z())/math.cos(theta)
+        line = StraightLine(particle.p4, particle.vertex) 
+        particle.set_path( line )
+        theta = line.udir.Theta()
+        if line.udir.Z():
+            destz = cylinder.z if line.udir.Z() > 0. else -cylinder.z
+            length = (destz - line.origin.Z())/math.cos(theta)
             # import pdb; pdb.set_trace()
             assert(length>=0)
-            destination = origin + udir * length
+            destination = line.origin + line.udir * length
             rdest = destination.Perp()
             if rdest > cylinder.rad:
-                udirxy = TVector3(udir.X(), udir.Y(), 0.)
-                originxy = TVector3(origin.X(), origin.Y(), 0.)
+                udirxy = TVector3(line.udir.X(), line.udir.Y(), 0.)
+                originxy = TVector3(line.origin.X(), line.origin.Y(), 0.)
                 # solve 2nd degree equation for intersection
                 # between the straight line and the cylinder
                 # in the xy plane to get k,
@@ -45,7 +44,7 @@ class StraightLinePropagator(Propagator):
                 # positive propagation -> correct solution.
                 kp = (-b + math.sqrt(delta))/(2*a)
                 # print delta, km, kp
-                destination = origin + udir * kp  
+                destination = line.origin + line.udir * kp  
         #TODO deal with Z == 0 
         #TODO deal with overlapping cylinders
         particle.points[cylinder.name] = destination
@@ -56,7 +55,7 @@ class HelixPropagator(Propagator):
     def propagate_one(self, particle, cylinder, field, debug_info=None):
         helix = Helix(field, particle.charge, particle.p4,
                       particle.vertex)
-        particle.set_helix(helix)
+        particle.set_path(helix)
         is_looper = helix.extreme_point_xy.Mag() < cylinder.rad
         is_positive = particle.p4.Z() > 0.
         if not is_looper:
