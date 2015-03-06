@@ -2,6 +2,7 @@ import math
 from scipy import constants
 from ROOT import TVector3
 from heppy.utils.deltar import deltaPhi
+from collections import OrderedDict
 
 class Path(object):
     '''Path followed by a particle in 3D space. 
@@ -13,6 +14,8 @@ class Path(object):
         self.udir = p4.Vect().Unit()
         self.origin = origin
         self.speed = self.p4.Beta() * constants.c
+        self.points = OrderedDict()
+        self.points['vertex'] = origin
 
     def time_at_z(self, z):
         dest_time = (z - self.origin.Z())/self.vz()

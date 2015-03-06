@@ -1,5 +1,5 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
-from heppy_fcc.fastsim.pfobjects import Cluster
+from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster
 import random
 
 class Simulator(object):
@@ -32,20 +32,38 @@ class Simulator(object):
         if size is None:
             size = detector.cluster_size(ptc)
         cylname = detector.volume.inner.name
-        ptc.clusters[cylname] = Cluster(ptc.p4.E()*fraction,
-                                        ptc.points[cylname],
-                                        size,
-                                        cylname, ptc)
-
+        cluster =  Cluster(ptc.p4.E()*fraction,
+                           ptc.points[cylname],
+                           size,
+                           cylname, ptc)
+        ptc.clusters[cylname] = cluster
+        return cluster
+         
+    def smear_cluster(self, cluster, detector):
+        eres = detector.energy_resolution(cluster)
+        energy = cluster.energy * random.gauss(1, eres)
+        smeared_cluster = SmearedCluster( cluster,
+                                          energy,
+                                          cluster.position,
+                                          cluster.size,
+                                          cluster.layer,
+                                          cluster.particle )
+        smeared_cluster.set_energy(energy)
+        return smeared_cluster
+        #TODO make the interface look like make_cluster?
+        
     def simulate_photon(self, ptc):
         # true deposit:
         # straight extrapolation to ECAL
         # EM deposit all energy
-        ecal = self.detector.elements['ecal']
+        detname = 'ecal'
+        ecal = self.detector.elements[detname]
         self.prop_straight.propagate_one(ptc,
                                          ecal.volume.inner)
         
-        self.make_cluster(ptc, 'ecal')
+        cluster = self.make_cluster(ptc, detname)
+        smeared = self.smear_cluster(cluster, ecal)
+        ptc.clusters_smeared[smeared.layer] = smeared
 
     def reconstruct_photon(self, ptc):
         # create reconstructed EM deposit
@@ -71,6 +89,8 @@ class Simulator(object):
         # smear energy EM        
         pass
 
+    def simulate_neutrino(self, ptc):
+        self.propagate(ptc)
         
     def simulate_hadron(self, ptc):
         ecal = self.detector.elements['ecal']
@@ -105,6 +125,8 @@ class Simulator(object):
                 self.simulate_electron(ptc)
             elif abs(ptc.pdgid) == 13:
                 self.simulate_muon(ptc)
+            elif abs(ptc.pdgid) in [12,14,16]:
+                self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
             
@@ -121,7 +143,7 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(1, 130, 1, 2,
+    particles = list(particles(1, 22, 1, 2,
                                5., 5.) )
     simulator.simulate(particles)
 

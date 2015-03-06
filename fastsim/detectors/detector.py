@@ -1,5 +1,4 @@
 import operator
-import numpy as np
 
 class DetectorElement(object):
 

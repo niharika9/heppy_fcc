@@ -10,10 +10,10 @@ class Info(object):
 
 class Propagator(object):
 
-    def propagate(self, particles, *args, **kwargs):
+    def propagate(self, particles, cylinders, *args, **kwargs):
         for ptc in particles:
             for cyl in cylinders:
-                self.propagate_one(ptc, *args, **kwargs)
+                self.propagate_one(ptc, cyl, *args, **kwargs)
                 
                 
 class StraightLinePropagator(Propagator):        

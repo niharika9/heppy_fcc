@@ -10,16 +10,26 @@ class ECAL(DetectorElement):
         mat = material.Material('ECAL', 8.9e-3, 0.25)
         super(ECAL, self).__init__('ecal', volume,  mat)
 
-    def energy_resolution(self, ptc):
-        E = ptc.p4.E()
-        return 0.07 / math.sqrt(E) + 0.001
+    def energy_resolution(self, cluster):
+        E = cluster.energy
+        return 0.07 / cluster.energy + 0.001
 
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid)
         if pdgid==22 or pdgid==11:
-            return 0.05
+            return 0.04
         else:
             return 0.07
+
+    def acceptance(self, cluster):
+        energy = cluster.energy
+        eta = abs(cluster.position.Eta())
+        if eta < 1.5:
+            return energy>2.
+        elif eta < 3.:
+            return cluster.pt>0.5
+        else:
+            return False
 
     def space_resolution(self, ptc):
         pass
@@ -32,13 +42,22 @@ class HCAL(DetectorElement):
         mat = material.Material('HCAL', None, 0.17)
         super(HCAL, self).__init__('ecal', volume, mat)
 
-    def energy_resolution(self, ptc):
-        E = ptc.p4.E()
-        return 1.1/ math.sqrt(E) 
+    def energy_resolution(self, cluster):
+        return 1.1/ math.sqrt( cluster.energy ) 
 
     def cluster_size(self, ptc):
         return 0.2
 
+    def acceptance(self, cluster):
+        energy = cluster.energy
+        eta = abs(cluster.position.Eta())
+        if eta < 3. : 
+            return energy>5.
+        elif eta < 5.:
+            return energy>10.
+        else:
+            return False
+    
     def space_resolution(self, ptc):
         pass
 
@@ -50,7 +69,18 @@ class Tracker(DetectorElement):
         mat = material.void
         super(Tracker, self).__init__('tracker', volume,  mat)
 
-        
+    def acceptance(self, ptc):
+        pt = ptc.p4.Pt()
+        eta = abs(ptc.p4.Eta())
+        if eta < 2.5 : 
+            return pt>0.7
+        else:
+            return False
+
+    def pt_resolution(self, ptc):
+        return 0.01
+    
+
 class Field(DetectorElement):
 
     def __init__(self, magnitude):

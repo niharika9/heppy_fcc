@@ -23,8 +23,7 @@ def pfsimparticle(edmparticle):
     return PFSimParticle(tp4, vertex, charge, core.Type) 
 
 class PFSimOutput(object):
-    def __init__(self):
-        self.genparticles_stable = []
+    pass
         
 class PFSim(Analyzer):
 
@@ -46,20 +45,25 @@ class PFSim(Analyzer):
         if self.is_display:
             self.display.clear()
         store = event.input
-        output = PFSimOutput()
         edm_particles = store.get("GenParticle")
+        gen_particles_stable = []
         pfsim_particles = []
         for ptc in edm_particles:
             core = ptc.read().Core
             if core.Status == 1 and core.P4.Pt>1.:
                 pyptc = Particle(ptc) 
-                output.genparticles_stable.append( pyptc )
+                gen_particles_stable.append( pyptc )
                 pfsim_particles.append(pfsimparticle(ptc))
                 if self.cfg_ana.verbose:
                     print pyptc
         if self.cfg_ana.verbose:
-            print 'stable/all particles = {s}/{a}'.format(s=len(output.genparticles_stable),
+            print 'stable/all particles = {s}/{a}'.format(s=len(gen_particles_stable),
                                                           a=len(edm_particles))
-        self.simulator.simulate(pfsim_particles)
-        self.display.register( GTrajectories(pfsim_particles), layer=1) 
+        self.simulator.simulate( pfsim_particles )
+        self.display.register( GTrajectories(pfsim_particles), layer=1)
+        
+        output = PFSimOutput()
+        output.gen_stable = gen_particles_stable
+        output.pfsim = pfsim_particles
+        event.pfsim = output
 
