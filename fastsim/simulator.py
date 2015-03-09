@@ -39,23 +39,23 @@ class Simulator(object):
         ptc.clusters[cylname] = cluster
         return cluster
          
-    def smear_cluster(self, cluster, detector):
-        '''detector is only used to get the resolution and acceptance.
-        returns a smeared cluster that is basically a copy of cluster, 
-        with smeared position and energy. 
-        if the smeared cluster does not pass the acceptance cuts, 
-        returns None.
-        '''
-        eres = detector.energy_resolution(cluster)
-        energy = cluster.energy * random.gauss(1, eres)
-        smeared_cluster = SmearedCluster( cluster,
-                                          energy,
-                                          cluster.position,
-                                          cluster.size,
-                                          cluster.layer,
-                                          cluster.particle )
-        smeared_cluster.set_energy(energy)
-        return smeared_cluster
+    # def smear_cluster(self, cluster, detector):
+    #     '''detector is only used to get the resolution and acceptance.
+    #     returns a smeared cluster that is basically a copy of cluster, 
+    #     with smeared position and energy. 
+    #     if the smeared cluster does not pass the acceptance cuts, 
+    #     returns None.
+    #     '''
+    #     eres = detector.energy_resolution(cluster)
+    #     energy = cluster.energy * random.gauss(1, eres)
+    #     smeared_cluster = SmearedCluster( cluster,
+    #                                       energy,
+    #                                       cluster.position,
+    #                                       cluster.size,
+    #                                       cluster.layer,
+    #                                       cluster.particle )
+    #     smeared_cluster.set_energy(energy)
+    #     return smeared_cluster
         #TODO make the interface look like make_cluster?
         
     def simulate_photon(self, ptc):
@@ -68,7 +68,7 @@ class Simulator(object):
                                          ecal.volume.inner)
         
         cluster = self.make_cluster(ptc, detname)
-        smeared = self.smear_cluster(cluster, ecal)
+        smeared = cluster.smear(ecal)
         ptc.clusters_smeared[smeared.layer] = smeared
 
 
@@ -81,7 +81,7 @@ class Simulator(object):
                                       ecal.volume.inner,
                                       self.detector.elements['field'].magnitude )
         self.make_cluster(ptc, 'ecal')
-        smeared = self.smear_cluster(cluster, ecal)
+        smeared = cluster.smear(ecal)
         ptc.clusters_smeared[smeared.layer] = smeared
 
 
@@ -106,10 +106,10 @@ class Simulator(object):
             cluster = self.make_cluster(ptc, 'ecal', frac_ecal)
             # For now, using the hcal resolution for hadronic cluster
             # in the ECAL. That's not a bug! 
-            smeared = self.smear_cluster(cluster, hcal)
+            smeared = cluster.smear(hcal)
             ptc.clusters_smeared[smeared.layer] = smeared
         cluster = self.make_cluster(ptc, 'hcal', 1-frac_ecal)
-        smeared = self.smear_cluster(cluster, hcal)
+        smeared = cluster.smear(hcal)
         ptc.clusters_smeared[smeared.layer] = smeared
 
     

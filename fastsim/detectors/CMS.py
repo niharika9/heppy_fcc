@@ -8,6 +8,8 @@ class ECAL(DetectorElement):
     def __init__(self):
         volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
         mat = material.Material('ECAL', 8.9e-3, 0.25)
+        self.eta_crack = 1.5
+        self.emin = 2.
         super(ECAL, self).__init__('ecal', volume,  mat)
 
     def energy_resolution(self, cluster):
@@ -24,10 +26,10 @@ class ECAL(DetectorElement):
     def acceptance(self, cluster):
         energy = cluster.energy
         eta = abs(cluster.position.Eta())
-        if eta < 1.5:
-            return energy>2.
+        if eta < self.eta_crack:
+            return energy>self.emin
         elif eta < 3.:
-            return cluster.pt>0.5
+            return energy>self.emin and cluster.pt>0.5
         else:
             return False
 
@@ -98,7 +100,4 @@ class CMS(Detector):
         self.elements['hcal'] = HCAL()
         self.elements['field'] = Field(3.8)
 
-
-if __name__ == '__main__':
-
-    cms = CMS()
+cms = CMS()
