@@ -1,5 +1,5 @@
 import unittest
-from geometry import SurfaceCylinder
+from detectors.geometry import SurfaceCylinder
 from pfobjects import Particle
 from propagator import straight_line, helix
 from vectors import LorentzVector, Point
@@ -16,10 +16,10 @@ class TestPropagator(unittest.TestCase):
         straight_line.propagate_one( particle, cyl2 )
         self.assertEqual( len(particle.points), 3)
         # test extrapolation to barrel
-        self.assertEqual( particle.points['cyl1'].Perp(), 1. )
-        self.assertEqual( particle.points['cyl1'].Z(), 1. )
+        self.assertAlmostEqual( particle.points['cyl1'].Perp(), 1. )
+        self.assertAlmostEqual( particle.points['cyl1'].Z(), 1. )
         # test extrapolation to endcap
-        self.assertEqual( particle.points['cyl2'].Z(), 1. )
+        self.assertAlmostEqual( particle.points['cyl2'].Z(), 1. )
         
         # testing extrapolation to -z 
         particle = Particle( LorentzVector(1, 0, -1, 2.), origin, 0)
@@ -52,23 +52,16 @@ class TestPropagator(unittest.TestCase):
         self.assertAlmostEqual( particle.points['cyl1'].Z(), 1. )
         
     def test_helix(self):
-        cyl1 = SurfaceCylinder('cyl1', 1, 2)
-        cyl2 = SurfaceCylinder('cyl2', 2, 1)
-        
+        cyl1 = SurfaceCylinder('cyl1', 1., 2.)
+        cyl2 = SurfaceCylinder('cyl2', 2., 1.)
+        field = 3.8
         particle = Particle( LorentzVector(2., 0, 1, 5),
-                             Point(0., 0.5, 0.), -1)
-        debug_info = helix.propagate_one(particle, cyl1)
-        # self.assertTrue(debug_info.is_looper)
-        # self.assertTrue(debug_info.is_positive)
-        # particle = Particle( LorentzVector(1, 0, -1, 2.), Point(0., 0., 0.), 1)
-        # debug_info = helix.propagate_one(particle, cyl1)
-        # self.assertFalse(debug_info.is_positive)
-        # particle = Particle( LorentzVector(4.1, 0, 1, 5), Point(0., 0., 0.), 1)
-        # debug_info = helix.propagate_one(particle, cyl1)
-        # self.assertFalse(debug_info.is_looper)
-        # particle = Particle( LorentzVector(2., 0, 1, 5), Point(0.51, 0., 0.), 1)
-        # debug_info = helix.propagate_one(particle, cyl1)
-        # self.assertFalse(debug_info.is_looper)
+                             Point(0., 0., 0.), -1)        
+        debug_info = helix.propagate_one(particle, cyl1, field)
+        particle = Particle( LorentzVector(0., 2, 1, 5),
+                             Point(0., 0., 0.), -1)        
+        debug_info = helix.propagate_one(particle, cyl1, field)
+
         
 if __name__ == '__main__':
     unittest.main()

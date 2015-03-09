@@ -1,7 +1,11 @@
 import math
 
+
 def circle_intersection(x1, y1, r1, r2):
     '''Intersections between a circle 1 and a circle 2 centred at origin.'''
+    switchxy = x1 == 0.
+    if switchxy:
+        x1, y1 = y1, x1
     A = (r2**2 - r1**2 + x1**2 + y1**2) / (2*x1)
     B = y1/x1
     a = 1 + B**2
@@ -18,6 +22,9 @@ def circle_intersection(x1, y1, r1, r2):
     xm = math.sqrt(r2**2 - ym**2)
     if abs((xm-x1)**2 + (ym-y1)**2 - r1**2) > 1e-9:
         xm = -xm
+    if switchxy:
+        xm, ym = ym, xm
+        xp, yp = yp, xp
     return xm, ym, xp, yp
     
 
@@ -28,7 +35,7 @@ if __name__ == '__main__':
     can = TCanvas("can","", 600, 600)
     suph = TH2F("suph", "", 10, -5, 5, 10, -5, 5)
     suph.Draw()
-    x1, y1, r1, r2 = 1.8, 0., 1., 2.
+    x1, y1, r1, r2 = 0., 1.8, 1., 2.
     results = circle_intersection(x1, y1, r1, r2)
     c1 = TEllipse(x1, y1, r1)
     c1.Draw('same')

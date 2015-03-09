@@ -40,6 +40,12 @@ class Simulator(object):
         return cluster
          
     def smear_cluster(self, cluster, detector):
+        '''detector is only used to get the resolution and acceptance.
+        returns a smeared cluster that is basically a copy of cluster, 
+        with smeared position and energy. 
+        if the smeared cluster does not pass the acceptance cuts, 
+        returns None.
+        '''
         eres = detector.energy_resolution(cluster)
         energy = cluster.energy * random.gauss(1, eres)
         smeared_cluster = SmearedCluster( cluster,
@@ -65,13 +71,6 @@ class Simulator(object):
         smeared = self.smear_cluster(cluster, ecal)
         ptc.clusters_smeared[smeared.layer] = smeared
 
-    def reconstruct_photon(self, ptc):
-        # create reconstructed EM deposit
-        # acceptance
-        # possibly smear position EM
-        # apply E thresh
-        # smear energy EM
-        pass
 
     def simulate_electron(self, ptc):
         # true deposit
@@ -82,18 +81,16 @@ class Simulator(object):
                                       ecal.volume.inner,
                                       self.detector.elements['field'].magnitude )
         self.make_cluster(ptc, 'ecal')
+        smeared = self.smear_cluster(cluster, ecal)
+        ptc.clusters_smeared[smeared.layer] = smeared
 
-    def reconstruct_electron(self, ptc):
-        # create reconstructed EM deposit
-        # possibly smear position EM
-        # smear energy EM        
-        pass
 
     def simulate_neutrino(self, ptc):
         self.propagate(ptc)
         
     def simulate_hadron(self, ptc):
         ecal = self.detector.elements['ecal']
+        hcal = self.detector.elements['hcal']        
         path_length = ecal.material.path_length(ptc)
         self.propagator(ptc).propagate_one(ptc,
                                            ecal.volume.inner,
@@ -106,14 +103,15 @@ class Simulator(object):
         frac_ecal = 0.
         if ecal.volume.contains(point_decay):
             frac_ecal = random.uniform(0., 0.7)
-            self.make_cluster(ptc, 'ecal', frac_ecal)
-        self.make_cluster(ptc, 'hcal', 1-frac_ecal)
+            cluster = self.make_cluster(ptc, 'ecal', frac_ecal)
+            # For now, using the hcal resolution for hadronic cluster
+            # in the ECAL. That's not a bug! 
+            smeared = self.smear_cluster(cluster, hcal)
+            ptc.clusters_smeared[smeared.layer] = smeared
+        cluster = self.make_cluster(ptc, 'hcal', 1-frac_ecal)
+        smeared = self.smear_cluster(cluster, hcal)
+        ptc.clusters_smeared[smeared.layer] = smeared
 
-    def reconstruct_charged_hadron(self, ptc):
-        # create reconstructed ECAL and HCAL deposits
-        # possibly smear position ECAL and HCAL
-        # smear total energy        
-        pass
     
     def simulate(self, ptcs):
         self.reset()
@@ -143,7 +141,7 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(1, 22, 1, 2,
+    particles = list(particles(1, 211, 1, 2,
                                5., 5.) )
     simulator.simulate(particles)
 
