@@ -1,5 +1,5 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
-from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster
+from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
 import random
 
 class Simulator(object):
@@ -38,8 +38,38 @@ class Simulator(object):
                            cylname, ptc)
         ptc.clusters[cylname] = cluster
         return cluster
-         
 
+    def smear_cluster(self, cluster, detector, accept=False):
+        '''Returns a copy of self with a smeared energy.  
+        If accept is False (default), returns None if the smeared 
+        cluster is not in the detector acceptance. '''
+        eres = detector.energy_resolution(cluster)
+        energy = cluster.energy * random.gauss(1, eres)
+        smeared_cluster = SmearedCluster( cluster,
+                                          energy,
+                                          cluster.position,
+                                          cluster.size,
+                                          cluster.layer,
+                                          cluster.particle )
+        # smeared_cluster.set_energy(energy)
+        if detector.acceptance(smeared_cluster) or accept:
+            return smeared_cluster
+        else:
+            return None
+    
+    def smear_track(self, track, detector, accept=False):
+        #TODO smearing depends on particle type!
+        ptres = detector.pt_resolution(track)
+        scale_factor = random.gauss(1, ptres)
+        smeared_track = SmearedTrack(track,
+                                     track.p3 * scale_factor,
+                                     track.charge,
+                                     track.path)
+        if detector.acceptance(smeared_track) or accept:
+            return smeared_track
+        else:
+            return None
+        
     def simulate_photon(self, ptc):
         detname = 'ecal'
         ecal = self.detector.elements[detname]
@@ -47,7 +77,7 @@ class Simulator(object):
                                          ecal.volume.inner)
         
         cluster = self.make_cluster(ptc, detname)
-        smeared = cluster.smear(ecal)
+        smeared = self.smear_cluster(cluster, ecal)
         if smeared: 
             ptc.clusters_smeared[smeared.layer] = smeared
 
@@ -58,10 +88,11 @@ class Simulator(object):
                                       ecal.volume.inner,
                                       self.detector.elements['field'].magnitude )
         cluster = self.make_cluster(ptc, 'ecal')
-        smeared_cluster = cluster.smear(ecal)
+        smeared_cluster = self.smear_cluster(cluster, ecal)
         if smeared_cluster: 
             ptc.clusters_smeared[smeared_cluster.layer] = smeared_cluster
-        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        smeared_track = self.smear_track(ptc.track,
+                                         self.detector.elements['tracker'])
         if smeared_track:
             ptc.track_smeared = smeared_track
 
@@ -88,20 +119,22 @@ class Simulator(object):
             # For now, using the hcal resolution and acceptance
             # for hadronic cluster
             # in the ECAL. That's not a bug! 
-            smeared = cluster.smear(hcal)
+            smeared = self.smear_cluster(cluster, hcal)
             if smeared:
                 ptc.clusters_smeared[smeared.layer] = smeared
         cluster = self.make_cluster(ptc, 'hcal', 1-frac_ecal)
-        smeared = cluster.smear(hcal)
+        smeared = self.smear_cluster(cluster, hcal)
         if smeared:
             ptc.clusters_smeared[smeared.layer] = smeared
-        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        smeared_track = self.smear_track(ptc.track,
+                                         self.detector.elements['tracker'])
         if smeared_track:
             ptc.track_smeared = smeared_track
 
     def simulate_muon(self, ptc):
         self.propagate(ptc)
-        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        smeared_track = self.smear_track(ptc.track,
+                                         self.detector.elements['tracker'])
         if smeared_track:
             ptc.track_smeared = smeared_track
             

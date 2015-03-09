@@ -1,5 +1,4 @@
 from vectors import Point
-import random
 
 
 class Cluster(object):
@@ -35,25 +34,6 @@ class Cluster(object):
             phi = self.position.Phi()
         )
 
-    def smear(self, detector, accept=False):
-        '''Returns a copy of self with a smeared energy.  
-        If accept is False (default), returns None if the smeared 
-        cluster is not in the detector acceptance. '''
-        #TODO I don't like to have this here. Should be in simulator
-        eres = detector.energy_resolution(self)
-        energy = self.energy * random.gauss(1, eres)
-        smeared_cluster = SmearedCluster( self,
-                                          energy,
-                                          self.position,
-                                          self.size,
-                                          self.layer,
-                                          self.particle )
-        # smeared_cluster.set_energy(energy)
-        if detector.acceptance(smeared_cluster) or accept:
-            return smeared_cluster
-        else:
-            return None
-
         
 class SmearedCluster(Cluster):
     def __init__(self, mother, *args, **kwargs):
@@ -70,20 +50,6 @@ class Track(object):
         self.path = path
         self.particle = particle
 
-    def smear(self, detector, accept=False):
-        #TODO smearing depends on particle type!
-        #TODO this is wierd. put this code in smeared track constructor
-        # or in simulator
-        ptres = detector.pt_resolution(self)
-        scale_factor = random.gauss(1, ptres)
-        smeared_track = SmearedTrack(self,
-                                     self.p3 * scale_factor,
-                                     self.charge,
-                                     self.path)
-        if detector.acceptance(smeared_track) or accept:
-            return smeared_track
-        else:
-            return None
         
 class SmearedTrack(Track):
 
@@ -134,9 +100,7 @@ class Particle(object):
             theta = self.p4.Theta(),
             phi = self.p4.Phi()
         )
-        
-# class Track(Trajectory):
-#     pass
+
     
 if __name__ == '__main__':
     from ROOT import TVector3
