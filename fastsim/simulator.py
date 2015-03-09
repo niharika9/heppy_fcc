@@ -39,28 +39,7 @@ class Simulator(object):
         ptc.clusters[cylname] = cluster
         return cluster
          
-<<<<<<< HEAD
-=======
-    # def smear_cluster(self, cluster, detector):
-    #     '''detector is only used to get the resolution and acceptance.
-    #     returns a smeared cluster that is basically a copy of cluster, 
-    #     with smeared position and energy. 
-    #     if the smeared cluster does not pass the acceptance cuts, 
-    #     returns None.
-    #     '''
-    #     eres = detector.energy_resolution(cluster)
-    #     energy = cluster.energy * random.gauss(1, eres)
-    #     smeared_cluster = SmearedCluster( cluster,
-    #                                       energy,
-    #                                       cluster.position,
-    #                                       cluster.size,
-    #                                       cluster.layer,
-    #                                       cluster.particle )
-    #     smeared_cluster.set_energy(energy)
-    #     return smeared_cluster
-        #TODO make the interface look like make_cluster?
-        
->>>>>>> origin/master
+
     def simulate_photon(self, ptc):
         detname = 'ecal'
         ecal = self.detector.elements[detname]
@@ -69,12 +48,8 @@ class Simulator(object):
         
         cluster = self.make_cluster(ptc, detname)
         smeared = cluster.smear(ecal)
-<<<<<<< HEAD
         if smeared: 
             ptc.clusters_smeared[smeared.layer] = smeared
-=======
-        ptc.clusters_smeared[smeared.layer] = smeared
->>>>>>> origin/master
 
 
     def simulate_electron(self, ptc):
@@ -82,7 +57,6 @@ class Simulator(object):
         self.prop_helix.propagate_one(ptc,
                                       ecal.volume.inner,
                                       self.detector.elements['field'].magnitude )
-<<<<<<< HEAD
         cluster = self.make_cluster(ptc, 'ecal')
         smeared_cluster = cluster.smear(ecal)
         if smeared_cluster: 
@@ -90,11 +64,6 @@ class Simulator(object):
         smeared_track = ptc.track.smear(self.detector.elements['tracker'])
         if smeared_track:
             ptc.track_smeared = smeared_track
-=======
-        self.make_cluster(ptc, 'ecal')
-        smeared = cluster.smear(ecal)
-        ptc.clusters_smeared[smeared.layer] = smeared
->>>>>>> origin/master
 
 
     def simulate_neutrino(self, ptc):
