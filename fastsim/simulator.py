@@ -1,5 +1,6 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
 from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
+from pfalgo.pfinput import PFInput
 import random
 
 class Simulator(object):
@@ -152,7 +153,8 @@ class Simulator(object):
                 self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
-            
+        self.pfinput = PFInput(self.ptcs)
+        print self.pfinput
                 
 if __name__ == '__main__':
 
@@ -166,13 +168,17 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(1, 11, 1, 2,
-                               5., 5.) )
+    particles = list(particles(5, 211, 1, 2,
+                               5., 10.) )
     simulator.simulate(particles)
 
+    print simulator.pfinput.clusters
+    print simulator.pfinput.tracks
+    
     display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])
     gcms = GDetector(cms)
     display.register(gcms, 0)
     gtrajectories = GTrajectories(particles)
     display.register(gtrajectories,1)
     display.draw()
+    

@@ -1,5 +1,5 @@
 from vectors import Point
-
+import math
 
 class Cluster(object):
 
@@ -30,7 +30,7 @@ class Cluster(object):
             classname = self.__class__.__name__,
             layer = self.layer,
             energy = self.energy,
-            theta = self.position.Theta(),
+            theta = math.pi/2. - self.position.Theta(),
             phi = self.position.Phi()
         )
 
@@ -49,6 +49,15 @@ class Track(object):
         self.charge = charge
         self.path = path
         self.particle = particle
+
+    def __str__(self):
+        return '{classname}: {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+            classname = self.__class__.__name__,
+            pt = self.pt,
+            theta = self.p3.Theta(),
+            phi = self.p3.Phi()
+        )
+        
 
         
 class SmearedTrack(Track):
