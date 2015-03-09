@@ -63,6 +63,9 @@ class Blob(object):
         
 
 class GTrajectory(object):
+
+    draw_smeared_clusters = True
+    
     def __init__(self, description, linestyle=1, linecolor=1):
         self.desc = description
         npoints = len(self.desc.points)
@@ -88,7 +91,10 @@ class GTrajectory(object):
             if i == 0:
                 tppoint = description.p4.Vect()
             self.graph_thetaphi.SetPoint(i, math.pi/2. - tppoint.Theta(), tppoint.Phi() )
-        self.blobs = map(Blob, self.desc.clusters.values())            
+        clusters = self.desc.clusters_smeared \
+                   if self.__class__.draw_smeared_clusters \
+                   else self.desc.clusters
+        self.blobs = map(Blob, clusters.values())            
 
     def set_color(self, color):
         for graph in self.graphs:
