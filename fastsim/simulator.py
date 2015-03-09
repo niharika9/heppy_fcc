@@ -40,9 +40,6 @@ class Simulator(object):
         return cluster
          
     def simulate_photon(self, ptc):
-        # true deposit:
-        # straight extrapolation to ECAL
-        # EM deposit all energy
         detname = 'ecal'
         ecal = self.detector.elements[detname]
         self.prop_straight.propagate_one(ptc,
@@ -55,17 +52,17 @@ class Simulator(object):
 
 
     def simulate_electron(self, ptc):
-        # true deposit
-        # helix extrapolation to ECAL
-        # EM deposit all energy
         ecal = self.detector.elements['ecal']
         self.prop_helix.propagate_one(ptc,
                                       ecal.volume.inner,
                                       self.detector.elements['field'].magnitude )
         cluster = self.make_cluster(ptc, 'ecal')
-        smeared = cluster.smear(ecal)
-        if smeared: 
-            ptc.clusters_smeared[smeared.layer] = smeared
+        smeared_cluster = cluster.smear(ecal)
+        if smeared_cluster: 
+            ptc.clusters_smeared[smeared_cluster.layer] = smeared_cluster
+        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        if smeared_track:
+            ptc.track_smeared = smeared_track
 
 
     def simulate_neutrino(self, ptc):
@@ -87,7 +84,8 @@ class Simulator(object):
         if ecal.volume.contains(point_decay):
             frac_ecal = random.uniform(0., 0.7)
             cluster = self.make_cluster(ptc, 'ecal', frac_ecal)
-            # For now, using the hcal resolution for hadronic cluster
+            # For now, using the hcal resolution and acceptance
+            # for hadronic cluster
             # in the ECAL. That's not a bug! 
             smeared = cluster.smear(hcal)
             if smeared:
@@ -96,9 +94,15 @@ class Simulator(object):
         smeared = cluster.smear(hcal)
         if smeared:
             ptc.clusters_smeared[smeared.layer] = smeared
+        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        if smeared_track:
+            ptc.track_smeared = smeared_track
 
     def simulate_muon(self, ptc):
         self.propagate(ptc)
+        smeared_track = ptc.track.smear(self.detector.elements['tracker'])
+        if smeared_track:
+            ptc.track_smeared = smeared_track
             
     def simulate(self, ptcs):
         self.reset()
@@ -128,8 +132,8 @@ if __name__ == '__main__':
 
     cms = CMS()
     simulator = Simulator(cms)
-    particles = list(particles(1, 211, 1, 2,
-                               20., 20.) )
+    particles = list(particles(1, 11, 1, 2,
+                               5., 5.) )
     simulator.simulate(particles)
 
     display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])

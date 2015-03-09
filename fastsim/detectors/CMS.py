@@ -64,23 +64,28 @@ class HCAL(DetectorElement):
         pass
 
 
+    
 class Tracker(DetectorElement):
+    #TODO acceptance and resolution depend on the particle type
     
     def __init__(self):
         volume = VolumeCylinder('tracker', 1.29, 1.99)
         mat = material.void
         super(Tracker, self).__init__('tracker', volume,  mat)
 
-    def acceptance(self, ptc):
-        pt = ptc.p4.Pt()
-        eta = abs(ptc.p4.Eta())
+    def acceptance(self, track):
+        pt = track.pt
+        eta = abs(track.p3.Eta())
         if eta < 2.5 : 
             return pt>0.7
         else:
             return False
 
-    def pt_resolution(self, ptc):
+    def pt_resolution(self, track):
+        # TODO: depends on the field
+        pt = track.pt
         return 0.01
+
     
 
 class Field(DetectorElement):
