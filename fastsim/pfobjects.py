@@ -1,5 +1,5 @@
 from vectors import Point
-# from collections import OrderedDict
+import random
 
 
 class Cluster(object):
@@ -33,7 +33,24 @@ class Cluster(object):
             theta = self.position.Theta(),
             phi = self.position.Phi()
         )
-        
+
+    def smear(self, detector, accept=False):
+        '''Returns a copy of self with a smeared energy.  
+        If accept is False (default), returns None if the smeared 
+        cluster is not in the detector acceptance. '''
+        eres = detector.energy_resolution(self)
+        energy = self.energy * random.gauss(1, eres)
+        smeared_cluster = SmearedCluster( self,
+                                          energy,
+                                          self.position,
+                                          self.size,
+                                          self.layer,
+                                          self.particle )
+        # smeared_cluster.set_energy(energy)
+        if detector.acceptance(smeared_cluster) or accept:
+            return smeared_cluster
+        else:
+            return None
 
 class SmearedCluster(Cluster):
     def __init__(self, mother, *args, **kwargs):
