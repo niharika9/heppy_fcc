@@ -14,7 +14,7 @@ class Detector(object):
         self._cylinders = []
         
     def cylinders(self):
-        '''Return list of cylinders sorted by increasing radius.'''
+        '''Return list of surface cylinders sorted by increasing radius.'''
         if len(self._cylinders):
             return self._cylinders
         for element in self.elements.values():
