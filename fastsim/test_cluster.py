@@ -1,11 +1,14 @@
 import unittest
 from pfobjects import Cluster, SmearedCluster
 from detectors.CMS import cms
+from simulator import Simulator
 from ROOT import TVector3
 import math
 import numpy as np
 from ROOT import TFile, TH1F, TH2F
- 
+
+simulator = Simulator(cms)
+
 class TestCluster(unittest.TestCase):
 
     def test_pt(self):
@@ -22,8 +25,8 @@ class TestCluster(unittest.TestCase):
         cluster = Cluster(energy, TVector3(1,0,0), 1, 1)
         ecal = cms.elements['ecal']
         energies = []
-        for i in range(10000):
-            smeared = cluster.smear(ecal, accept=True)
+        for i in range(1000):
+            smeared = simulator.smear_cluster(cluster, ecal, accept=True)
             h_e.Fill(smeared.energy)
             energies.append(smeared.energy)
         npe = np.array(energies)
@@ -41,7 +44,7 @@ class TestCluster(unittest.TestCase):
                         100, -5, 5, 100, 0, 15)
         h_ptvseta = TH2F('h_ptvseta','cluster pt vs eta',
                          100, -5, 5, 100, 0, 15)
-        nclust = 10000.
+        nclust = 1000.
         energies = np.random.uniform(0., 10., nclust)
         thetas = np.random.uniform(0, math.pi, nclust)
         costhetas = np.cos(thetas)
@@ -53,7 +56,7 @@ class TestCluster(unittest.TestCase):
         smeared_clusters = []
         min_energy = -999.
         for cluster in clusters:
-            smeared_cluster = cluster.smear(ecal)
+            smeared_cluster = simulator.smear_cluster(cluster, ecal)
             if smeared_cluster:
                 h_evseta.Fill(smeared_cluster.position.Eta(),
                               smeared_cluster.energy)
@@ -66,6 +69,18 @@ class TestCluster(unittest.TestCase):
         self.assertGreater(min_energy, ecal.emin)
         rootfile.Write()
         rootfile.Close()
+
+    def test_absorption(self):
+        #TODO test several absorptions
+        #TODO test very asymmetric cases
+        #TODO test absorption of several compound clusters 
+        e1 = 10.
+        e2 = 20.
+        c1 = Cluster(e1, TVector3(1,1,0), 1, 1)
+        c2 = Cluster(e2, TVector3(1,1.01,0), 1, 1)
+        c1.absorb(c2)
+        self.assertEqual(c1.absorbed[0], c2)
+        self.assertEqual(c1.energy, e1+e2)
         
 if __name__ == '__main__':
     unittest.main()

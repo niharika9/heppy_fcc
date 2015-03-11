@@ -19,7 +19,7 @@ class Simulator(object):
         return self.prop_straight if is_neutral else self.prop_helix
         
     def propagate(self, ptc):
-        '''propagate the particle to all dector cylinders'''
+        '''propagate the particle to all detector cylinders'''
         self.propagator(ptc).propagate([ptc], self.detector.cylinders(),
                                        self.detector.elements['field'].magnitude)
 

@@ -1,4 +1,5 @@
 from vectors import Point
+from heppy.utils.deltar import deltaR
 import math
 
 class Cluster(object):
@@ -12,7 +13,22 @@ class Cluster(object):
         self.size = size
         self.layer = layer
         self.particle = particle
+        self.absorbed = []
 
+    def absorb(self, other):
+        subs = list(self.absorbed)
+        subs.append(self)
+        osubs = list(other.absorbed)
+        osubs.append(other)
+        for sub in subs:
+            for osub in osubs:
+                if deltaR(sub.position.Eta(),
+                          sub.position.Phi(),
+                          osub.position.Eta(),
+                          osub.position.Phi()) < sub.size + osub.size:
+                    self.absorbed.extend(osubs)
+                    self.set_energy( self.energy + other.energy ) 
+        
     def set_energy(self, energy):
         self.energy = energy
         if energy > self.__class__.max_energy:
@@ -33,7 +49,6 @@ class Cluster(object):
             theta = math.pi/2. - self.position.Theta(),
             phi = self.position.Phi()
         )
-
         
 class SmearedCluster(Cluster):
     def __init__(self, mother, *args, **kwargs):
