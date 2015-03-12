@@ -99,7 +99,7 @@ class Particle(object):
         # TODO remove track datamembers from self.
         self.track = Track(self.p3, self.charge, self.path)
         self.clusters_smeared = dict()
-        self.track_smeared = None
+        self.track_smeared = None  
         
     def __getattr__(self, name):
         if name=='points':
@@ -120,7 +120,7 @@ class Particle(object):
             self.track = Track(self.p3, self.charge, self.path)
         
     def __str__(self):
-        return '{classname}: {pdgid} {charge} {mass:5.2f} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname}: {pdgid:5} {charge:2} {mass:8.3f} {energy:6.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             pdgid = self.pdgid,
             charge = self.charge,

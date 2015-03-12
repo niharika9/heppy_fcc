@@ -162,7 +162,7 @@ if __name__ == '__main__':
     from heppy_fcc.fastsim.vectors import Point
     from heppy_fcc.fastsim.detectors.CMS import cms
     from heppy_fcc.fastsim.detectors.perfect import perfect    
-    from heppy_fcc.fastsim.toyevents import particles as generator
+    from heppy_fcc.fastsim.toyevents import monojet 
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
     from heppy_fcc.display.pfobjects import GTrajectories
@@ -170,10 +170,7 @@ if __name__ == '__main__':
     detector = perfect
     
     simulator = Simulator(detector)
-    particles = list(generator(2, 211, 1, 2,
-                               2., 10.))
-    particles.extend(generator(2, 22, 1, 2,
-                               2., 10.))
+    particles = monojet([211, 22, 22], 1, 0.5, 50)
     simulator.simulate(particles)
     
     display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])
