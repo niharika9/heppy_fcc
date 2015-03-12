@@ -17,31 +17,30 @@ class PFInput(object):
           ecal: [cluster0, cluster1, ...]
           hcal: [... ]
         '''
-        self.clusters = dict()
-        self.tracks = []
+        self.elements = dict()
         self.build(ptcs)
         
     def build(self, ptcs):
         for ptc in ptcs:
             for key, cluster in ptc.clusters_smeared.iteritems():
-                self.clusters.setdefault(key, []).append(cluster)
+                self.elements.setdefault(key, []).append(cluster)
             if ptc.track_smeared: 
-                self.tracks.append(ptc.track_smeared)
-        self.tracks.sort(key=operator.attrgetter('pt'), reverse=True)
-        for clusters in self.clusters.values():
-            merge_clusters(clusters)
-            clusters.sort(key=operator.attrgetter('energy'), reverse=True)
+                self.elements.setdefault('tracker', []).append(ptc.track_smeared)
+        # self.tracks.sort(key=operator.attrgetter('pt'), reverse=True)
+        for elems in self.elements.values():
+            # merge_clusters(clusters)
+            elems.sort(key=operator.attrgetter('energy'), reverse=True)
             
     def __str__(self):
         lines = ['PFInput:']
-        lines.append('\tTracks:')
+        # lines.append('\tTracks:')
         def tab(astr, ntabs=2):
             return ''.join(['\t'*ntabs, str(astr)])
-        for track in self.tracks:
-            lines.append(tab(str(track)))
-        lines.append('\tClusters:')
-        for layer, clusters in sorted(self.clusters.iteritems()):
+        # for track in self.tracks:
+        #     lines.append(tab(str(track)))
+        # lines.append('\tClusters:')
+        for layer, elements in sorted(self.elements.iteritems()):
             lines.append(tab(layer))
-            for cluster in clusters:
-                lines.append(tab(str(cluster), 3))
+            for element in elements:
+                lines.append(tab(str(element), 3))
         return '\n'.join(lines)

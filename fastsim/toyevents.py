@@ -42,7 +42,12 @@ def particles(nptcs, pdgid, thetamin, thetamax, emin, emax, vertex=None ):
         ngenerated += 1
         yield Particle(p4, vertex, charge, pdgid) 
 
-
+        
+def monojet(pdgids, theta, jetmass, jetenergy):
+    for pdgid in pdgids: 
+        phistar = random.uniform(-math.pi, math.pi)
+        thetastar = random.uniform(-math.pi, math.pi)
+        
         
 if __name__ == '__main__':
     for ptc in particles(10, 0., 0., 0.1, 0.2, 10, 50):

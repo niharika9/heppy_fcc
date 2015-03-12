@@ -71,32 +71,60 @@ class TestCluster(unittest.TestCase):
         rootfile.Close()
 
     def test_absorption(self):
-        #TODO test several absorptions
-        #TODO test very asymmetric cases
-        #TODO test absorption of several compound clusters 
-        e1 = 10.
-        e2 = 20.
-        e3 = 30.
-        def make_clusters():
-            c1 = Cluster(e1, TVector3(1,0,0), size=0.04, layer=0)
-            c2 = Cluster(e2, TVector3(1,0,0.099), size=0.06, layer=0)
-            c3 = Cluster(e3, TVector3(1,0,0.11), size=0.06, layer=0)
-            return c1, c2, c3
-        c1, c2, c3 = make_clusters()
-        c1.absorb(c2)
-        self.assertEqual(len(c1.absorbed), 1)
-        self.assertEqual(len(c2.absorbed), 0)
-        self.assertEqual(c1.absorbed[0], c2)
-        self.assertEqual(c1.energy, e1+e2)
-        c1.absorb(c3)
-        self.assertEqual(len(c1.absorbed), 2)
-        self.assertEqual(c1.energy, e1+e2+e3)
-        c1, c2, c3 = make_clusters()
-        code = c1.absorb(c3)
-        self.assertFalse(code)
-        self.assertEqual(len(c1.absorbed), 0)
-        self.assertEqual(len(c2.absorbed), 0)
-        self.assertEqual(c1.energy, e1)
+        energies = [10, 20, 30, 40]
+        e1, e2, e3, e4 = energies
+        dists = [-0.01, 0.089, 0.11, 0.16]
+        sizes  = [0.04, 0.06, 0.06, 0.06]
+        def make_clusters(proj='z'):
+            clusters = []
+            for i, energy in enumerate(energies):
+                # moving along z, at phi=0.
+                x, y, z = 1, 0, dists[i]
+                if proj=='x':
+                    #moving along x, around phi = pi/2.
+                    x, y, z = dists[i], 1, 0.
+                elif proj=='y':
+                    #moving along y, around phi=0. testing periodic condition. 
+                    x, y, z = 1, dists[i], 0
+                position = TVector3(x, y, z)
+                clusters.append( Cluster( energy,
+                                          position,
+                                          sizes[i],
+                                          0 ))
+            return clusters
+        def test(proj):
+            # test simple absorption between two single clusters
+            c1, c2, c3, c4 = make_clusters(proj)
+            print c1.position.X(), c1.position.Y(), c1.position.Z()
+            print c2.position.X(), c2.position.Y(), c2.position.Z()            
+            c1.absorb(c2)
+            self.assertEqual(len(c1.absorbed), 1)
+            self.assertEqual(len(c2.absorbed), 0)
+            self.assertEqual(c1.absorbed[0], c2)
+            self.assertEqual(c1.energy, e1+e2)
+            # testing absorption of an additional cluster by a compound cluster
+            c1.absorb(c3)
+            self.assertEqual(len(c1.absorbed), 2)
+            self.assertEqual(c1.energy, e1+e2+e3)
+            c1, c2, c3, c4 = make_clusters(proj)
+            # testing impossible absorption, cause the 2 clusters are too far
+            code = c1.absorb(c3)
+            self.assertFalse(code)
+            self.assertEqual(len(c1.absorbed), 0)
+            self.assertEqual(len(c2.absorbed), 0)
+            self.assertEqual(c1.energy, e1)
+            c1, c2, c3, c4 = make_clusters(proj)
+            # testing absorption between two compound clusters
+            c1.absorb(c2)
+            self.assertEqual(c1.energy, e1+e2)        
+            c3.absorb(c4)
+            self.assertEqual(c3.energy, e3+e4)        
+            c1.absorb(c3)
+            self.assertEqual(len(c1.absorbed), 3)
+            self.assertEqual(c1.energy, e1+e2+e3+e4)
+        test('z')
+        test('y')
+        test('x')
         
 if __name__ == '__main__':
     unittest.main()

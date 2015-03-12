@@ -63,14 +63,17 @@ class Track(object):
     def __init__(self, p3, charge, path, particle=None):
         self.p3 = p3
         self.pt = p3.Perp()
+        self.energy = p3.Mag()
         self.charge = charge
         self.path = path
         self.particle = particle
+        self.layer = 'tracker'
 
     def __str__(self):
-        return '{classname}: {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname}: {e:5.2f} {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             pt = self.pt,
+            e = self.energy, 
             theta = self.p3.Theta(),
             phi = self.p3.Phi()
         )
