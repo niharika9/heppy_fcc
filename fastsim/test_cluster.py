@@ -76,11 +76,27 @@ class TestCluster(unittest.TestCase):
         #TODO test absorption of several compound clusters 
         e1 = 10.
         e2 = 20.
-        c1 = Cluster(e1, TVector3(1,1,0), 1, 1)
-        c2 = Cluster(e2, TVector3(1,1.01,0), 1, 1)
+        e3 = 30.
+        def make_clusters():
+            c1 = Cluster(e1, TVector3(1,0,0), size=0.04, layer=0)
+            c2 = Cluster(e2, TVector3(1,0,0.099), size=0.06, layer=0)
+            c3 = Cluster(e3, TVector3(1,0,0.11), size=0.06, layer=0)
+            return c1, c2, c3
+        c1, c2, c3 = make_clusters()
         c1.absorb(c2)
+        self.assertEqual(len(c1.absorbed), 1)
+        self.assertEqual(len(c2.absorbed), 0)
         self.assertEqual(c1.absorbed[0], c2)
         self.assertEqual(c1.energy, e1+e2)
+        c1.absorb(c3)
+        self.assertEqual(len(c1.absorbed), 2)
+        self.assertEqual(c1.energy, e1+e2+e3)
+        c1, c2, c3 = make_clusters()
+        code = c1.absorb(c3)
+        self.assertFalse(code)
+        self.assertEqual(len(c1.absorbed), 0)
+        self.assertEqual(len(c2.absorbed), 0)
+        self.assertEqual(c1.energy, e1)
         
 if __name__ == '__main__':
     unittest.main()

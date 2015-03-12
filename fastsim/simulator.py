@@ -160,24 +160,23 @@ if __name__ == '__main__':
 
     import math
     from heppy_fcc.fastsim.vectors import Point
-    from heppy_fcc.fastsim.detectors.CMS import CMS
+    from heppy_fcc.fastsim.detectors.CMS import cms
+    from heppy_fcc.fastsim.detectors.perfect import perfect    
     from heppy_fcc.fastsim.toyevents import particles
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
     from heppy_fcc.display.pfobjects import GTrajectories
 
-    cms = CMS()
-    simulator = Simulator(cms)
+    detector = perfect
+    
+    simulator = Simulator(detector)
     particles = list(particles(5, 211, 1, 2,
                                5., 10.) )
     simulator.simulate(particles)
-
-    print simulator.pfinput.clusters
-    print simulator.pfinput.tracks
     
     display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])
-    gcms = GDetector(cms)
-    display.register(gcms, 0)
+    gdetector = GDetector(detector)
+    display.register(gdetector, 0)
     gtrajectories = GTrajectories(particles)
     display.register(gtrajectories,1)
     display.draw()

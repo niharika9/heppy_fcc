@@ -28,7 +28,9 @@ class Cluster(object):
                           osub.position.Phi()) < sub.size + osub.size:
                     self.absorbed.extend(osubs)
                     self.set_energy( self.energy + other.energy ) 
-        
+                    return True
+        return False
+                    
     def set_energy(self, energy):
         self.energy = energy
         if energy > self.__class__.max_energy:

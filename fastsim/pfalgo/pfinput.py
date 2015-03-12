@@ -1,5 +1,8 @@
 import operator
 
+def merge_clusters(clusters):
+    pass
+
 class PFInput(object):
     '''Builds the inputs to particle flow from a collection of simulated particles:
     - collects all smeared tracks and clusters
@@ -26,11 +29,8 @@ class PFInput(object):
                 self.tracks.append(ptc.track_smeared)
         self.tracks.sort(key=operator.attrgetter('pt'), reverse=True)
         for clusters in self.clusters.values():
-            self.merge_clusters(clusters)
+            merge_clusters(clusters)
             clusters.sort(key=operator.attrgetter('energy'), reverse=True)
-            
-    def merge_clusters(self, clusters):
-        pass
             
     def __str__(self):
         lines = ['PFInput:']

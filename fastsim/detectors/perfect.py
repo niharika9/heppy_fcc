@@ -7,14 +7,13 @@ class ECAL(DetectorElement):
 
     def __init__(self):
         volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
-        mat = material.Material('ECAL', 8.9e-3, 0.25)
+        mat = material.Material('ECAL', 8.9e-3, 0.) # lambda_I = 0
         self.eta_crack = 1.5
         self.emin = 2.
         super(ECAL, self).__init__('ecal', volume,  mat)
 
     def energy_resolution(self, cluster):
-        E = cluster.energy
-        return 0.07 / cluster.energy + 0.001
+        return 0. 
 
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid)
@@ -24,14 +23,7 @@ class ECAL(DetectorElement):
             return 0.07
 
     def acceptance(self, cluster):
-        energy = cluster.energy
-        eta = abs(cluster.position.Eta())
-        if eta < self.eta_crack:
-            return energy>self.emin
-        elif eta < 3.:
-            return energy>self.emin and cluster.pt>0.5
-        else:
-            return False
+        return True
 
     def space_resolution(self, ptc):
         pass
@@ -45,20 +37,13 @@ class HCAL(DetectorElement):
         super(HCAL, self).__init__('ecal', volume, mat)
 
     def energy_resolution(self, cluster):
-        return 1.1/ math.sqrt( cluster.energy ) 
+        return 0.
 
     def cluster_size(self, ptc):
         return 0.2
 
     def acceptance(self, cluster):
-        energy = cluster.energy
-        eta = abs(cluster.position.Eta())
-        if eta < 3. : 
-            return energy>5.
-        elif eta < 5.:
-            return energy>10.
-        else:
-            return False
+        return True
     
     def space_resolution(self, ptc):
         pass
@@ -74,17 +59,10 @@ class Tracker(DetectorElement):
         super(Tracker, self).__init__('tracker', volume,  mat)
 
     def acceptance(self, track):
-        pt = track.pt
-        eta = abs(track.p3.Eta())
-        if eta < 2.5 : 
-            return pt>0.7
-        else:
-            return False
+        return True
 
     def pt_resolution(self, track):
-        # TODO: depends on the field
-        pt = track.pt
-        return 0.01
+       return 0.
 
     
 
@@ -97,12 +75,16 @@ class Field(DetectorElement):
         super(Field, self).__init__('tracker', volume,  mat)
         
         
-class CMS(Detector):
+class Perfect(Detector):
+    '''A detector with the geometry of CMS and the same cluster size, 
+    but without smearing, and with full acceptance (no thresholds).
+    Used for testing purposes. 
+    '''
     def __init__(self):
-        super(CMS, self).__init__()
+        super(Perfect, self).__init__()
         self.elements['tracker'] = Tracker()
         self.elements['ecal'] = ECAL()
         self.elements['hcal'] = HCAL()
         self.elements['field'] = Field(3.8)
 
-cms = CMS()
+perfect = Perfect()
