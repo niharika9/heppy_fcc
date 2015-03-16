@@ -13,8 +13,7 @@ class ECAL(DetectorElement):
         super(ECAL, self).__init__('ecal', volume,  mat)
 
     def energy_resolution(self, cluster):
-        E = cluster.energy
-        return 0.07 / cluster.energy + 0.001
+        return 0.07 / math.sqrt(cluster.energy) + 0.001 #TODO bug
 
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid)

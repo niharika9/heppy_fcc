@@ -1,6 +1,7 @@
 from ROOT import TCanvas, TH1, TH2F
 import operator
 import math
+import os
 from heppy_fcc.fastsim.pfobjects import Cluster
 
 class Display(object):
@@ -13,7 +14,7 @@ class Display(object):
         for view in views:
             if view in ['xy', 'yz', 'xz']:
                 self.views[view] = ViewPane(view, view,
-                                            100, -5, 5, 100, -5, 5)
+                                            100, -4, 4, 100, -4, 4)
             elif 'thetaphi' in view:
                 self.views[view] = ViewPane(view, view,
                                             100, -math.pi/2, math.pi/2,
@@ -35,6 +36,11 @@ class Display(object):
     def draw(self):
         for view in self.views.values():
             view.draw()
+
+    def save(self, outdir, filetype='png'):
+        os.mkdir(outdir)
+        for view in self.views.values():
+            view.save(outdir, filetype)
         
 
 class ViewPane(object):
@@ -80,3 +86,9 @@ class ViewPane(object):
         self.hist.GetYaxis().UnZoom()
         self.canvas.Modified()
         self.canvas.Update()
+
+    def save(self, outdir, filetype):
+        fname = '{outdir}/{name}.{filetype}'.format(outdir=outdir,
+                                                    name=self.canvas.GetName(),
+                                                    filetype=filetype)
+        self.canvas.SaveAs(fname)

@@ -13,7 +13,8 @@ class Simulator(object):
     def reset(self):
         self.particles = None
         Cluster.max_energy = 0.
-
+        SmearedCluster.max_energy = 0.
+        
     def propagator(self, ptc):
         is_neutral = abs(ptc.charge)<0.5
         return self.prop_straight if is_neutral else self.prop_helix
@@ -154,7 +155,7 @@ class Simulator(object):
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
         self.pfinput = PFInput(self.ptcs)
-        print self.pfinput
+        # print self.pfinput
                 
 if __name__ == '__main__':
 
