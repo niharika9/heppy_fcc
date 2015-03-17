@@ -38,7 +38,7 @@ class Blob(object):
             contour.SetFillStyle(0)
         for inner in inners: 
             inner.SetFillColor(color)
-            inner.SetFillStyle(1001)
+            inner.SetFillStyle(3002)
             
     def draw(self, projection, opt=''):
         if projection == 'xy':
@@ -125,6 +125,7 @@ class GStraightTrajectory(GTrajectory):
 
 class GHelixTrajectory(GTrajectory):    
     def __init__(self, description):
+        super(GHelixTrajectory, self).__init__(description)
         helix = description.path
         self.helix_xy = TArc(helix.center_xy.X(),
                              helix.center_xy.Y(),
@@ -146,10 +147,17 @@ class GHelixTrajectory(GTrajectory):
             if i == 0:
                 tppoint = description.p4.Vect()
             self.graphline_thetaphi.SetPoint(i, math.pi/2.-tppoint.Theta(), tppoint.Phi())
-        super(GHelixTrajectory, self).__init__(description)
-        
+        if abs(self.desc.pdgid) in [11,13]:
+            def set_graph_style(graph):
+                graph.SetLineWidth(3)
+                graph.SetLineColor(5)
+            set_graph_style(self.graphline_xy)
+            set_graph_style(self.graphline_xz)
+            set_graph_style(self.graphline_yz)
+            set_graph_style(self.graphline_thetaphi)
+
+
     def draw(self, projection):
-        super(GHelixTrajectory, self).draw(projection)
         if projection == 'xy':
             # self.helix_xy.Draw("onlysame")
             self.graphline_xy.Draw("lsame")
@@ -161,6 +169,7 @@ class GHelixTrajectory(GTrajectory):
             self.graphline_thetaphi.Draw("lsame")            
         else:
             raise ValueError('implement drawing for projection ' + projection )
+        super(GHelixTrajectory, self).draw(projection)
         
 
 class GTrajectories(list):
