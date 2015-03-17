@@ -44,7 +44,7 @@ class Cluster(object):
     #     self.__dict__[name] = value
 
     def __str__(self):
-        return '{classname}: {layer} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname:15}: {layer:10} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             layer = self.layer,
             energy = self.energy,
@@ -70,7 +70,7 @@ class Track(object):
         self.layer = 'tracker'
 
     def __str__(self):
-        return '{classname}: {e:5.2f} {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname:15}: {e:5.2f} {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             pt = self.pt,
             e = self.energy, 
@@ -84,6 +84,7 @@ class SmearedTrack(Track):
 
     def __init__(self, mother, *args, **kwargs):
         self.mother = mother
+        self.path = mother.path
         super(SmearedTrack, self).__init__(*args, **kwargs)
     
         

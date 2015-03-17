@@ -9,6 +9,7 @@ import sys
 class Simulator(object):
 
     def __init__(self, detector):
+        self.verbose = True
         self.detector = detector
         self.prop_helix = HelixPropagator()
         self.prop_straight = StraightLinePropagator()
@@ -163,8 +164,9 @@ class Simulator(object):
                 self.simulate_hadron(ptc)
         self.pfinput = PFInput(self.ptcs)
         self.linker = Linker(self.pfinput.element_list(), distance)
-        # print self.pfinput
-        # print self.linker
+        if self.verbose:
+            print self.pfinput
+            print self.linker
                 
 if __name__ == '__main__':
 
@@ -177,16 +179,17 @@ if __name__ == '__main__':
     from heppy_fcc.display.geometry import GDetector
     from heppy_fcc.display.pfobjects import GTrajectories
 
-    display_on = False
+    display_on = True
     detector = perfect
 
-    for i in range(10000):
+    for i in range(1):
         if not i%100:
             print i
         simulator = Simulator(detector)
-        particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
-        # particles = [particle(211, math.pi/2., math.pi/2., 50.),
-        #              particle(130, math.pi/2., math.pi/2.+0.07, 10.)]
+        # particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
+        particles = [particle(211, math.pi/2., math.pi/2., 50.),
+                     particle(211, math.pi/2.+0.02, math.pi/2., 10.),
+                     particle(130, math.pi/2., math.pi/2.+0.07, 10.)]
         simulator.simulate(particles)
         
     if display_on:

@@ -28,7 +28,9 @@ class Links(dict):
         lines = []
         for key, val in self.iteritems():
             ele1, ele2 = key
-            lines.append( "\t".join( map(str, [ele1, ele2, val])) )
+            lines.append("{ele1:50} {ele2:50} {val:5.4f}".format(ele1=ele1,
+                                                                 ele2=ele2,
+                                                                 val=val))
         return '\n'.join(lines)
         
 class Linker(object):
