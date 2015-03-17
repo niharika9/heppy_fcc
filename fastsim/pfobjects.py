@@ -33,7 +33,6 @@ class Cluster(object):
                     
     def set_energy(self, energy):
         self.energy = energy
-        print 'max', self.__class__.max_energy
         if energy > self.__class__.max_energy:
             self.__class__.max_energy = energy
         self.pt = energy * self.position.Unit().Perp()

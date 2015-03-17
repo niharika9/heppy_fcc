@@ -45,7 +45,23 @@ def particles(nptcs, pdgid, thetamin, thetamax, emin, emax, vertex=None ):
         yield Particle(p4, vertex, charge, pdgid) 
 
         
-def monojet(pdgids, theta, pstar, jetenergy, vertex=None):
+def particle(pdgid, theta, phi, energy, vertex=None):
+    if vertex is None:
+        vertex = Point(0, 0, 0)
+    mass, charge = particle_data[pdgid]
+    momentum = math.sqrt(energy**2 - mass**2)
+    costheta = math.cos(theta)
+    sintheta = math.sin(theta)
+    cosphi = math.cos(phi)
+    sinphi = math.sin(phi)        
+    p4 = LorentzVector(momentum*sintheta*cosphi,
+                       momentum*sintheta*sinphi,
+                       momentum*costheta,
+                       energy)
+    return Particle(p4, vertex, charge, pdgid) 
+    
+        
+def monojet(pdgids, theta, phi, pstar, jetenergy, vertex=None):
     particles = []
     if vertex is None:
         vertex = TVector3(0.,0.,0.)
@@ -75,7 +91,9 @@ def monojet(pdgids, theta, pstar, jetenergy, vertex=None):
     #boosting to lab
     gamma = jetenergy / jetp4star.M()
     beta = math.sqrt(1-1/gamma**2)
-    boostvec = TVector3(math.sin(theta), 0, math.cos(theta))
+    boostvec = TVector3(math.sin(theta)*math.cos(phi),
+                        math.sin(theta)*math.sin(phi),
+                        math.cos(theta))
     boostvec *= beta
     boosted_particles = []
     jetp4 = LorentzVector() 
@@ -87,12 +105,10 @@ def monojet(pdgids, theta, pstar, jetenergy, vertex=None):
                                            ptc.vertex,
                                            ptc.charge,
                                            ptc.pdgid) )
-    print jetp4.M(), jetp4.E()
+    # print jetp4.M(), jetp4.E()
     return boosted_particles
         
 if __name__ == '__main__':
-    # for ptc in particles(10, 0., 0., 0.1, 0.2, 10, 50):
-    #     print ptc
 
     for ptc in monojet([211, 22, 22], 1, 0.5, 50):
         print ptc

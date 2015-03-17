@@ -1,7 +1,10 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
 from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
 from pfalgo.pfinput import PFInput
+from pfalgo.linker import Linker
+from pfalgo.distance import distance
 import random
+import sys
 
 class Simulator(object):
 
@@ -105,33 +108,37 @@ class Simulator(object):
     def simulate_hadron(self, ptc):
         ecal = self.detector.elements['ecal']
         hcal = self.detector.elements['hcal']        
-        path_length = ecal.material.path_length(ptc)
-        self.propagator(ptc).propagate_one(ptc,
-                                           ecal.volume.inner,
-                                           self.detector.elements['field'].magnitude)
-        time_ecal_inner = ptc.path.time_at_z(ptc.points['ecal_in'].Z())
-        deltat = ptc.path.deltat(path_length)
-        time_decay = time_ecal_inner + deltat
-        point_decay = ptc.path.point_at_time(time_decay)
-        ptc.points['ecal_decay'] = point_decay
         frac_ecal = 0.
-        if ecal.volume.contains(point_decay):
-            frac_ecal = random.uniform(0., 0.7)
-            cluster = self.make_cluster(ptc, 'ecal', frac_ecal)
-            # For now, using the hcal resolution and acceptance
-            # for hadronic cluster
-            # in the ECAL. That's not a bug! 
-            smeared = self.smear_cluster(cluster, hcal)
-            if smeared:
-                ptc.clusters_smeared[smeared.layer] = smeared
+        path_length = ecal.material.path_length(ptc)
+        if path_length<sys.float_info.max:
+            # ecal path length can be infinite in case the ecal
+            # has lambda_I = 0 (fully transparent to hadrons)
+            self.propagator(ptc).propagate_one(ptc,
+                                               ecal.volume.inner,
+                                               self.detector.elements['field'].magnitude)
+            time_ecal_inner = ptc.path.time_at_z(ptc.points['ecal_in'].Z())
+            deltat = ptc.path.deltat(path_length)
+            time_decay = time_ecal_inner + deltat
+            point_decay = ptc.path.point_at_time(time_decay)
+            ptc.points['ecal_decay'] = point_decay
+            if ecal.volume.contains(point_decay):
+                frac_ecal = random.uniform(0., 0.7)
+                cluster = self.make_cluster(ptc, 'ecal', frac_ecal)
+                # For now, using the hcal resolution and acceptance
+                # for hadronic cluster
+                # in the ECAL. That's not a bug! 
+                smeared = self.smear_cluster(cluster, hcal)
+                if smeared:
+                    ptc.clusters_smeared[smeared.layer] = smeared
         cluster = self.make_cluster(ptc, 'hcal', 1-frac_ecal)
         smeared = self.smear_cluster(cluster, hcal)
         if smeared:
             ptc.clusters_smeared[smeared.layer] = smeared
-        smeared_track = self.smear_track(ptc.track,
-                                         self.detector.elements['tracker'])
-        if smeared_track:
-            ptc.track_smeared = smeared_track
+        if ptc.charge!=0:
+            smeared_track = self.smear_track(ptc.track,
+                                             self.detector.elements['tracker'])
+            if smeared_track:
+                ptc.track_smeared = smeared_track
 
     def simulate_muon(self, ptc):
         self.propagate(ptc)
@@ -155,7 +162,9 @@ class Simulator(object):
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
         self.pfinput = PFInput(self.ptcs)
+        self.linker = Linker(self.pfinput.element_list(), distance)
         # print self.pfinput
+        # print self.linker
                 
 if __name__ == '__main__':
 
@@ -163,21 +172,28 @@ if __name__ == '__main__':
     from heppy_fcc.fastsim.vectors import Point
     from heppy_fcc.fastsim.detectors.CMS import cms
     from heppy_fcc.fastsim.detectors.perfect import perfect    
-    from heppy_fcc.fastsim.toyevents import monojet 
+    from heppy_fcc.fastsim.toyevents import monojet, particle 
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
     from heppy_fcc.display.pfobjects import GTrajectories
 
+    display_on = False
     detector = perfect
-    
-    simulator = Simulator(detector)
-    particles = monojet([211, 22, 22], 1, 0.5, 50)
-    simulator.simulate(particles)
-    
-    display = Display(['xy', 'ECAL_thetaphi', 'HCAL_thetaphi'])
-    gdetector = GDetector(detector)
-    display.register(gdetector, 0)
-    gtrajectories = GTrajectories(particles)
-    display.register(gtrajectories,1)
-    display.draw()
+
+    for i in range(10000):
+        if not i%100:
+            print i
+        simulator = Simulator(detector)
+        particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
+        # particles = [particle(211, math.pi/2., math.pi/2., 50.),
+        #              particle(130, math.pi/2., math.pi/2.+0.07, 10.)]
+        simulator.simulate(particles)
+        
+    if display_on:
+        display = Display(['xy', 'yz', 'ECAL_thetaphi', 'HCAL_thetaphi'])
+        gdetector = GDetector(detector)
+        display.register(gdetector, 0)
+        gtrajectories = GTrajectories(particles)
+        display.register(gtrajectories,1)
+        display.draw()
     

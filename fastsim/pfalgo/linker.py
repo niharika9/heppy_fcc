@@ -23,12 +23,13 @@ class Distance(object):
         return True, dist12
         
         
-class Link(object):
-    def __init__(self, ele1, ele2, properties):
-        self.ele1 = ele1
-        self.ele2 = ele2
-        self.properties = properties
-
+class Links(dict):
+    def __str__(self):
+        lines = []
+        for key, val in self.iteritems():
+            ele1, ele2 = key
+            lines.append( "\t".join( map(str, [ele1, ele2, val])) )
+        return '\n'.join(lines)
         
 class Linker(object):
 
@@ -42,12 +43,14 @@ class Linker(object):
         self.links = self.link(elements)
 
     def link(self, elements):
-        links = dict()
+        links = Links()
         for ele1, ele2 in itertools.combinations(elements, 2):
-            linked, dist = self.distance(ele1, ele2)
-            if linked: 
+            link_type, link_ok, dist = self.distance(ele1, ele2)
+            if link_ok: 
                 links[ele1, ele2] = dist
                 ele1.linked.append(ele2)
                 ele2.linked.append(ele1)
         return links
 
+    def __str__(self):
+        return str(self.links)

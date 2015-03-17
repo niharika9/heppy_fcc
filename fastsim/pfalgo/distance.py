@@ -8,27 +8,27 @@ class Distance(object):
           True/False depending on the validity of the link
           float      the link distance
         ''' 
-        type1 = ele1.type
-        type2 = ele2.type
-        if type1 == type2:
+        layer1 = ele1.layer
+        layer2 = ele2.layer
+        if layer1 == layer2:
             return None, False, None
-        types = tuple(sorted([type1, type2]))
+        layers = tuple(sorted([layer1, layer2]))
         func = None
-        if types == ('ecal', 'track'):
+        if layers == ('ecal_in', 'tracker'):
             func = self.ecal_track
-        elif types == ('hcal', 'track'):
+        elif layers == ('hcal_in', 'tracker'):
             func = self.hcal_track
-        elif types == ('ecal', 'hcal'):
+        elif layers == ('ecal_in', 'hcal_in'):
             func = self.ecal_hcal
         else:
-            raise ValueError('no such link type:', types)
+            raise ValueError('no such link layer:', layers)
         return func(ele1, ele2)
         
     def ecal_track(self, ele1, ele2):
-        return ('ecal', 'track'), True, 1. 
+        return ('ecal_in', 'tracker'), True, 1. 
 
     def hcal_track(self, ele1, ele2):
-        return ('hcal', 'track'), True, 1. 
+        return ('hcal_in', 'tracker'), True, 1. 
 
     def ecal_hcal(self, ele1, ele2):
         #TODO eta or theta? 
@@ -37,5 +37,6 @@ class Distance(object):
                     ele2.position.Eta(),
                     ele2.position.Phi())
         link_ok = dR < ele1.size + ele2.size
-        return ('ecal', 'hcal'), link_ok, dR 
-        
+        return ('ecal_in', 'hcal_in'), link_ok, dR 
+
+distance = Distance()
