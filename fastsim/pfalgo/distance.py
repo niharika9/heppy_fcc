@@ -50,7 +50,7 @@ class Distance(object):
         return ('hcal_in', 'hcal_in'), link_ok, dR 
     
     def ecal_track(self, ecal, track):
-        tp = track.points['ecal_in']
+        tp = track.path.points['ecal_in']
         cp = ecal.position
         dR = deltaR(tp.Eta(),
                     tp.Phi(),
