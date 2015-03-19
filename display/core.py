@@ -32,6 +32,10 @@ class Display(object):
     def clear(self):
         for view in self.views.values():
             view.clear()
+
+    def unzoom(self):
+        for view in self.views.values():
+            view.unzoom()
             
     def draw(self):
         for view in self.views.values():
@@ -68,7 +72,7 @@ class ViewPane(object):
 
     def clear(self):
         self.registered = dict(self.locked.items())
-                
+        
     def draw(self):
         self.canvas.cd()
         for obj, layer in sorted(self.registered.items(),
