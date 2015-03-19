@@ -53,9 +53,9 @@ class HCAL(DetectorElement):
         energy = cluster.energy
         eta = abs(cluster.position.Eta())
         if eta < 3. : 
-            return energy>5.
+            return energy>4.
         elif eta < 5.:
-            return energy>10.
+            return energy>7.
         else:
             return False
     
