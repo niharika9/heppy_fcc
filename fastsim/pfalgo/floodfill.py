@@ -1,11 +1,27 @@
 
 
-class Element(basestring):
-    def __init__(self, linked):
-        self.linked = linked
+class Node(object):
+    '''Basic interface for nodes traversed by the floodfill algo.
+    Floodill will give a label to each node corresponding to the 
+    disconnected subgraph it corresponds to. 
+
+    The linked attribute is a list that should contain the elements y-linkes.
+    '''
+    def __init__(self):
+        self.linked = []
+        self.block_label = None
 
         
 class FloodFill(object):
+    '''The flood fill algorithm finds all disconnected subgraphs in 
+    a list of nodes. 
+    
+    The block_label of each node is set to an integer corresponding to the 
+    disconnected subgraph it corresponds to. 
+    
+    The results can be accessed through the nodes themselves, 
+    or through the groups attribute, which has the following form: 
+      {0: [list of elements in subgraph0], 1: [list of elements in subgraph 1], ...}
     
     def __init__(self, elements):
         self.label = 0

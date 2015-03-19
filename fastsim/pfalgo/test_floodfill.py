@@ -1,16 +1,14 @@
 import unittest
 from floodfill import FloodFill
 
-
-
 class Node(int):
     def __init__(self, *args):
         self.linked = []
+        self.block_label = None
         super(Node, self).__init__(*args)
 
     def accept(self, visitor):
         notseen = visitor.visit(self)
-        # print 'notseen', notseen, self
         if notseen:
             for elem in self.linked:
                 elem.accept(visitor)
