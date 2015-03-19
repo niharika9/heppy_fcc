@@ -23,14 +23,10 @@ class PFInput(object):
     def build(self, ptcs):
         for ptc in ptcs:
             for key, cluster in ptc.clusters_smeared.iteritems():
-                cluster.linked = []
                 self.elements.setdefault(key, []).append(cluster)
             if ptc.track_smeared:
-                ptc.track_smeared.linked = []
                 self.elements.setdefault('tracker', []).append(ptc.track_smeared)
-        # self.tracks.sort(key=operator.attrgetter('pt'), reverse=True)
         for elems in self.elements.values():
-            # merge_clusters(clusters)
             elems.sort(key=operator.attrgetter('energy'), reverse=True)
 
     def element_list(self):

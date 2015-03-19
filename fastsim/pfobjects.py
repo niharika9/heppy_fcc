@@ -2,34 +2,50 @@ from vectors import Point
 from heppy.utils.deltar import deltaR
 import math
 
-class Cluster(object):
+class PFObject(object):
+
+    def __init__(self):
+        self.linked = []
+        self.block_label = None
+
+    def accept(self, visitor):
+        '''Called by visitors, such as FloodFill.'''
+        notseen = visitor.visit(self)
+        if notseen:
+            for elem in self.linked:
+                elem.accept(visitor)
+
+
+class Cluster(PFObject):
 
     #TODO: not sure this plays well with SmearedClusters
     max_energy = 0.
     
     def __init__(self, energy, position, size, layer, particle=None):
+        super(Cluster, self).__init__()
         self.position = position
         self.set_energy(energy)
         self.size = size
         self.layer = layer
         self.particle = particle
-        self.absorbed = []
+        # self.absorbed = []
+        
 
-    def absorb(self, other):
-        subs = list(self.absorbed)
-        subs.append(self)
-        osubs = list(other.absorbed)
-        osubs.append(other)
-        for sub in subs:
-            for osub in osubs:
-                if deltaR(sub.position.Eta(),
-                          sub.position.Phi(),
-                          osub.position.Eta(),
-                          osub.position.Phi()) < sub.size + osub.size:
-                    self.absorbed.extend(osubs)
-                    self.set_energy( self.energy + other.energy ) 
-                    return True
-        return False
+    # def absorb(self, other):
+    #     subs = list(self.absorbed)
+    #     subs.append(self)
+    #     osubs = list(other.absorbed)
+    #     osubs.append(other)
+    #     for sub in subs:
+    #         for osub in osubs:
+    #             if deltaR(sub.position.Eta(),
+    #                       sub.position.Phi(),
+    #                       osub.position.Eta(),
+    #                       osub.position.Phi()) < sub.size + osub.size:
+    #                 self.absorbed.extend(osubs)
+    #                 self.set_energy( self.energy + other.energy ) 
+    #                 return True
+    #     return False
                     
     def set_energy(self, energy):
         self.energy = energy
@@ -58,9 +74,10 @@ class SmearedCluster(Cluster):
         super(SmearedCluster, self).__init__(*args, **kwargs)
 
         
-class Track(object):
+class Track(PFObject):
 
     def __init__(self, p3, charge, path, particle=None):
+        super(Track, self).__init__()
         self.p3 = p3
         self.pt = p3.Perp()
         self.energy = p3.Mag()

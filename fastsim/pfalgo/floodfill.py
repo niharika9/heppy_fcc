@@ -11,7 +11,15 @@ class Node(object):
         self.linked = []
         self.block_label = None
 
-        
+    def accept(self, visitor):
+        '''Called by visitors, such as FloodFill.'''
+        notseen = visitor.visit(self)
+        if notseen:
+            for elem in self.linked:
+                elem.accept(visitor)
+
+
+
 class FloodFill(object):
     '''The flood fill algorithm finds all disconnected subgraphs in 
     a list of nodes. 
@@ -22,8 +30,11 @@ class FloodFill(object):
     The results can be accessed through the nodes themselves, 
     or through the groups attribute, which has the following form: 
       {0: [list of elements in subgraph0], 1: [list of elements in subgraph 1], ...}
+    '''
     
     def __init__(self, elements):
+        '''Perform the search for disconnected subgraphs on a list of elements 
+        matching the interface given in this module.'''
         self.label = 0
         self.visited = dict()
         self.groups = dict()
@@ -35,6 +46,7 @@ class FloodFill(object):
             self.label += 1
 
     def visit(self, element):
+        '''visit one element.'''
         if self.visited.get(element, False):
             return False
         else:
@@ -44,4 +56,10 @@ class FloodFill(object):
             self.visited[element] = True
             return True
 
-
+    def __str__(self):
+        lines = []
+        for gid, group in self.groups.iteritems():
+            groupinfo = ', '.join(map(str, group))
+            lines.append('{gid:5} {ginfo}'.format(gid=gid, ginfo=groupinfo))
+        return '\n'.join(lines)
+            

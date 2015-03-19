@@ -1,8 +1,6 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
 from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
-from pfalgo.pfinput import PFInput
-from pfalgo.linker import Linker
-from pfalgo.distance import distance
+from pfalgo.sequence import PFSequence
 import random
 import sys
 
@@ -110,13 +108,13 @@ class Simulator(object):
         ecal = self.detector.elements['ecal']
         hcal = self.detector.elements['hcal']        
         frac_ecal = 0.
+        self.propagator(ptc).propagate_one(ptc,
+                                           ecal.volume.inner,
+                                           self.detector.elements['field'].magnitude)
         path_length = ecal.material.path_length(ptc)
         if path_length<sys.float_info.max:
             # ecal path length can be infinite in case the ecal
             # has lambda_I = 0 (fully transparent to hadrons)
-            self.propagator(ptc).propagate_one(ptc,
-                                               ecal.volume.inner,
-                                               self.detector.elements['field'].magnitude)
             time_ecal_inner = ptc.path.time_at_z(ptc.points['ecal_in'].Z())
             deltat = ptc.path.deltat(path_length)
             time_decay = time_ecal_inner + deltat
@@ -162,12 +160,13 @@ class Simulator(object):
                 self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
-        self.pfinput = PFInput(self.ptcs)
-        self.linker = Linker(self.pfinput.element_list(), distance)
-        if self.verbose:
-            print self.pfinput
-            print self.linker
-                
+        # self.pfinput = PFInput(self.ptcs)
+        # self.linker = Linker(self.pfinput.element_list(), distance)
+        # if self.verbose:
+        #     print self.pfinput
+        #     print self.linker
+        self.pfsequence = PFSequence(self.ptcs)
+        
 if __name__ == '__main__':
 
     import math
@@ -180,16 +179,19 @@ if __name__ == '__main__':
     from heppy_fcc.display.pfobjects import GTrajectories
 
     display_on = True
-    detector = cms
+    detector = perfect
 
     for i in range(1):
         if not i%100:
             print i
         simulator = Simulator(detector)
         # particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
-        particles = [particle(211, math.pi/2., math.pi/2., 50.),
-                     particle(211, math.pi/2.+0.02, math.pi/2., 10.),
-                     particle(130, math.pi/2., math.pi/2.+0.07, 10.)]
+        particles = [
+            particle(211, math.pi/2., math.pi/2., 50.),
+            particle(211, math.pi/2.+0.4, math.pi/2., 5.),
+            particle(22, math.pi/2.+0.4, math.pi/2., 100.),
+            # particle(130, math.pi/2., math.pi/2.+0.07, 5.)
+        ]
         simulator.simulate(particles)
         
     if display_on:

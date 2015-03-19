@@ -1,5 +1,7 @@
 from heppy.utils.deltar import deltaR
 
+#TODO BUG! the cluster size is in CM, so one cannot directly match in angular distance. match in real space for track-cluster, and in angular distance for cluster-cluster
+
 class Distance(object):
     '''Concrete distance calculator.
     ''' 
@@ -50,6 +52,7 @@ class Distance(object):
         return ('hcal_in', 'hcal_in'), link_ok, dR 
     
     def ecal_track(self, ecal, track):
+        import pdb; pdb.set_trace()
         tp = track.path.points['ecal_in']
         cp = ecal.position
         dR = deltaR(tp.Eta(),
@@ -76,6 +79,7 @@ class Distance(object):
                     ele2.position.Eta(),
                     ele2.position.Phi())
         link_ok = dR < ele1.size + ele2.size
+        print dR, ele1.size, ele2.size
         return ('ecal_in', 'hcal_in'), link_ok, dR 
 
 distance = Distance()
