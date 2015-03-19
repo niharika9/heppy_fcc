@@ -180,7 +180,7 @@ if __name__ == '__main__':
     from heppy_fcc.display.pfobjects import GTrajectories
 
     display_on = True
-    detector = perfect
+    detector = cms
 
     for i in range(1):
         if not i%100:
@@ -193,7 +193,10 @@ if __name__ == '__main__':
         simulator.simulate(particles)
         
     if display_on:
-        display = Display(['xy', 'yz', 'ECAL_thetaphi', 'HCAL_thetaphi'])
+        display = Display(['xy', 'yz',
+                           'ECAL_thetaphi',
+                           'HCAL_thetaphi'
+                       ])
         gdetector = GDetector(detector)
         display.register(gdetector, 0)
         gtrajectories = GTrajectories(particles)

@@ -10,8 +10,8 @@ inputSample = cfg.Component(
     'albers_example',
     # files = ['zqq.root'],
     # files = ['ww.root'],
-    # files = ['hz.root'],
-    files = ['ttbar.root'],
+    files = ['hz.root'],
+    # files = ['ttbar.root'],
     )
 
 selectedComponents  = [inputSample]
