@@ -21,16 +21,28 @@ class Cluster(PFObject):
     #TODO: not sure this plays well with SmearedClusters
     max_energy = 0.
     
-    def __init__(self, energy, position, size, layer, particle=None):
+    def __init__(self, energy, position, size_cm, layer, particle=None):
         super(Cluster, self).__init__()
         self.position = position
         self.set_energy(energy)
-        self.size = size
+        self.set_size(size_cm)
         self.layer = layer
         self.particle = particle
         # self.absorbed = []
-        
 
+    def set_size(self, value):
+        self._size = value
+        try:
+            self._angularsize = math.atan( self._size / self.position.Mag() ) 
+        except:
+            import pdb; pdb.set_trace()
+            
+    def size(self):
+        return self._size
+
+    def angular_size(self):
+        return self._angularsize
+        
     # def absorb(self, other):
     #     subs = list(self.absorbed)
     #     subs.append(self)

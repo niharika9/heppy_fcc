@@ -7,8 +7,8 @@ class Blob(object):
     def __init__(self, cluster):
         self.cluster = cluster
         pos = cluster.position
-        radius = cluster.size
-        thetaphiradius = math.atan(cluster.size / pos.Mag())
+        radius = cluster.size()
+        thetaphiradius = cluster.angular_size()
         # print radius
         color = 1
         if cluster.particle:

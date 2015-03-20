@@ -1,7 +1,5 @@
 from heppy.utils.deltar import deltaR
 
-#TODO BUG! the cluster size is in CM, so one cannot directly match in angular distance. match in real space for track-cluster, and in angular distance for cluster-cluster
-
 class Distance(object):
     '''Concrete distance calculator.
     ''' 
@@ -36,50 +34,42 @@ class Distance(object):
         return None, False, None
     
     def ecal_ecal(self, ele1, ele2):
-        dR = deltaR(ele1.position.Eta(),
+        dR = deltaR(ele1.position.Theta(),
                     ele1.position.Phi(),
-                    ele2.position.Eta(),
+                    ele2.position.Theta(),
                     ele2.position.Phi())
-        link_ok = dR < ele1.size + ele2.size
+        link_ok = dR < ele1.angular_size() + ele2.angular_size()
         return ('ecal_in', 'ecal_in'), link_ok, dR 
 
     def hcal_hcal(self, ele1, ele2):
-        dR = deltaR(ele1.position.Eta(),
+        dR = deltaR(ele1.position.Theta(),
                     ele1.position.Phi(),
-                    ele2.position.Eta(),
+                    ele2.position.Theta(),
                     ele2.position.Phi())
-        link_ok = dR < ele1.size + ele2.size
+        link_ok = dR < ele1.angular_size() + ele2.angular_size()
         return ('hcal_in', 'hcal_in'), link_ok, dR 
     
     def ecal_track(self, ecal, track):
-        import pdb; pdb.set_trace()
         tp = track.path.points['ecal_in']
         cp = ecal.position
-        dR = deltaR(tp.Eta(),
-                    tp.Phi(),
-                    cp.Eta(),
-                    cp.Phi())
-        link_ok = dR < ecal.size 
-        return ('ecal_in', 'tracker'), link_ok, dR 
+        dist = (cp - tp).Mag()
+        link_ok = dist < ecal.size() 
+        return ('ecal_in', 'tracker'), link_ok, dist
         
     def hcal_track(self, hcal, track):
         tp = track.path.points['hcal_in']
         cp = hcal.position
-        dR = deltaR(tp.Eta(),
-                    tp.Phi(),
-                    cp.Eta(),
-                    cp.Phi())
-        link_ok = dR < hcal.size
-        return ('hcal_in', 'tracker'), link_ok, dR
+        dist = (cp - tp).Mag()
+        link_ok = dist < hcal.size()
+        return ('hcal_in', 'tracker'), link_ok, dist
 
     def ecal_hcal(self, ele1, ele2):
         #TODO eta or theta? 
-        dR = deltaR(ele1.position.Eta(),
+        dR = deltaR(ele1.position.Theta(),
                     ele1.position.Phi(),
-                    ele2.position.Eta(),
+                    ele2.position.Theta(),
                     ele2.position.Phi())
-        link_ok = dR < ele1.size + ele2.size
-        print dR, ele1.size, ele2.size
+        link_ok = dR < ele1.angular_size() + ele2.angular_size()
         return ('ecal_in', 'hcal_in'), link_ok, dR 
 
 distance = Distance()
