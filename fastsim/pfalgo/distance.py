@@ -50,14 +50,20 @@ class Distance(object):
         return ('hcal_in', 'hcal_in'), link_ok, dR 
     
     def ecal_track(self, ecal, track):
-        tp = track.path.points['ecal_in']
+        tp = track.path.points.get('ecal_in', None)
+        if tp is None:
+            # probably a looper
+            return ('ecal_in', 'tracker'), False, None
         cp = ecal.position
         dist = (cp - tp).Mag()
         link_ok = dist < ecal.size() 
         return ('ecal_in', 'tracker'), link_ok, dist
         
     def hcal_track(self, hcal, track):
-        tp = track.path.points['hcal_in']
+        tp = track.path.points.get('hcal_in', None)
+        if tp is None:
+            # probably a looper
+            return ('hcal_in', 'tracker'), False, None
         cp = hcal.position
         dist = (cp - tp).Mag()
         link_ok = dist < hcal.size()
