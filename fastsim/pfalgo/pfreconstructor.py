@@ -14,13 +14,16 @@ class PFReconstructor(object):
         particles = []
         for groupid, elemlist in groups.iteritems():
             group = self.simplify_group(elemlist)
-#             for subgroup in subgroups: 
-#                particles.extend( self.reconstruct_group(subgroup) 
-
+            particles.extend( self.reconstruct_group(group) ) 
+            #             for subgroup in subgroups: 
+            #                particles.extend( self.reconstruct_group(subgroup) 
+        return particles
+            
     def simplify_group(self, elemlist):
         if len(elemlist)==1:
             return elemlist
-        
+        # TODO... cut ecal hcal links, cut track-hcal links
+        return elemlist
             
     def reconstruct_group(self, elemlist):
         particles = []
@@ -62,8 +65,7 @@ class PFReconstructor(object):
         pdg_id = 211 * track.charge
         mass, charge = particle_data[pdg_id]
         p4 = TLorentzVector()
-        p4.SetVect(track.p3)
-        p4.SetM(mass)
+        p4.SetVectM(track.p3, mass)
         particle = Particle(p4, vertex, charge, pdg_id)
         particle.set_path(track.path)
         return particle

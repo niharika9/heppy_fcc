@@ -18,6 +18,4 @@ class PFSequence(object):
         print self.linker
         self.pfreco = PFReconstructor( self.linker.groups() )
         print self.pfreco
-        # floodfill = FloodFill(elements)
-        # print 'groups', '*'*50
-        # print floodfill
+
