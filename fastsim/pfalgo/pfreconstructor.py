@@ -13,13 +13,25 @@ class PFReconstructor(object):
     def reconstruct(self, groups):
         particles = []
         for groupid, elemlist in groups.iteritems():
-            if len(elemlist)==1:
-                elem = elemlist[0]
-                layer = elem.layer
-                if layer == 'ecal_in' or layer == 'hcal_in':
-                    particles.append(self.reconstruct_cluster(elem, layer))
-                elif layer == 'tracker':
-                    particles.append(self.reconstruct_track(elem))
+            group = self.simplify_group(elemlist)
+#             for subgroup in subgroups: 
+#                particles.extend( self.reconstruct_group(subgroup) 
+
+    def simplify_group(self, elemlist):
+        if len(elemlist)==1:
+            return elemlist
+        
+            
+    def reconstruct_group(self, elemlist):
+        particles = []
+        if len(elemlist)==1:
+            elem = elemlist[0]
+            layer = elem.layer
+            if layer == 'ecal_in' or layer == 'hcal_in':
+                particles.append(self.reconstruct_cluster(elem, layer))
+            elif layer == 'tracker':
+                particles.append(self.reconstruct_track(elem))
+            elem.locked = True
         return particles
 
     def reconstruct_cluster(self, cluster, layer, vertex=None):
@@ -46,7 +58,16 @@ class PFReconstructor(object):
         return particle
         
     def reconstruct_track(self, track):
-        return None
+        vertex = track.path.points['vertex']
+        pdg_id = 211 * track.charge
+        mass, charge = particle_data[pdg_id]
+        p4 = TLorentzVector()
+        p4.SetVect(track.p3)
+        p4.SetM(mass)
+        particle = Particle(p4, vertex, charge, pdg_id)
+        particle.set_path(track.path)
+        return particle
+
 
     def __str__(self):
         return '\n'.join( map(str, self.particles) ) 

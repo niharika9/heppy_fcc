@@ -6,6 +6,7 @@ class PFObject(object):
 
     def __init__(self):
         self.linked = []
+        self.locked = False
         self.block_label = None
 
     def accept(self, visitor):
@@ -21,11 +22,11 @@ class Cluster(PFObject):
     #TODO: not sure this plays well with SmearedClusters
     max_energy = 0.
     
-    def __init__(self, energy, position, size_cm, layer, particle=None):
+    def __init__(self, energy, position, size_m, layer, particle=None):
         super(Cluster, self).__init__()
         self.position = position
         self.set_energy(energy)
-        self.set_size(size_cm)
+        self.set_size(size_m)
         self.layer = layer
         self.particle = particle
         # self.absorbed = []
