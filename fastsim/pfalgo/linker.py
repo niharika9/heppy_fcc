@@ -1,5 +1,5 @@
 import itertools
-
+from floodfill import FloodFill
 
 class Element(object):
     '''Basic interface for a particle flow element.
@@ -43,6 +43,7 @@ class Linker(object):
         '''
         self.distance = distance
         self.links = self.link(elements)
+        self.floodfill = FloodFill(elements)
 
     def link(self, elements):
         links = Links()
@@ -54,5 +55,8 @@ class Linker(object):
                 ele2.linked.append(ele1)
         return links
 
+    def groups(self):
+        return self.floodfill.groups
+    
     def __str__(self):
-        return str(self.links)
+        return '\n'.join( [str(self.links), str(self.floodfill)])

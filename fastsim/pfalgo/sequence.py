@@ -1,7 +1,7 @@
 from pfinput import PFInput
 from linker import Linker
 from distance import distance
-from floodfill import FloodFill
+from pfreconstructor import PFReconstructor
 
 #TODO: this class and PFInput should probably be in the fastsim module, to try to keep the pfalgo package independent from the dataformat in use. 
 
@@ -16,5 +16,8 @@ class PFSequence(object):
         self.linker = Linker(elements, distance)
         print self.pfinput
         print self.linker
-        floodfill = FloodFill(elements)
-        print floodfill
+        self.pfreco = PFReconstructor( self.linker.groups() )
+        print self.pfreco
+        # floodfill = FloodFill(elements)
+        # print 'groups', '*'*50
+        # print floodfill

@@ -190,7 +190,7 @@ if __name__ == '__main__':
             particle(211, math.pi/2., math.pi/2., 50.),
             particle(211, math.pi/2.+0.4, math.pi/2., 8.),
             particle(22, math.pi/2.+0.4, math.pi/2., 100.),
-            # particle(130, math.pi/2., math.pi/2.+0.07, 5.)
+            particle(130, math.pi/2., math.pi/2.+0.25, 20.)
         ]
         simulator.simulate(particles)
         

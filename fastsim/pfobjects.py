@@ -72,7 +72,7 @@ class Cluster(PFObject):
     #     self.__dict__[name] = value
 
     def __str__(self):
-        return '{classname:15}: {layer:10} {energy:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname:15}: {layer:10} {energy:7.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             layer = self.layer,
             energy = self.energy,
@@ -99,11 +99,11 @@ class Track(PFObject):
         self.layer = 'tracker'
 
     def __str__(self):
-        return '{classname:15}: {e:5.2f} {pt:5.2f} {theta:5.2f} {phi:5.2f}'.format(
+        return '{classname:15}: {e:7.2f} {pt:7.2f} {theta:5.2f} {phi:5.2f}'.format(
             classname = self.__class__.__name__,
             pt = self.pt,
             e = self.energy, 
-            theta = self.p3.Theta(),
+            theta = math.pi/2. - self.p3.Theta(),
             phi = self.p3.Phi()
         )
         
@@ -156,7 +156,7 @@ class Particle(object):
             charge = self.charge,
             mass = abs(self.p4.M()),
             energy = self.p4.E(),
-            theta = self.p4.Theta(),
+            theta = math.pi/2. - self.p4.Theta(),
             phi = self.p4.Phi()
         )
 

@@ -5,23 +5,8 @@ from ROOT import TLorentzVector
 import math
 
 from pfobjects import Particle
+from pdt import particle_data
 
-m_e = 0.000511
-m_mu = 0.105
-m_pi = 0.139
-m_K0 = 0.498
-m_n = 1.
-m_p = 1. 
-particle_data = {
-    11 : (m_e, 1),    
-    -11 : (m_e, -1),    
-    13 : (m_mu, 1),    
-    -13 : (m_mu, -1),    
-    22 : (0., 0),
-    130 : (m_K0, 0),
-    211 : (m_pi, 1),
-    -211 : (m_pi, -1)
-    }
 
 def particles(nptcs, pdgid, thetamin, thetamax, emin, emax, vertex=None ):
     ngenerated = 0
