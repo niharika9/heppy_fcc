@@ -4,6 +4,7 @@ from heppy_fcc.fastsim.pfobjects import Particle
 
 from ROOT import TVector3, TLorentzVector
 import math
+import pprint
 
 class PFReconstructor(object):
 
@@ -13,36 +14,54 @@ class PFReconstructor(object):
 
     def reconstruct(self, links):
         particles = []
-        for groupid, elemlist in links.groups().iteritems():
-            group = self.simplify_group(elemlist)
+        all_subgroups = dict()
+        # pprint.pprint( links.groups )
+        for groupid, group in links.groups.iteritems():
+            if self.simplify_group(group):
+                all_subgroups[groupid] = links.subgroups(groupid)
+        for group_id, subgroups in all_subgroups.iteritems():
+            del links.groups[group_id]
+            links.groups.update(subgroups)
+        for group_id, group in links.groups.iteritems():
+            print "GROUP", group_id, group
             particles.extend( self.reconstruct_group(group) ) 
-            #             for subgroup in subgroups: 
-            #                particles.extend( self.reconstruct_group(subgroup) 
         return particles
             
-    def simplify_group(self, elemlist):
+    def simplify_group(self, group):
         # for each track, keeping only the closest hcal link
-        tracks = [elem for elem in elemlist if elem.layer=='tracker']
+        simplified = False
+        assert(len(group)!=0)
+        if len(group)==1:
+            return False
+        tracks = [elem for elem in group if elem.layer=='tracker']
         for track in tracks:
             first_hcal = True
+            to_unlink = []
             for linked in track.linked:
                 if linked.layer == 'hcal_in':
                     if first_hcal:
                         first_hcal = False
                     else:
-                        self.links.unlink(track, linked)
+                        to_unlink.append(linked)
+            for linked in to_unlink:
+                self.links.unlink(track, linked)
+                simplified = True
         # remove all ecal-hcal links. ecal linked to hcal give rise to a photon anyway.
-        ecals = [elem for elem in elemlist if elem.layer=='ecal_in']
+        ecals = [elem for elem in group if elem.layer=='ecal_in']
         for ecal in ecals:
+            to_unlink = []
             for linked in ecal.linked:
                 if linked.layer == 'hcal_in':
-                    self.links.unlink(ecal, linked)
-        return elemlist
+                    to_unlink.append(linked)
+            for linked in to_unlink:
+                self.links.unlink(ecal, linked)
+                simplified = True
+        return simplified
             
-    def reconstruct_group(self, elemlist):
+    def reconstruct_group(self, group):
         particles = []
-        if len(elemlist)==1:
-            elem = elemlist[0]
+        if len(group)==1: #TODO WARNING
+            elem = group[0]
             layer = elem.layer
             if layer == 'ecal_in' or layer == 'hcal_in':
                 particles.append(self.reconstruct_cluster(elem, layer))
@@ -50,7 +69,7 @@ class PFReconstructor(object):
                 particles.append(self.reconstruct_track(elem))
             elem.locked = True
         else:
-            group = self.simplify_group(elemlist)
+            print 'more than 1 elements, skipping', group
         return particles 
         
     def reconstruct_cluster(self, cluster, layer, vertex=None):

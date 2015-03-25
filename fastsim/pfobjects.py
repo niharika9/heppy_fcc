@@ -16,6 +16,9 @@ class PFObject(object):
             for elem in self.linked:
                 elem.accept(visitor)
 
+    def __repr__(self):
+        return str(self)
+
 
 class Cluster(PFObject):
 

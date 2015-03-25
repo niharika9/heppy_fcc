@@ -42,10 +42,20 @@ class Links(dict):
             link_type, link_ok, dist = distance(ele1, ele2)
             if link_ok: 
                 self.add(ele1, ele2, dist)
-        self.floodfill = FloodFill(elements)
+        floodfill = FloodFill(elements)
+        self.groups = floodfill.groups
+        self.group_label = floodfill.label
         for elem in elements:
             self.sort_links(elem)
 
+    def subgroups(self, groupid):
+        floodfill = FloodFill(self.groups[groupid], self.group_label)
+        self.group_label = floodfill.label
+        return floodfill.groups
+        # if len(floodfill.groups)>1:
+        #     del self.groups[groupid]
+        #     self.groups.extend(floodfill.groups)
+    
     def dist_linked(self, elem):
         '''returns [(dist, linked_elem1), ...]
         for all elements linked to elem.'''
@@ -67,6 +77,7 @@ class Links(dict):
         elem.linked = sorted_links
             
     def key(self, elem1, elem2):
+        '''Build the dictionary key for the pair elem1 and elem2.'''
         return tuple(sorted([elem1, elem2]))
     
     def add(self, elem1, elem2, link_info):
@@ -90,10 +101,7 @@ class Links(dict):
         None if the link does not exist.'''
         key = self.key(elem1, elem2)
         return self.get(key, None)
-    
-    def groups(self):
-        return self.floodfill.groups
-    
+     
     def __str__(self):
         lines = []
         for key, val in self.iteritems():
