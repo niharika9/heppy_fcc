@@ -7,12 +7,13 @@ import math
 
 class PFReconstructor(object):
 
-    def __init__(self, groups):
-        self.particles = self.reconstruct(groups)
+    def __init__(self, links):
+        self.links = links
+        self.particles = self.reconstruct(links)
 
-    def reconstruct(self, groups):
+    def reconstruct(self, links):
         particles = []
-        for groupid, elemlist in groups.iteritems():
+        for groupid, elemlist in links.groups().iteritems():
             group = self.simplify_group(elemlist)
             particles.extend( self.reconstruct_group(group) ) 
             #             for subgroup in subgroups: 
@@ -20,9 +21,22 @@ class PFReconstructor(object):
         return particles
             
     def simplify_group(self, elemlist):
-        if len(elemlist)==1:
-            return elemlist
-        # TODO... cut ecal hcal links, cut track-hcal links
+        # for each track, keeping only the closest hcal link
+        tracks = [elem for elem in elemlist if elem.layer=='tracker']
+        for track in tracks:
+            first_hcal = True
+            for linked in track.linked:
+                if linked.layer == 'hcal_in':
+                    if first_hcal:
+                        first_hcal = False
+                    else:
+                        self.links.unlink(track, linked)
+        # remove all ecal-hcal links. ecal linked to hcal give rise to a photon anyway.
+        ecals = [elem for elem in elemlist if elem.layer=='ecal_in']
+        for ecal in ecals:
+            for linked in ecal.linked:
+                if linked.layer == 'hcal_in':
+                    self.links.unlink(ecal, linked)
         return elemlist
             
     def reconstruct_group(self, elemlist):
@@ -35,8 +49,10 @@ class PFReconstructor(object):
             elif layer == 'tracker':
                 particles.append(self.reconstruct_track(elem))
             elem.locked = True
-        return particles
-
+        else:
+            group = self.simplify_group(elemlist)
+        return particles 
+        
     def reconstruct_cluster(self, cluster, layer, vertex=None):
         if vertex is None:
             vertex = TVector3()

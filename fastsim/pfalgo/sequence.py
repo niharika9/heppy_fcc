@@ -16,6 +16,6 @@ class PFSequence(object):
         self.links = Links(elements, distance)
         print self.pfinput
         print self.links
-        self.pfreco = PFReconstructor( self.links.groups() )
+        self.pfreco = PFReconstructor( self.links )
         print self.pfreco
-
+        print self.links

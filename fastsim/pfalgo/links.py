@@ -1,4 +1,5 @@
 import itertools
+import pprint
 from floodfill import FloodFill
 
 class Element(object):
@@ -42,20 +43,54 @@ class Links(dict):
             if link_ok: 
                 self.add(ele1, ele2, dist)
         self.floodfill = FloodFill(elements)
+        for elem in elements:
+            self.sort_links(elem)
+
+    def dist_linked(self, elem):
+        '''returns [(dist, linked_elem1), ...]
+        for all elements linked to elem.'''
+        dist_linked = []
+        for linked_elem in elem.linked:
+            dist = self.info(elem, linked_elem)
+            dist_linked.append( (dist, linked_elem) )
+        return dist_linked
+            
+    def sort_links(self, elem):
+        '''sort links in elem according to link distance.
+        TODO unittest
+        '''
+        dist_linked = []
+        for linked_elem in elem.linked:
+            dist = self.info(elem, linked_elem)
+            dist_linked.append( (dist, linked_elem) )
+        sorted_links = [linked_elem for dist, linked_elem in sorted(dist_linked)]
+        elem.linked = sorted_links
             
     def key(self, elem1, elem2):
         return tuple(sorted([elem1, elem2]))
     
     def add(self, elem1, elem2, link_info):
+        '''Link two elements.
+        TODO: call that link.
+        '''
         key = self.key(elem1, elem2)
         elem1.linked.append(elem2)
         elem2.linked.append(elem1)
         self[key] = link_info
 
+    def unlink(self, elem1, elem2):
+        '''Unlink two elements.'''
+        key = self.key(elem1, elem2)
+        elem1.linked.remove(elem2)
+        elem2.linked.remove(elem1)
+        del self[key]
+        
     def info(self, elem1, elem2):
+        '''Return link information between two elements. 
+        None if the link does not exist.'''
         key = self.key(elem1, elem2)
         return self.get(key, None)
-
+    
     def groups(self):
         return self.floodfill.groups
     
@@ -67,6 +102,7 @@ class Links(dict):
                                                                  ele2=ele2,
                                                                  val=val))
         return '\n'.join(lines)
+
 
 
 

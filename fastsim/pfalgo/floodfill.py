@@ -19,7 +19,6 @@ class Node(object):
                 elem.accept(visitor)
 
 
-
 class FloodFill(object):
     '''The flood fill algorithm finds all disconnected subgraphs in 
     a list of nodes. 
