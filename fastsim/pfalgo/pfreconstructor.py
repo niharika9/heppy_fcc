@@ -97,7 +97,7 @@ class PFReconstructor(object):
                 particles.append(self.reconstruct_track(track))
             e_over_p = (hcal_energy + ecal_energy) / track_energy
             calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
-            print 'E/p, res = ' e_over_p, calo_eres
+            print 'E/p, res = ', e_over_p, calo_eres
             if e_over_p - 1 > calo_eres:
                 print 'excess!'
         return particles 
