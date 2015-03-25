@@ -7,15 +7,15 @@ from pfreconstructor import PFReconstructor
 
 class PFSequence(object):
     
-    def __init__(self, simptcs):
-        self.recptcs = self.reconstruct(simptcs)
+    def __init__(self, simptcs, detector):
+        self.recptcs = self.reconstruct(simptcs, detector)
 
-    def reconstruct(self, simptcs):
+    def reconstruct(self, simptcs, detector):
         self.pfinput = PFInput(simptcs)
         elements = self.pfinput.element_list()
         self.links = Links(elements, distance)
         print self.pfinput
         print self.links
-        self.pfreco = PFReconstructor( self.links )
+        self.pfreco = PFReconstructor( self.links, detector )
         print self.pfreco
         print self.links

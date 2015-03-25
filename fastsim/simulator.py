@@ -47,7 +47,7 @@ class Simulator(object):
         '''Returns a copy of self with a smeared energy.  
         If accept is False (default), returns None if the smeared 
         cluster is not in the detector acceptance. '''
-        eres = detector.energy_resolution(cluster)
+        eres = detector.energy_resolution(cluster.energy)
         energy = cluster.energy * random.gauss(1, eres)
         smeared_cluster = SmearedCluster( cluster,
                                           energy,
@@ -165,7 +165,7 @@ class Simulator(object):
         # if self.verbose:
         #     print self.pfinput
         #     print self.linker
-        self.pfsequence = PFSequence(self.ptcs)
+        self.pfsequence = PFSequence(self.ptcs, self.detector)
         
 if __name__ == '__main__':
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     from heppy_fcc.display.pfobjects import GTrajectories
 
     display_on = True
-    detector = perfect
+    detector = cms
 
     for i in range(1):
         if not i%100:
@@ -189,8 +189,8 @@ if __name__ == '__main__':
         particles = [
             particle(211, math.pi/2., math.pi/2., 50),
             #particle(22, math.pi/2.+0.4, 0., 200.),
-            particle(22, math.pi/2., math.pi/2.+0.05, 100.),
-            particle(130, math.pi/2., math.pi/2.+0.05, 20.)
+            # particle(22, math.pi/2., math.pi/2.+0.05, 100.),
+            particle(130, math.pi/2., math.pi/2., 50.)
         ]
         simulator.simulate(particles)
         

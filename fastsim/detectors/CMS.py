@@ -10,10 +10,11 @@ class ECAL(DetectorElement):
         mat = material.Material('ECAL', 8.9e-3, 0.25)
         self.eta_crack = 1.5
         self.emin = 2.
+        self.eres = [0.07, 0., 0.]
         super(ECAL, self).__init__('ecal', volume,  mat)
 
-    def energy_resolution(self, cluster):
-        return 0.07 / math.sqrt(cluster.energy) + 0.001 #TODO bug
+    def energy_resolution(self, energy, theta=0.):
+        return self.eres[0] / math.sqrt(energy)
 
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid)
@@ -41,10 +42,11 @@ class HCAL(DetectorElement):
     def __init__(self):
         volume = VolumeCylinder('hcal', 2.9, 3.6, 1.9, 2.6 )
         mat = material.Material('HCAL', None, 0.17)
+        self.eres = [1.1, 0., 0.]
         super(HCAL, self).__init__('ecal', volume, mat)
 
-    def energy_resolution(self, cluster):
-        return 1.1/ math.sqrt( cluster.energy ) 
+    def energy_resolution(self, energy, theta=0.):
+        return self.eres[0]/ math.sqrt( energy ) 
 
     def cluster_size(self, ptc):
         return 0.2

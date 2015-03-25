@@ -8,8 +8,9 @@ import pprint
 
 class PFReconstructor(object):
 
-    def __init__(self, links):
+    def __init__(self, links, detector):
         self.links = links
+        self.detector = detector
         self.particles = self.reconstruct(links)
 
     def reconstruct(self, links):
@@ -69,9 +70,38 @@ class PFReconstructor(object):
                 particles.append(self.reconstruct_track(elem))
             elem.locked = True
         else:
-            print 'more than 1 elements, skipping', group
+            hcals = [elem for elem in group if elem.layer=='hcal_in']
+            for hcal in hcals:
+                particles.append(self.reconstruct_hcal(hcal))
         return particles 
-        
+
+    def reconstruct_hcal(self, hcal):
+        particles = []
+        tracks = []
+        ecals = []
+        for elem in hcal.linked:
+            assert(elem.layer!='ecal_in') # should have killed ecal-hcal links
+            if elem.layer == 'hcal_in':
+                continue
+            elif elem.layer == 'tracker':
+                tracks.append(elem)
+                ecals.extend([te for te in elem.linked if te.layer=='ecal_in'])
+        print hcal
+        print '\tT', tracks
+        print '\tE', ecals
+        hcal_energy = hcal.energy
+        ecal_energy = sum(ecal.energy for ecal in ecals)
+        track_energy = sum(track.energy for track in tracks)
+        if len(tracks):
+            for track in tracks:
+                particles.append(self.reconstruct_track(track))
+            e_over_p = (hcal_energy + ecal_energy) / track_energy
+            calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
+            print 'E/p, res = ' e_over_p, calo_eres
+            if e_over_p - 1 > calo_eres:
+                print 'excess!'
+        return particles 
+                
     def reconstruct_cluster(self, cluster, layer, vertex=None):
         if vertex is None:
             vertex = TVector3()
@@ -93,6 +123,7 @@ class PFReconstructor(object):
         path.points[layer] = cluster.position
         particle.set_path(path)
         particle.clusters_smeared[layer] = cluster
+        cluster.locked = True
         return particle
         
     def reconstruct_track(self, track):
@@ -103,6 +134,7 @@ class PFReconstructor(object):
         p4.SetVectM(track.p3, mass)
         particle = Particle(p4, vertex, charge, pdg_id)
         particle.set_path(track.path)
+        track.locked = True
         return particle
 
 

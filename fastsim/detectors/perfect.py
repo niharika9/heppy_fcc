@@ -12,7 +12,7 @@ class ECAL(DetectorElement):
         self.emin = 2.
         super(ECAL, self).__init__('ecal', volume,  mat)
 
-    def energy_resolution(self, cluster):
+    def energy_resolution(self, energy, theta=0.):
         return 0. 
 
     def cluster_size(self, ptc):
@@ -36,7 +36,7 @@ class HCAL(DetectorElement):
         mat = material.Material('HCAL', None, 0.17)
         super(HCAL, self).__init__('ecal', volume, mat)
 
-    def energy_resolution(self, cluster):
+    def energy_resolution(self, energy, theta=0.):
         return 0.
 
     def cluster_size(self, ptc):

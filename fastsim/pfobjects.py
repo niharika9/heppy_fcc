@@ -96,7 +96,7 @@ class Track(PFObject):
         super(Track, self).__init__()
         self.p3 = p3
         self.pt = p3.Perp()
-        self.energy = p3.Mag()
+        self.energy = p3.Mag()  #TODO clarify energy and momentum
         self.charge = charge
         self.path = path
         self.particle = particle
@@ -163,6 +163,9 @@ class Particle(object):
             theta = math.pi/2. - self.p4.Theta(),
             phi = self.p4.Phi()
         )
+
+    def __repr__(self):
+        return str(self)
 
     
 if __name__ == '__main__':
