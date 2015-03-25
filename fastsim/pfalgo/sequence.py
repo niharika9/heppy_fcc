@@ -1,5 +1,5 @@
 from pfinput import PFInput
-from linker import Linker
+from links import Links
 from distance import distance
 from pfreconstructor import PFReconstructor
 
@@ -13,9 +13,9 @@ class PFSequence(object):
     def reconstruct(self, simptcs):
         self.pfinput = PFInput(simptcs)
         elements = self.pfinput.element_list()
-        self.linker = Linker(elements, distance)
+        self.links = Links(elements, distance)
         print self.pfinput
-        print self.linker
-        self.pfreco = PFReconstructor( self.linker.groups() )
+        print self.links
+        self.pfreco = PFReconstructor( self.links.groups() )
         print self.pfreco
 

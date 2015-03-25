@@ -1,7 +1,7 @@
 import unittest
 import itertools
 from distance import Distance
-from linker import Element
+from links import Element
 from heppy_fcc.fastsim.pfobjects import Cluster, Track
 from heppy_fcc.fastsim.path import StraightLine
 

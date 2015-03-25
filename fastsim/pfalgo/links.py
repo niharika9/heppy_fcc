@@ -31,10 +31,18 @@ class Distance(object):
         link_type = 'dummy'
         dist12 = 0.
         return link_type, True, dist12
-        
-        
+    
+    
+    
 class Links(dict):
 
+    def __init__(self, elements, distance):
+        for ele1, ele2 in itertools.combinations(elements, 2):
+            link_type, link_ok, dist = distance(ele1, ele2)
+            if link_ok: 
+                self.add(ele1, ele2, dist)
+        self.floodfill = FloodFill(elements)
+            
     def key(self, elem1, elem2):
         return tuple(sorted([elem1, elem2]))
     
@@ -47,7 +55,10 @@ class Links(dict):
     def info(self, elem1, elem2):
         key = self.key(elem1, elem2)
         return self.get(key, None)
-        
+
+    def groups(self):
+        return self.floodfill.groups
+    
     def __str__(self):
         lines = []
         for key, val in self.iteritems():
@@ -58,28 +69,4 @@ class Links(dict):
         return '\n'.join(lines)
 
 
-class Linker(object):
 
-    def __init__(self, elements, distance):
-        '''
-        parameters: 
-          elements: list of Elements
-          distance: function able to quantify the link between two elements
-        '''
-        self.distance = distance
-        self.links = self.link(elements)
-        self.floodfill = FloodFill(elements)
-
-    def link(self, elements):
-        links = Links()
-        for ele1, ele2 in itertools.combinations(elements, 2):
-            link_type, link_ok, dist = self.distance(ele1, ele2)
-            if link_ok: 
-                links.add(ele1, ele2, dist)
-        return links
-
-    def groups(self):
-        return self.floodfill.groups
-    
-    def __str__(self):
-        return '\n'.join( [str(self.links), str(self.floodfill)])
