@@ -50,6 +50,18 @@ class TestFloodFill(unittest.TestCase):
         self.assertEqual(floodfill.groups.keys(), [0,1])
         self.assertEqual(floodfill.groups.values()[0], [1,2,3,4])
         self.assertEqual(floodfill.groups.values()[1], [5,6])
+
+    def test_regroup(self):
+        graph = Graph( [ (1,2), (2,3), (3,4), (5, 6) ] )
+        floodfill = FloodFill(graph.nodes.values())
+        self.assertEqual(floodfill.groups.keys(), [0,1])
+        graph.nodes[1].linked.remove(graph.nodes[2])
+        graph.nodes[2].linked.remove(graph.nodes[1])
+        floodfill = FloodFill(floodfill.groups[0],
+                              first_label=floodfill.label)
+        self.assertEqual(floodfill.groups.keys(), [2,3])
+        self.assertEqual(floodfill.groups[2], [1])
+        self.assertEqual(floodfill.groups[3], [2,3,4])
         
 
     

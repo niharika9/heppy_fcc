@@ -31,10 +31,10 @@ class FloodFill(object):
       {0: [list of elements in subgraph0], 1: [list of elements in subgraph 1], ...}
     '''
     
-    def __init__(self, elements):
+    def __init__(self, elements, first_label=0):
         '''Perform the search for disconnected subgraphs on a list of elements 
         matching the interface given in this module.'''
-        self.label = 0
+        self.label = first_label
         self.visited = dict()
         self.groups = dict()
         for elem in elements:
