@@ -11,6 +11,7 @@ class PFReconstructor(object):
     def __init__(self, links, detector):
         self.links = links
         self.detector = detector
+        self.unused = []
         self.particles = self.reconstruct(links)
 
     def reconstruct(self, links):
@@ -26,7 +27,8 @@ class PFReconstructor(object):
             links.groups.update(subgroups)
         for group_id, group in links.groups.iteritems():
             print "GROUP", group_id, group
-            particles.extend( self.reconstruct_group(group) ) 
+            particles.extend( self.reconstruct_group(group) )
+        self.unused = [elem for elem in links.elements if not elem.locked]
         return particles
             
     def simplify_group(self, group):
@@ -73,14 +75,14 @@ class PFReconstructor(object):
         else:
             hcals = [elem for elem in group if elem.layer=='hcal_in']
             for hcal in hcals:
-                particles.append(self.reconstruct_hcal(hcal))
+                particles.extend(self.reconstruct_hcal(hcal))
             #TODO deal with ecal-ecal
-            ecals = [elem for elem in group if elem.layer=='ecal_in']
+            ecals = [elem for elem in group if elem.layer=='ecal_in'
+                     and not elem.locked]
             for ecal in ecals:
                 linked_layers = [linked.layer for linked in ecal.linked]
-                assert('tracker' not in linked_layers)
-                if not ecal.locked:
-                    particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
+                assert('tracker' not in linked_layers) #TODO electrons
+                particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
             #TODO deal with track-ecal
         return particles 
 
@@ -175,4 +177,11 @@ class PFReconstructor(object):
 
 
     def __str__(self):
-        return '\n'.join( map(str, self.particles) ) 
+        theStr = ['Particles:']
+        theStr.extend( map(str, self.particles))
+        theStr.append('Unused:')
+        if len(self.unused)==0:
+            theStr.append('None')
+        else:
+            theStr.extend( map(str, self.unused))
+        return '\n'.join( theStr )
