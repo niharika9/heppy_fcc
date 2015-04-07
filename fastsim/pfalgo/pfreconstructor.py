@@ -115,9 +115,12 @@ class PFReconstructor(object):
                                                                   ecal_energy))
 
         else:
-            assert(len(hcal.linked)==0)
-            # this case is already handled (single element block)
-            
+            # hcal cluster linked to other hcal clusters 
+            for elem in hcal.linked:
+                assert(elem.layer=='hcal_in')
+                # ecal hcal links have been cut
+            particles.append(self.reconstruct_cluster(hcal, 'hcal_in'))
+           
         return particles 
                 
     def reconstruct_cluster(self, cluster, layer, energy=None, vertex=None):

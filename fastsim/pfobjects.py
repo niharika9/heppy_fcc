@@ -29,9 +29,10 @@ class Cluster(PFObject):
         super(Cluster, self).__init__()
         self.position = position
         self.set_energy(energy)
-        self.set_size(size_m)
+        self.set_size( float(size_m) )
         self.layer = layer
         self.particle = particle
+        self.subclusters = [self]
         # self.absorbed = []
 
     def set_size(self, value):
@@ -48,29 +49,27 @@ class Cluster(PFObject):
         return self._angularsize
 
     def is_inside(self, point):
-        dist = (self.position - point).Mag()
+        subdists = [ (subc.position - point).Mag() for subc in self.subclusters ]
+        dist = min(subdists) 
         if dist < self.size():
             return True, dist
         else:
             return False, dist
-        
-    # def absorb(self, other):
-    #     subs = list(self.absorbed)
-    #     subs.append(self)
-    #     osubs = list(other.absorbed)
-    #     osubs.append(other)
-    #     for sub in subs:
-    #         for osub in osubs:
-    #             if deltaR(sub.position.Eta(),
-    #                       sub.position.Phi(),
-    #                       osub.position.Eta(),
-    #                       osub.position.Phi()) < sub.size + osub.size:
-    #                 self.absorbed.extend(osubs)
-    #                 self.set_energy( self.energy + other.energy ) 
-    #                 return True
-    #     return False
-                    
+
+    def __iadd__(self, other):
+        if other.layer != self.layer:
+            raise ValueError('can only add a cluster from the same layer') 
+        position = self.position * self.energy + other.position * other.energy
+        energy = self.energy + other.energy
+        denom  = 1/energy
+        position *= denom
+        self.position = position
+        self.energy = energy
+        self.subclusters.extend(other.subclusters)
+        return self
+
     def set_energy(self, energy):
+        energy = float(energy)
         self.energy = energy
         if energy > self.__class__.max_energy:
             self.__class__.max_energy = energy

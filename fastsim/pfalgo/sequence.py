@@ -1,4 +1,5 @@
 from pfinput import PFInput
+from merger import merge_clusters
 from links import Links
 from distance import distance
 from pfreconstructor import PFReconstructor
@@ -13,6 +14,8 @@ class PFSequence(object):
     def reconstruct(self, simptcs, detector):
         self.pfinput = PFInput(simptcs)
         elements = self.pfinput.element_list()
+        elements = merge_clusters(elements, 'hcal_in')
+        elements = merge_clusters(elements, 'ecal_in')
         self.links = Links(elements, distance)
         self.pfreco = PFReconstructor( self.links, detector )
         print self.pfreco
