@@ -84,25 +84,41 @@ class PFReconstructor(object):
             if elem.layer == 'hcal_in':
                 continue
             elif elem.layer == 'tracker':
-                tracks.append(elem)
+                tracks.append(elem)                
                 ecals.extend([te for te in elem.linked if te.layer=='ecal_in'])
+                # hcal should be the only remaining linked hcal cluster (closest one)
+                thcals = [th for th in elem.linked if th.layer=='hcal_in']
+                assert(thcals[0]==hcal)
         print hcal
         print '\tT', tracks
         print '\tE', ecals
         hcal_energy = hcal.energy
-        ecal_energy = sum(ecal.energy for ecal in ecals)
-        track_energy = sum(track.energy for track in tracks)
         if len(tracks):
+            ecal_energy = sum(ecal.energy for ecal in ecals)
+            track_energy = sum(track.energy for track in tracks)
             for track in tracks:
                 particles.append(self.reconstruct_track(track))
             e_over_p = (hcal_energy + ecal_energy) / track_energy
             calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
             print 'E/p, res = ', e_over_p, calo_eres
-            if e_over_p - 1 > calo_eres:
-                print 'excess!'
+            if e_over_p > calo_eres:
+                excess = hcal_energy + ecal_energy - track_energy
+                print 'excess!', excess, ecal_energy
+                if excess <= ecal_energy:
+                    particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
+                                                              excess))
+                else:
+                    particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
+                                                              ecal_energy))
+                    particles.append(self.reconstruct_cluster(hcal, 'hcal_in',
+                                                              excess-ecal_energy))
+        else:
+            assert(len(hcal.linked)==0)
+            # this case is already handled (single element block)
+            
         return particles 
                 
-    def reconstruct_cluster(self, cluster, layer, vertex=None):
+    def reconstruct_cluster(self, cluster, layer, energy=None, vertex=None):
         if vertex is None:
             vertex = TVector3()
         pdg_id = None
@@ -114,7 +130,8 @@ class PFReconstructor(object):
             raise ValueError('layer must be equal to ecal_in or hcal_in')
         assert(pdg_id)
         mass, charge = particle_data[pdg_id]
-        energy = cluster.energy
+        if energy is None:
+            energy = cluster.energy
         momentum = math.sqrt(energy**2 - mass**2) 
         p3 = cluster.position.Unit() * momentum
         p4 = TLorentzVector(p3.Px(), p3.Py(), p3.Pz(), energy)
