@@ -46,6 +46,13 @@ class Cluster(PFObject):
 
     def angular_size(self):
         return self._angularsize
+
+    def is_inside(self, point):
+        dist = (self.position - point).Mag()
+        if dist < self.size():
+            return True, dist
+        else:
+            return False, dist
         
     # def absorb(self, other):
     #     subs = list(self.absorbed)

@@ -54,9 +54,7 @@ class Distance(object):
         if tp is None:
             # probably a looper
             return ('ecal_in', 'tracker'), False, None
-        cp = ecal.position
-        dist = (cp - tp).Mag()
-        link_ok = dist < ecal.size() 
+        link_ok, dist = ecal.is_inside(tp)
         return ('ecal_in', 'tracker'), link_ok, dist
         
     def hcal_track(self, hcal, track):
@@ -64,15 +62,7 @@ class Distance(object):
         if tp is None:
             # probably a looper
             return ('hcal_in', 'tracker'), False, None
-        cp = hcal.position
-        # dist = (cp - tp).Mag()
-        # link_ok = dist < hcal.size()
-        dist = deltaR(tp.Theta(),
-                      tp.Phi(),
-                      cp.Theta(),
-                      cp.Phi())
-        print tp.Theta(), tp.Phi(), cp.Theta(), cp.Phi(), dist
-        link_ok = dist < hcal.angular_size()        
+        link_ok, dist = hcal.is_inside(tp)
         return ('hcal_in', 'tracker'), link_ok, dist
 
     def ecal_hcal(self, ele1, ele2):

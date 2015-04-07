@@ -98,20 +98,22 @@ class PFReconstructor(object):
             track_energy = sum(track.energy for track in tracks)
             for track in tracks:
                 particles.append(self.reconstruct_track(track))
-            e_over_p = (hcal_energy + ecal_energy) / track_energy
+            delta_e_rel = (hcal_energy + ecal_energy) / track_energy - 1.
             calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
-            print 'E/p, res = ', e_over_p, calo_eres
-            if e_over_p > calo_eres:
-                excess = hcal_energy + ecal_energy - track_energy
+            print 'dE/p, res = ', delta_e_rel, calo_eres
+            if delta_e_rel > calo_eres:
+                excess = delta_e_rel * track_energy
                 print 'excess!', excess, ecal_energy
                 if excess <= ecal_energy:
                     particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
                                                               excess))
                 else:
-                    particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
-                                                              ecal_energy))
                     particles.append(self.reconstruct_cluster(hcal, 'hcal_in',
                                                               excess-ecal_energy))
+                    if ecal_energy:
+                        particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
+                                                                  ecal_energy))
+
         else:
             assert(len(hcal.linked)==0)
             # this case is already handled (single element block)

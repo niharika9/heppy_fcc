@@ -14,8 +14,5 @@ class PFSequence(object):
         self.pfinput = PFInput(simptcs)
         elements = self.pfinput.element_list()
         self.links = Links(elements, distance)
-        print self.pfinput
-        print self.links
         self.pfreco = PFReconstructor( self.links, detector )
         print self.pfreco
-        print self.links
