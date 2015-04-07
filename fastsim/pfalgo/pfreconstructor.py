@@ -17,6 +17,7 @@ class PFReconstructor(object):
         particles = []
         all_subgroups = dict()
         # pprint.pprint( links.groups )
+        # import pdb; pdb.set_trace()
         for groupid, group in links.groups.iteritems():
             if self.simplify_group(group):
                 all_subgroups[groupid] = links.subgroups(groupid)
@@ -61,7 +62,7 @@ class PFReconstructor(object):
             
     def reconstruct_group(self, group):
         particles = []
-        if len(group)==1: #TODO WARNING
+        if len(group)==1: #TODO WARNING!!! LOTS OF MISSING CASES
             elem = group[0]
             layer = elem.layer
             if layer == 'ecal_in' or layer == 'hcal_in':
@@ -73,6 +74,12 @@ class PFReconstructor(object):
             hcals = [elem for elem in group if elem.layer=='hcal_in']
             for hcal in hcals:
                 particles.append(self.reconstruct_hcal(hcal))
+            #TODO deal with ecal-ecal
+            ecals = [elem for elem in group if elem.layer=='ecal_in']
+            for ecal in ecals:
+                if not ecal.locked: 
+                    particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
+            #TODO deal with track-ecal
         return particles 
 
     def reconstruct_hcal(self, hcal):
@@ -84,8 +91,13 @@ class PFReconstructor(object):
             if elem.layer == 'hcal_in':
                 continue
             elif elem.layer == 'tracker':
-                tracks.append(elem)                
-                ecals.extend([te for te in elem.linked if te.layer=='ecal_in'])
+                tracks.append(elem)
+                for ecal in elem.linked:
+                    if ecal.layer!='ecal_in':
+                        continue
+                    ecals.append(ecal)
+                    ecal.locked = True
+                # ecals.extend([te for te in elem.linked if te.layer=='ecal_in'])
                 # hcal should be the only remaining linked hcal cluster (closest one)
                 thcals = [th for th in elem.linked if th.layer=='hcal_in']
                 assert(thcals[0]==hcal)

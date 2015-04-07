@@ -38,6 +38,8 @@ class Distance(object):
 class Links(dict):
 
     def __init__(self, elements, distance):
+        for ele in elements:
+            ele.linked = []
         for ele1, ele2 in itertools.combinations(elements, 2):
             link_type, link_ok, dist = distance(ele1, ele2)
             if link_ok: 

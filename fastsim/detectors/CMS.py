@@ -7,7 +7,8 @@ class ECAL(DetectorElement):
 
     def __init__(self):
         volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
-        mat = material.Material('ECAL', 8.9e-3, 0.25)
+        # mat = material.Material('ECAL', 8.9e-3, 0.25)
+        mat = material.Material('ECAL', 8.9e-3, 1e-5)
         self.eta_crack = 1.5
         self.emin = 2.
         self.eres = [0.07, 0., 0.]

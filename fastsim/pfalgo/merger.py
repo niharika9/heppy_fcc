@@ -6,7 +6,13 @@ from ROOT import TVector3
 
 def merge_clusters(elements, layer):
     merged = []
-    elem_in_layer = [elem for elem in elements if elem.layer==layer]
+    elem_in_layer = []
+    elem_other = []
+    for elem in elements:
+        if elem.layer == layer:
+            elem_in_layer.append(elem)
+        else:
+            elem_other.append(elem)
     links = Links(elem_in_layer, distance)
     for group in links.groups.values():
         if len(group) == 1:
@@ -20,4 +26,5 @@ def merge_clusters(elements, layer):
                 continue
             else: 
                 supercluster += cluster
+    merged.extend(elem_other)
     return merged
