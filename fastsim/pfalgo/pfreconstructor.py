@@ -77,7 +77,9 @@ class PFReconstructor(object):
             #TODO deal with ecal-ecal
             ecals = [elem for elem in group if elem.layer=='ecal_in']
             for ecal in ecals:
-                if not ecal.locked: 
+                linked_layers = [linked.layer for linked in ecal.linked]
+                assert('tracker' not in linked_layers)
+                if not ecal.locked:
                     particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
             #TODO deal with track-ecal
         return particles 
