@@ -1,7 +1,5 @@
 import os
 import heppy.framework.config as cfg
-import logging
-logging.basicConfig(level=logging.WARNING)
 
 # input component 
 # several input components can be declared,
@@ -20,7 +18,8 @@ selectedComponents  = [inputSample]
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
-    verbose = True
+    display = False,
+    verbose = False
 )
 
 # definition of a sequence of analyzers,
@@ -45,29 +44,38 @@ config = cfg.Config(
 
     
 if __name__ == '__main__':
-    from heppy.framework.looper import Looper
     import sys
+    from heppy.framework.looper import Looper
+    import logging
+
+    # next 2 lines necessary to deal with reimports from ipython
+    logging.shutdown()
+    reload(logging)
+    logging.basicConfig(level=logging.INFO)
 
     def process(iev=None):
         if iev is None:
             iev = loop.iEvent
         loop.process(iev)
-        display.draw()
+        if display:
+            display.draw()
 
     def next():
         loop.process(loop.iEvent+1)
-        display.draw()
+        if display:
+            display.draw()            
 
-    iev = int(sys.argv[1])
-    loop = Looper( 'looper',
-                   config,
-                   1000, 0,
-                   nPrint = 0,
-                   timeReport = False,
-                   quiet = True)
-
+    iev = None
+    if len(sys.argv)==2:
+        iev = int(sys.argv[1])
+    loop = Looper( 'looper', config,
+                   nEvents=100,
+                   timeReport=True)
     pfsim = loop.analyzers[0]
-    display = pfsim.display
+    display = getattr(pfsim, 'display', None)
     simulator = pfsim.simulator
     detector = simulator.detector
-    process(iev)
+    if iev:
+        process(iev)
+    else:
+        loop.loop()

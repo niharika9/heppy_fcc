@@ -30,9 +30,10 @@ class PFSim(Analyzer):
     def __init__(self, *args, **kwargs):
         super(PFSim, self).__init__(*args, **kwargs)
         self.detector = CMS()
-        self.simulator = Simulator(self.detector)
-        self.is_display = False
-        self.init_display()        
+        self.simulator = Simulator(self.detector, self.mainLogger)
+        self.is_display = self.cfg_ana.display
+        if self.is_display:
+            self.init_display()        
         
     def init_display(self):
         self.display = Display(['xy','yz', 'ECAL_thetaphi', 'HCAL_thetaphi'])
@@ -60,7 +61,8 @@ class PFSim(Analyzer):
             print 'stable/all particles = {s}/{a}'.format(s=len(gen_particles_stable),
                                                           a=len(edm_particles))
         self.simulator.simulate( pfsim_particles )
-        self.display.register( GTrajectories(pfsim_particles), layer=1)
+        if self.is_display:
+            self.display.register( GTrajectories(pfsim_particles), layer=1)
         
         output = PFSimOutput()
         output.gen_stable = gen_particles_stable

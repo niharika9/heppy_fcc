@@ -12,11 +12,11 @@ class PFReconstructor(object):
         self.links = links
         self.detector = detector
         self.log = logger
-        self.particles = self.reconstruct(links)
+        self.reconstruct(links)
 
     def reconstruct(self, links):
         self.unused = []
-        particles = []
+        self.particles = []
         all_subgroups = dict()
         # pprint.pprint( links.groups )
         # import pdb; pdb.set_trace()
@@ -27,12 +27,13 @@ class PFReconstructor(object):
             del links.groups[group_id]
             links.groups.update(subgroups)
         for group_id, group in links.groups.iteritems():
-            self.log.warning( "group {group_id} {group}".format(
+            self.log.info( "group {group_id} {group}".format(
                 group_id = group_id,
                 group = group) ) 
-            particles.extend( self.reconstruct_group(group) )
+            self.particles.extend( self.reconstruct_group(group) )
         self.unused = [elem for elem in links.elements if not elem.locked]
-        return particles
+        self.log.info("Particles:")
+        self.log.info(str(self))
             
     def simplify_group(self, group):
         # for each track, keeping only the closest hcal link
@@ -85,7 +86,7 @@ class PFReconstructor(object):
             for ecal in ecals:
                 linked_layers = [linked.layer for linked in ecal.linked]
                 # assert('tracker' not in linked_layers) #TODO electrons
-                self.log.warning( 'WARNING!! DEAL WITH ELECTRONS!' ) 
+                self.log.warning( 'DEAL WITH ELECTRONS!' ) 
                 particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
             #TODO deal with track-ecal
         return particles 
@@ -109,9 +110,9 @@ class PFReconstructor(object):
                 # hcal should be the only remaining linked hcal cluster (closest one)
                 thcals = [th for th in elem.linked if th.layer=='hcal_in']
                 assert(thcals[0]==hcal)
-        self.log.warning( hcal )
-        self.log.warning( '\tT {tracks}'.format(tracks=tracks) )
-        self.log.warning( '\tE {ecals}'.format(ecals=ecals) )
+        self.log.info( hcal )
+        self.log.info( '\tT {tracks}'.format(tracks=tracks) )
+        self.log.info( '\tE {ecals}'.format(ecals=ecals) )
         hcal_energy = hcal.energy
         if len(tracks):
             ecal_energy = sum(ecal.energy for ecal in ecals)
@@ -120,19 +121,21 @@ class PFReconstructor(object):
                 particles.append(self.reconstruct_track(track))
             delta_e_rel = (hcal_energy + ecal_energy) / track_energy - 1.
             calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
-            self.log.warning( 'dE/p, res = {derel}, {res} '.format(
+            self.log.info( 'dE/p, res = {derel}, {res} '.format(
                 derel = delta_e_rel,
                 res = calo_eres ))
             if delta_e_rel > calo_eres:
                 excess = delta_e_rel * track_energy
-                self.log.warning( 'excess = {excess:5.2f}, ecal_E = {ecal_e:5.2f}, diff = {diff:5.2f}'.format(
+                self.log.info( 'excess = {excess:5.2f}, ecal_E = {ecal_e:5.2f}, diff = {diff:5.2f}'.format(
                     excess=excess, ecal_e = ecal_energy, diff=excess-ecal_energy)) 
                 if excess <= ecal_energy:
                     particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
                                                               excess))
                 else:
-                    particles.append(self.reconstruct_cluster(hcal, 'hcal_in',
-                                                              excess-ecal_energy))
+                    particle = self.reconstruct_cluster(hcal, 'hcal_in',
+                                                        excess-ecal_energy)
+                    if particle:
+                        particles.append(particle)
                     if ecal_energy:
                         particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
                                                                   ecal_energy))
@@ -160,7 +163,9 @@ class PFReconstructor(object):
         mass, charge = particle_data[pdg_id]
         if energy is None:
             energy = cluster.energy
-        momentum = math.sqrt(energy**2 - mass**2) 
+        if energy < mass: 
+            return None 
+        momentum = math.sqrt(energy**2 - mass**2)
         p3 = cluster.position.Unit() * momentum
         p4 = TLorentzVector(p3.Px(), p3.Py(), p3.Pz(), energy)
         particle = Particle(p4, vertex, charge, pdg_id)

@@ -178,10 +178,11 @@ if __name__ == '__main__':
     display_on = True
     detector = cms
 
-    logging.shutdown()
+                
     reload(logging)
+    logging.basicConfig(level='ERROR')
     logger = logging.getLogger('Simulator')
-    logger.addHandler( logging.StreamHandler(sys.stdout) )
+    # logger.addHandler( logging.StreamHandler(sys.stdout) )
     
     for i in range(1):
         if not i%100:

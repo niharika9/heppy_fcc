@@ -19,4 +19,4 @@ class PFSequence(object):
         elements = merge_clusters(elements, 'ecal_in')
         self.links = Links(elements, distance)
         self.pfreco = PFReconstructor( self.links, detector, self.logger)
-        print self.pfreco
+        # print self.pfreco
