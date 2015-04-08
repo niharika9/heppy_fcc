@@ -8,7 +8,8 @@ from pfreconstructor import PFReconstructor
 
 class PFSequence(object):
     
-    def __init__(self, simptcs, detector):
+    def __init__(self, simptcs, detector, logger):
+        self.logger = logger
         self.recptcs = self.reconstruct(simptcs, detector)
 
     def reconstruct(self, simptcs, detector):
@@ -17,5 +18,5 @@ class PFSequence(object):
         elements = merge_clusters(elements, 'hcal_in')
         elements = merge_clusters(elements, 'ecal_in')
         self.links = Links(elements, distance)
-        self.pfreco = PFReconstructor( self.links, detector )
+        self.pfreco = PFReconstructor( self.links, detector, self.logger)
         print self.pfreco

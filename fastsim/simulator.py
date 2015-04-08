@@ -6,9 +6,10 @@ import sys
 
 class Simulator(object):
 
-    def __init__(self, detector):
+    def __init__(self, detector, logger):
         self.verbose = True
         self.detector = detector
+        self.logger = logger
         self.prop_helix = HelixPropagator()
         self.prop_straight = StraightLinePropagator()
         
@@ -160,16 +161,12 @@ class Simulator(object):
                 self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
-        # self.pfinput = PFInput(self.ptcs)
-        # self.linker = Linker(self.pfinput.element_list(), distance)
-        # if self.verbose:
-        #     print self.pfinput
-        #     print self.linker
-        self.pfsequence = PFSequence(self.ptcs, self.detector)
+        self.pfsequence = PFSequence(self.ptcs, self.detector, self.logger)
         
 if __name__ == '__main__':
 
     import math
+    import logging
     from heppy_fcc.fastsim.vectors import Point
     from heppy_fcc.fastsim.detectors.CMS import cms
     from heppy_fcc.fastsim.detectors.perfect import perfect    
@@ -181,13 +178,18 @@ if __name__ == '__main__':
     display_on = True
     detector = cms
 
+    logging.shutdown()
+    reload(logging)
+    logger = logging.getLogger('Simulator')
+    logger.addHandler( logging.StreamHandler(sys.stdout) )
+    
     for i in range(1):
         if not i%100:
             print i
-        simulator = Simulator(detector)
+        simulator = Simulator(detector, logger)
         # particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
         particles = [
-            # particle(211, math.pi/2., math.pi/2., 100),
+            particle(211, math.pi/2., math.pi/2., 100),
             # particle(22, math.pi/2.+0.4, 0., 200.),
             particle(130, math.pi/2., math.pi/2.+0., 100.),
             particle(22, math.pi/2., math.pi/2.+0.0, 50.)

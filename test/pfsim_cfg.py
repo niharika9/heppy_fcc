@@ -8,9 +8,9 @@ logging.basicConfig(level=logging.WARNING)
 # and added to the list of selected components
 inputSample = cfg.Component(
     'albers_example',
-    # files = ['zqq.root'],
+    files = ['zqq.root'],
     # files = ['ww.root'],
-    files = ['hz.root'],
+    # files = ['hz.root'],
     # files = ['ttbar.root'],
     )
 
