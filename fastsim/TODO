@@ -11,8 +11,7 @@
 
 - implement particle display
 
-- test massive processing, profiling
-
 - fastjet interface
 
+- merging clusters should happen before smearing and acceptance.
 

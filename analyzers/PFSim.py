@@ -21,9 +21,6 @@ def pfsimparticle(edmparticle):
     vertex = TVector3()
     charge = core.Charge
     return PFSimParticle(tp4, vertex, charge, core.Type) 
-
-class PFSimOutput(object):
-    pass
         
 class PFSim(Analyzer):
 
@@ -64,8 +61,6 @@ class PFSim(Analyzer):
         if self.is_display:
             self.display.register( GTrajectories(pfsim_particles), layer=1)
         
-        output = PFSimOutput()
-        output.gen_stable = gen_particles_stable
-        output.pfsim = pfsim_particles
-        event.pfsim = output
+        event.genparticles = gen_particles_stable
+        event.particles = pfsim_particles
 

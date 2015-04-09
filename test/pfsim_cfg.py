@@ -22,10 +22,26 @@ pfsim = cfg.Analyzer(
     verbose = False
 )
 
+
+from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
+jets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'rec',
+    particles = 'particles'
+)
+
+genjets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'gen',
+    particles = 'genparticles'
+)
+
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     pfsim,
+    jets,
+    # genjets
     ] )
 
 # inputSample.files.append('albers_2.root')
@@ -69,7 +85,7 @@ if __name__ == '__main__':
     if len(sys.argv)==2:
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
-                   nEvents=100,
+                   nEvents=5,
                    timeReport=True)
     pfsim = loop.analyzers[0]
     display = getattr(pfsim, 'display', None)

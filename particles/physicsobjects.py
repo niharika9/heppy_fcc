@@ -5,6 +5,7 @@ class Jet(Handle, P4):
     pass
 
 class Particle(Handle, P4):
+        
     def __str__(self):
         tmp = '{className} : id = {id:3} pt = {pt:5.1f}, eta = {eta:5.2f}, phi = {phi:5.2f}, mass = {mass:5.2f}'
         return tmp.format(
