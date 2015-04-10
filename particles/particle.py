@@ -5,6 +5,9 @@ class Particle(object):
     def p4(self):
         return self.tlv
 
+    def p3(self):
+        return self.tlv.Vect()
+
     def e(self):
         return self.tlv.E()
 

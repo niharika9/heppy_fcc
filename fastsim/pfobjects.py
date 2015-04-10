@@ -131,21 +131,13 @@ class SmearedTrack(Track):
 class Particle(BaseParticle):
     def __init__(self, tlv, vertex, charge, pdgid=None):
         super(Particle, self).__init__(pdgid, charge, tlv)
-        # self.tlv = tlv
-        self.p3 = tlv.Vect()
         self.vertex = vertex
-        self.charge = charge
-        # self.pdgid = pdgid
         self.path = None
         self.clusters = dict()
-        # TODO remove track datamembers from self.
-        self.track = Track(self.p3, self.charge, self.path)
+        self.track = Track(self.p3(), self.q(), self.path)
         self.clusters_smeared = dict()
         self.track_smeared = None  
-        
-    # def p4(self):
-    #    return self.tlv
-        
+  
     def __getattr__(self, name):
         if name=='points':
             if self.path is None:
@@ -162,21 +154,7 @@ class Particle(BaseParticle):
     def set_path(self, path, option=None):
         if option == 'w' or self.path is None:
             self.path = path
-            self.track = Track(self.p3, self.charge, self.path)
-        
-    # def __str__(self):
-    #     return '{classname}: {pdgid:5} {charge:2} {mass:8.3f} {energy:6.2f} {theta:5.2f} {phi:5.2f}'.format(
-    #         classname = self.__class__.__name__,
-    #         pdgid = self.pdgid,
-    #         charge = self.charge,
-    #         mass = abs(self.tlv.M()),
-    #         energy = self.tlv.E(),
-    #         theta = math.pi/2. - self.tlv.Theta(),
-    #         phi = self.tlv.Phi()
-    #     )
-
-    # def __repr__(self):
-    #     return str(self)
+            self.track = Track(self.p3(), self.q(), self.path)
 
     
 if __name__ == '__main__':

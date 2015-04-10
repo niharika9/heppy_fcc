@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # next 2 lines necessary to deal with reimports from ipython
     logging.shutdown()
     reload(logging)
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.ERROR)
 
     def process(iev=None):
         if iev is None:
@@ -86,6 +86,7 @@ if __name__ == '__main__':
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
                    nEvents=5,
+                   nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[0]
     display = getattr(pfsim, 'display', None)

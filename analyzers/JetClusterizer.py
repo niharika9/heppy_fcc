@@ -47,4 +47,4 @@ class JetClusterizer(Analyzer):
             jet = Jet( self.clusterizer.jet(jeti) )
             jets.append( jet )
             self.mainLogger.info( '\t{jet}'.format(jet=jet))
-        event.jets = jets
+        setattr(event, '_'.join([self.instance_label,'jets']), jets)
