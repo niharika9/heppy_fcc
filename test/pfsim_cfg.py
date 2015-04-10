@@ -85,14 +85,14 @@ if __name__ == '__main__':
     if len(sys.argv)==2:
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
-                   nEvents=5,
+                   nEvents=100,
                    nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[0]
     display = getattr(pfsim, 'display', None)
     simulator = pfsim.simulator
     detector = simulator.detector
-    if iev:
+    if iev is not None:
         process(iev)
     else:
         loop.loop()

@@ -12,7 +12,7 @@ class Blob(object):
         # print radius
         color = 1
         if cluster.particle:
-            if cluster.particle.pdgid == 22 or cluster.particle.pdgid == 11:
+            if cluster.particle.pdgid() == 22 or cluster.particle.pdgid() == 11:
                 color = 2
             else:
                 color = 4
@@ -89,7 +89,7 @@ class GTrajectory(object):
             self.graph_xz.SetPoint(i, point.Z(), point.X() )
             tppoint = point
             if i == 0:
-                tppoint = description.p4.Vect()
+                tppoint = description.p4().Vect()
             self.graph_thetaphi.SetPoint(i, math.pi/2. - tppoint.Theta(), tppoint.Phi() )
         clusters = self.desc.clusters_smeared \
                    if self.__class__.draw_smeared_clusters \
@@ -145,9 +145,9 @@ class GHelixTrajectory(GTrajectory):
             self.graphline_xz.SetPoint(i, point.Z(), point.X())
             tppoint = point
             if i == 0:
-                tppoint = description.p4.Vect()
+                tppoint = description.p4().Vect()
             self.graphline_thetaphi.SetPoint(i, math.pi/2.-tppoint.Theta(), tppoint.Phi())
-        if abs(self.desc.pdgid) in [11,13]:
+        if abs(self.desc.pdgid()) in [11,13]:
             def set_graph_style(graph):
                 graph.SetLineWidth(3)
                 graph.SetLineColor(5)
