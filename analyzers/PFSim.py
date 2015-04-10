@@ -1,5 +1,5 @@
 from heppy.framework.analyzer import Analyzer
-from heppy_fcc.particles.physicsobjects import Particle 
+from heppy_fcc.particles.fcc.particle import Particle 
 
 import math
 from heppy_fcc.fastsim.detectors.CMS import CMS
@@ -13,14 +13,12 @@ from heppy_fcc.display.pfobjects import GTrajectories
 
 from ROOT import TLorentzVector, TVector3
 
-def pfsimparticle(edmparticle):
-    tp4 = TLorentzVector()
-    core = edmparticle.read().Core
-    p4 = core.P4
-    tp4.SetPtEtaPhiM(p4.Pt, p4.Eta, p4.Phi, p4.Mass)
+def pfsimparticle(ptc):
+    tp4 = ptc.p4()
     vertex = TVector3()
-    charge = core.Charge
-    return PFSimParticle(tp4, vertex, charge, core.Type) 
+    charge = ptc.q()
+    pid = ptc.pdgid()
+    return PFSimParticle(tp4, vertex, charge, pid) 
         
 class PFSim(Analyzer):
 
@@ -47,11 +45,12 @@ class PFSim(Analyzer):
         gen_particles_stable = []
         pfsim_particles = []
         for ptc in edm_particles:
+            pyptc = Particle(ptc)
             core = ptc.read().Core
             if core.Status == 1 and core.P4.Pt>1.:
-                pyptc = Particle(ptc) 
                 gen_particles_stable.append( pyptc )
-                pfsim_particles.append(pfsimparticle(ptc))
+                pfsimptc = pfsimparticle(pyptc)
+                pfsim_particles.append(pfsimptc)
                 if self.cfg_ana.verbose:
                     print pyptc
         if self.cfg_ana.verbose:
@@ -62,5 +61,6 @@ class PFSim(Analyzer):
             self.display.register( GTrajectories(pfsim_particles), layer=1)
         
         event.genparticles = gen_particles_stable
-        event.particles = pfsim_particles
+        event.simparticles = pfsim_particles
+        event.particles = self.simulator.pfsequence.pfreco.particles 
 

@@ -41,7 +41,7 @@ genjets = cfg.Analyzer(
 sequence = cfg.Sequence( [
     pfsim,
     jets,
-    # genjets
+    genjets
     ] )
 
 # inputSample.files.append('albers_2.root')

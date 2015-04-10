@@ -19,7 +19,7 @@ class Propagator(object):
 class StraightLinePropagator(Propagator):        
 
     def propagate_one(self, particle, cylinder, dummy=None):
-        line = StraightLine(particle.p4, particle.vertex) 
+        line = StraightLine(particle.p4(), particle.vertex) 
         particle.set_path( line )
         theta = line.udir.Theta()
         if line.udir.Z():
@@ -53,11 +53,11 @@ class StraightLinePropagator(Propagator):
 class HelixPropagator(Propagator):
     
     def propagate_one(self, particle, cylinder, field, debug_info=None):
-        helix = Helix(field, particle.charge, particle.p4,
+        helix = Helix(field, particle.charge, particle.p4(),
                       particle.vertex)
         particle.set_path(helix)
         is_looper = helix.extreme_point_xy.Mag() < cylinder.rad
-        is_positive = particle.p4.Z() > 0.
+        is_positive = particle.p4().Z() > 0.
         if not is_looper:
             xm, ym, xp, yp = circle_intersection(helix.center_xy.X(),
                                                  helix.center_xy.Y(),

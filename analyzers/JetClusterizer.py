@@ -38,7 +38,7 @@ class JetClusterizer(Analyzer):
         particles = getattr(event, self.cfg_ana.particles)
         self.clusterizer.clear();
         for ptc in particles:
-            self.clusterizer.add_p4( ptc.p4 )
+            self.clusterizer.add_p4( ptc.p4() )
         self.clusterizer.clusterize()
         self.mainLogger.info( 'njets = {n}'.format(
             n=self.clusterizer.n_jets()))

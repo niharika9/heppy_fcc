@@ -18,7 +18,7 @@ class ECAL(DetectorElement):
         return self.eres[0] / math.sqrt(energy)
 
     def cluster_size(self, ptc):
-        pdgid = abs(ptc.pdgid)
+        pdgid = abs(ptc.pdgid())
         if pdgid==22 or pdgid==11:
             return 0.04
         else:

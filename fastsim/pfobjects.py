@@ -1,4 +1,5 @@
 from vectors import Point
+from heppy_fcc.particles.tlv.particle import Particle as BaseParticle
 from heppy.utils.deltar import deltaR
 import math
 
@@ -127,19 +128,23 @@ class SmearedTrack(Track):
         super(SmearedTrack, self).__init__(*args, **kwargs)
     
         
-class Particle(object):
-    def __init__(self, p4, vertex, charge, pdgid=None):
-        self.p4 = p4
-        self.p3 = p4.Vect()
+class Particle(BaseParticle):
+    def __init__(self, tlv, vertex, charge, pdgid=None):
+        super(Particle, self).__init__(pdgid, charge, tlv)
+        # self.tlv = tlv
+        self.p3 = tlv.Vect()
         self.vertex = vertex
         self.charge = charge
-        self.pdgid = pdgid
+        # self.pdgid = pdgid
         self.path = None
         self.clusters = dict()
         # TODO remove track datamembers from self.
         self.track = Track(self.p3, self.charge, self.path)
         self.clusters_smeared = dict()
         self.track_smeared = None  
+        
+    # def p4(self):
+    #    return self.tlv
         
     def __getattr__(self, name):
         if name=='points':
@@ -148,7 +153,7 @@ class Particle(object):
             return self.path.points
         
     def is_em(self):
-        kind = abs(self.pdgid)
+        kind = abs(self.pdgid())
         if kind==11 or kind==22:
             return True
         else:
@@ -159,19 +164,19 @@ class Particle(object):
             self.path = path
             self.track = Track(self.p3, self.charge, self.path)
         
-    def __str__(self):
-        return '{classname}: {pdgid:5} {charge:2} {mass:8.3f} {energy:6.2f} {theta:5.2f} {phi:5.2f}'.format(
-            classname = self.__class__.__name__,
-            pdgid = self.pdgid,
-            charge = self.charge,
-            mass = abs(self.p4.M()),
-            energy = self.p4.E(),
-            theta = math.pi/2. - self.p4.Theta(),
-            phi = self.p4.Phi()
-        )
+    # def __str__(self):
+    #     return '{classname}: {pdgid:5} {charge:2} {mass:8.3f} {energy:6.2f} {theta:5.2f} {phi:5.2f}'.format(
+    #         classname = self.__class__.__name__,
+    #         pdgid = self.pdgid,
+    #         charge = self.charge,
+    #         mass = abs(self.tlv.M()),
+    #         energy = self.tlv.E(),
+    #         theta = math.pi/2. - self.tlv.Theta(),
+    #         phi = self.tlv.Phi()
+    #     )
 
-    def __repr__(self):
-        return str(self)
+    # def __repr__(self):
+    #     return str(self)
 
     
 if __name__ == '__main__':

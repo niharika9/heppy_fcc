@@ -1,4 +1,4 @@
-from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator 
+from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator
 from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
 from pfalgo.sequence import PFSequence
 import random
@@ -37,7 +37,7 @@ class Simulator(object):
         if size is None:
             size = detector.cluster_size(ptc)
         cylname = detector.volume.inner.name
-        cluster =  Cluster(ptc.p4.E()*fraction,
+        cluster =  Cluster(ptc.p4().E()*fraction,
                            ptc.points[cylname],
                            size,
                            cylname, ptc)
@@ -151,15 +151,15 @@ class Simulator(object):
         self.reset()
         self.ptcs = ptcs
         for ptc in ptcs:
-            if ptc.pdgid == 22:
+            if ptc.pdgid() == 22:
                 self.simulate_photon(ptc)
-            elif abs(ptc.pdgid) == 11:
+            elif abs(ptc.pdgid()) == 11:
                 self.simulate_electron(ptc)
-            elif abs(ptc.pdgid) == 13:
+            elif abs(ptc.pdgid()) == 13:
                 self.simulate_muon(ptc)
-            elif abs(ptc.pdgid) in [12,14,16]:
+            elif abs(ptc.pdgid()) in [12,14,16]:
                 self.simulate_neutrino(ptc)
-            elif abs(ptc.pdgid) > 100: #TODO make sure this is ok
+            elif abs(ptc.pdgid()) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
         self.pfsequence = PFSequence(self.ptcs, self.detector, self.logger)
         
