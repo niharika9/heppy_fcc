@@ -11,7 +11,7 @@
 
 - implement particle display
 
-- fastjet interface
+- jet constituents and fractions
 
 - merging clusters should happen before smearing and acceptance.
 

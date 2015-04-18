@@ -2,6 +2,7 @@ from detector import Detector, DetectorElement
 import material
 from geometry import VolumeCylinder
 import math
+import random
 
 class ECAL(DetectorElement):
 
@@ -76,10 +77,11 @@ class Tracker(DetectorElement):
         super(Tracker, self).__init__('tracker', volume,  mat)
 
     def acceptance(self, track):
+        # return False
         pt = track.pt
         eta = abs(track.p3.Eta())
-        if eta < 2.5 : 
-            return pt>0.7
+        if eta < 2.5 and pt>0.7:
+            return random.uniform(0,1)<0.9 # 90% eff plateau in acceptance
         else:
             return False
 
