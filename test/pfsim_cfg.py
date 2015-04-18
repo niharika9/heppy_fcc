@@ -85,6 +85,10 @@ if __name__ == '__main__':
     reload(logging)
     logging.basicConfig(level=logging.ERROR)
 
+    import random
+    random.seed(0xdeadbeef)
+
+    
     def process(iev=None):
         if iev is None:
             iev = loop.iEvent
@@ -101,7 +105,7 @@ if __name__ == '__main__':
     if len(sys.argv)==2:
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
-                   nEvents=None,
+                   nEvents=100,
                    nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[0]

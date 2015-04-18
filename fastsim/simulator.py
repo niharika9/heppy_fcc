@@ -4,6 +4,7 @@ from pfalgo.sequence import PFSequence
 import random
 import sys
 
+
 class Simulator(object):
 
     def __init__(self, detector, logger):
