@@ -36,12 +36,28 @@ genjets = cfg.Analyzer(
     particles = 'genparticles'
 )
 
+from heppy_fcc.analyzers.JetAnalyzer import JetAnalyzer
+jetana = cfg.Analyzer(
+    JetAnalyzer,
+)
+
+
+from heppy_fcc.analyzers.JetTreeProducer import JetTreeProducer
+tree = cfg.Analyzer(
+    JetTreeProducer,
+    tree_name = 'events',
+    tree_title = 'jets'
+)
+
+
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     pfsim,
     jets,
-    genjets
+    genjets,
+    jetana,
+    tree
     ] )
 
 # inputSample.files.append('albers_2.root')
@@ -85,7 +101,7 @@ if __name__ == '__main__':
     if len(sys.argv)==2:
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
-                   nEvents=100,
+                   nEvents=None,
                    nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[0]
@@ -96,3 +112,4 @@ if __name__ == '__main__':
         process(iev)
     else:
         loop.loop()
+        loop.write()
