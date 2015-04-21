@@ -20,7 +20,7 @@ class Simulator(object):
         SmearedCluster.max_energy = 0.
         
     def propagator(self, ptc):
-        is_neutral = abs(ptc.charge)<0.5
+        is_neutral = abs(ptc.q())<0.5
         return self.prop_straight if is_neutral else self.prop_helix
         
     def propagate(self, ptc):
@@ -135,7 +135,7 @@ class Simulator(object):
         smeared = self.smear_cluster(cluster, hcal)
         if smeared:
             ptc.clusters_smeared[smeared.layer] = smeared
-        if ptc.charge!=0:
+        if ptc.q()!=0:
             smeared_track = self.smear_track(ptc.track,
                                              self.detector.elements['tracker'])
             if smeared_track:

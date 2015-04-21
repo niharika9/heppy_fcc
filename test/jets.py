@@ -2,7 +2,7 @@ from ROOT import *
 
 rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
 
-dirs = ['looper_pf', 'looper']
+dirs = ['looper_pf', 'looper_calo']
 
 def draw(dir, color, opt=""):
     fname = '/'.join([dir, rootfile])

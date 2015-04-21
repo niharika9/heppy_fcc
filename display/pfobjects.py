@@ -176,7 +176,7 @@ class GTrajectories(list):
     
     def __init__(self, particles):
         for ptc in particles:
-            is_neutral = abs(ptc.charge)<0.5
+            is_neutral = abs(ptc.q())<0.5
             TrajClass = GStraightTrajectory if is_neutral else GHelixTrajectory
             gtraj = TrajClass(ptc)
             self.append(gtraj)

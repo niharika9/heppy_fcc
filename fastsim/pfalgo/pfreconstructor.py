@@ -179,7 +179,10 @@ class PFReconstructor(object):
     def reconstruct_track(self, track):
         vertex = track.path.points['vertex']
         pdg_id = 211 * track.charge
-        mass, charge = particle_data[pdg_id]
+        try: 
+            mass, charge = particle_data[pdg_id]
+        except KeyError:
+            import pdb; pdb.set_trace()
         p4 = TLorentzVector()
         p4.SetVectM(track.p3, mass)
         particle = Particle(p4, vertex, charge, pdg_id)

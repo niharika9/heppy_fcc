@@ -88,7 +88,7 @@ def monojet(pdgids, theta, phi, pstar, jetenergy, vertex=None):
         jetp4 += bp4
         boosted_particles.append( Particle(bp4,
                                            ptc.vertex,
-                                           ptc.charge,
+                                           ptc.q(),
                                            ptc.pdgid) )
     # print jetp4.M(), jetp4.E()
     return boosted_particles

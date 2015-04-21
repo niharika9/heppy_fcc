@@ -37,31 +37,18 @@ class PFSim(Analyzer):
         self.is_display = True
         
     def process(self, event):
-        # move the following to a gen particle analyzer at some point 
         if self.is_display:
             self.display.clear()
-        store = event.input
-        edm_particles = store.get("GenParticle")
-        gen_particles_stable = []
         pfsim_particles = []
-        for ptc in edm_particles:
-            pyptc = Particle(ptc)
-            core = ptc.read().Core
-            if core.Status == 1 and core.P4.Pt>1.:
-                gen_particles_stable.append( pyptc )
-                pfsimptc = pfsimparticle(pyptc)
+        for ptc in event.gen_particles_stable:
+            if not math.isnan(ptc.pt()) and ptc.pt()>1.:
+                pfsimptc = pfsimparticle(ptc)
                 pfsim_particles.append(pfsimptc)
                 if self.cfg_ana.verbose:
                     print pyptc
-        if self.cfg_ana.verbose:
-            print 'stable/all particles = {s}/{a}'.format(s=len(gen_particles_stable),
-                                                          a=len(edm_particles))
         self.simulator.simulate( pfsim_particles )
         if self.is_display:
-            self.display.register( GTrajectories(pfsim_particles), layer=1)
-        
-        event.genparticles = sorted( gen_particles_stable,
-                                     key = lambda ptc: ptc.e(), reverse=True)
+            self.display.register( GTrajectories(pfsim_particles), layer=1)        
         event.simparticles = sorted( pfsim_particles,
                                      key = lambda ptc: ptc.e(), reverse=True)
         event.particles = sorted( self.simulator.pfsequence.pfreco.particles,
