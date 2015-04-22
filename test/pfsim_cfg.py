@@ -23,7 +23,7 @@ reader = cfg.Analyzer(
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
-    display = False,
+    display = True,
     verbose = False
 )
 
