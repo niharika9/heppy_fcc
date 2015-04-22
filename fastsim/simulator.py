@@ -7,9 +7,13 @@ import sys
 
 class Simulator(object):
 
-    def __init__(self, detector, logger):
+    def __init__(self, detector, logger=None):
         self.verbose = True
         self.detector = detector
+        if logger is None:
+            import logging
+            logging.basicConfig(level='ERROR')
+            logger = logging.getLogger('Simulator')
         self.logger = logger
         self.prop_helix = HelixPropagator()
         self.prop_straight = StraightLinePropagator()
@@ -167,11 +171,11 @@ class Simulator(object):
 if __name__ == '__main__':
 
     import math
-    import logging
-    from heppy_fcc.fastsim.vectors import Point
-    from heppy_fcc.fastsim.detectors.CMS import cms
-    from heppy_fcc.fastsim.detectors.perfect import perfect    
-    from heppy_fcc.fastsim.toyevents import monojet, particle 
+    import logging 
+    from vectors import Point
+    from detectors.CMS import cms
+    from detectors.perfect import perfect    
+    from toyevents import monojet, particle 
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
     from heppy_fcc.display.pfobjects import GTrajectories
@@ -179,11 +183,9 @@ if __name__ == '__main__':
     display_on = True
     detector = cms
 
-                
-    reload(logging)
     logging.basicConfig(level='ERROR')
     logger = logging.getLogger('Simulator')
-    # logger.addHandler( logging.StreamHandler(sys.stdout) )
+    logger.addHandler( logging.StreamHandler(sys.stdout) )
     
     for i in range(1):
         if not i%100:

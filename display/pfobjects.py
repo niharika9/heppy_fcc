@@ -188,17 +188,21 @@ class GTrajectories(list):
         
 if __name__ == '__main__':
     import math
-    from heppy_fcc.fastsim.geometry import CMS
+    from heppy_fcc.fastsim.detectors.CMS import CMS
     from heppy_fcc.fastsim.simulator import Simulator
     from heppy_fcc.fastsim.vectors import Point
     from heppy_fcc.fastsim.toyevents import particles
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
+
+    import logging 
+    logging.basicConfig(level='ERROR')
+    logger = logging.getLogger('Simulator')
     
     cms = CMS()
-    simulator = Simulator(cms)
+    simulator = Simulator(cms, logger)
     
-    particles = list( particles(5, 1, 0.5, math.pi/5., 4*math.pi/5.,
+    particles = list( particles(5, 211, math.pi/5., 4*math.pi/5.,
                                 10., 10., Point(0.5,0.5,0)) )
     simulator.simulate(particles)
     

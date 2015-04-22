@@ -84,7 +84,7 @@ class GDetector(object):
 if __name__ == '__main__':
 
     from ROOT import TCanvas, TH2F
-    from heppy_fcc.fastsim.geometry import CMS
+    from heppy_fcc.fastsim.detectors.CMS import CMS
     from heppy_fcc.display.core import Display
 
     cms = CMS()
