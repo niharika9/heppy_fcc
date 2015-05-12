@@ -23,7 +23,7 @@ reader = cfg.Analyzer(
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
-    display = True,
+    display = False,
     verbose = False
 )
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     # next 2 lines necessary to deal with reimports from ipython
     logging.shutdown()
     reload(logging)
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.INFO)
 
     import random
     random.seed(0xdeadbeef)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
                    nEvents=2000,
-                   nPrint=5,
+                   nPrint=0,
                    timeReport=True)
     pfsim = loop.analyzers[1]
     display = getattr(pfsim, 'display', None)

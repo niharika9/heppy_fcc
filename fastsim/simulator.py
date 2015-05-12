@@ -193,10 +193,10 @@ if __name__ == '__main__':
         simulator = Simulator(detector, logger)
         # particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
         particles = [
-            particle(211, math.pi/2., math.pi/2., 100),
-            # particle(22, math.pi/2.+0.4, 0., 200.),
-            particle(130, math.pi/2., math.pi/2.+0., 100.),
-            particle(22, math.pi/2., math.pi/2.+0.0, 50.)
+            # particle(211, math.pi/2., math.pi/2., 100),
+            particle(211, math.pi/2 + 0.5, 0., 20.),
+            # particle(130, math.pi/2., math.pi/2.+0., 100.),
+            particle(22, math.pi/2., math.pi/2.+0.0, 10.)
         ]
         simulator.simulate(particles)
         

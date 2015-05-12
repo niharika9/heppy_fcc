@@ -9,7 +9,7 @@ class ECAL(DetectorElement):
     def __init__(self):
         volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
         # mat = material.Material('ECAL', 8.9e-3, 0.25)
-        mat = material.Material('ECAL', 8.9e-3, 1e-5)
+        mat = material.Material('ECAL', 8.9e-3, 0.25)
         self.eta_crack = 1.5
         self.emin = 2.
         self.eres = [0.07, 0., 0.]
@@ -102,11 +102,12 @@ class Field(DetectorElement):
         
         
 class CMS(Detector):
+    
     def __init__(self):
         super(CMS, self).__init__()
         self.elements['tracker'] = Tracker()
         self.elements['ecal'] = ECAL()
         self.elements['hcal'] = HCAL()
-        self.elements['field'] = Field(3.8)
+        self.elements['field'] = Field(1.0)
 
 cms = CMS()

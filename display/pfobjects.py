@@ -195,12 +195,8 @@ if __name__ == '__main__':
     from heppy_fcc.display.core import Display
     from heppy_fcc.display.geometry import GDetector
 
-    import logging 
-    logging.basicConfig(level='ERROR')
-    logger = logging.getLogger('Simulator')
-    
     cms = CMS()
-    simulator = Simulator(cms, logger)
+    simulator = Simulator(cms)
     
     particles = list( particles(5, 211, math.pi/5., 4*math.pi/5.,
                                 10., 10., Point(0.5,0.5,0)) )
