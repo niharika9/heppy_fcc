@@ -1,5 +1,15 @@
 import math
 
+def group_pdgid(ptc):
+    pdgid = abs(ptc.pdgid())
+    if pdgid>100:
+        if ptc.q():
+            return 211
+        else:
+            return 130
+    else:
+        return pdgid
+
 class JetComponent(list):
 
     def __init__(self):
@@ -22,9 +32,10 @@ class JetComponent(list):
         return self._num
     
     def append(self, ptc):
+        pdgid = group_pdgid(ptc)
         if self._pdgid is None:
-            self._pdgid = ptc.pdgid()
-        elif ptc.pdgid()!=self._pdgid:
+            self._pdgid = pdgid
+        elif pdgid!=self._pdgid:
             raise ValueError('cannot add particles of different type to a component')
         super(JetComponent, self).append(ptc)
         self._e += ptc.e()
@@ -32,7 +43,7 @@ class JetComponent(list):
         self._num += 1
 
     def __str__(self):
-        header = 'pdgid={pdgid}, n={num:d}, e={e:3.1f}, pt={pt:3.1f}'.format(
+        header = '\t\tpdgid={pdgid}, n={num:d}, e={e:3.1f}, pt={pt:3.1f}'.format(
             pdgid = self.pdgid(),
             num = self.num(),
             e = self.e(),
@@ -40,24 +51,26 @@ class JetComponent(list):
         )
         ptcs = []
         for ptc in self:
-            ptcs.append('\t{particle}'.format(particle=str(ptc)))
+            ptcs.append('\t\t\t{particle}'.format(particle=str(ptc)))
         result = [header]
         result.extend(ptcs)
         return '\n'.join(result)
         
-
+ 
 class JetConstituents(object):
 
     def __init__(self):
         self.components = dict()
 
     def append(self, ptc):
-        self.components.setdefault(ptc.pdgid(), JetComponent()).append(ptc)
+        self.components.setdefault(group_pdgid(ptc), JetComponent()).append(ptc)
 
     def sort(self):
         for ptcs in self.components.values():
             ptcs.sort(key = lambda ptc: ptc.e(), reverse=True)
 
+    def __str__(self):
+        return '\n'.join(map(str, self.components.values()))
             
 class Jet(object):
     

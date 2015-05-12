@@ -89,7 +89,7 @@ if __name__ == '__main__':
     # next 2 lines necessary to deal with reimports from ipython
     logging.shutdown()
     reload(logging)
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.ERROR)
 
     import random
     random.seed(0xdeadbeef)

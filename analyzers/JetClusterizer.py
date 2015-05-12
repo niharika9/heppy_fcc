@@ -14,9 +14,19 @@ class JetClusterizer(Analyzer):
     def __init__(self, *args, **kwargs):
         super(JetClusterizer, self).__init__(*args, **kwargs)
         self.clusterizer = CCJetClusterizer()
-      
+
+    def validate(self, jet):
+        constits = jet.constituents
+        keys = set(jet.constituents.components.keys())
+        all_possible = set({211, 22, 130, 11, 13})
+        if not keys.issubset(all_possible):
+            print constits
+            assert(False)
+        
     def process(self, event):
         particles = getattr(event, self.cfg_ana.particles)
+        # removing neutrinos
+        particles = [ptc for ptc in particles if abs(ptc.pdgid()) not in [12,14,16]]
         self.clusterizer.clear();
         for ptc in particles:
             self.clusterizer.add_p4( ptc.p4() )
@@ -35,4 +45,6 @@ class JetClusterizer(Analyzer):
                 constituent = particles[constituent_index]
                 jet.constituents.append(constituent)
             jet.constituents.sort()
+            self.mainLogger.info( '{jet}'.format(jet=str(jet.constituents)))
+            self.validate(jet)
         setattr(event, '_'.join([self.instance_label,'jets']), jets)
