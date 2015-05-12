@@ -22,11 +22,31 @@ def fillParticle( tree, pName, particle ):
     
 # jet
 
+def bookComponent( tree, pName ):
+    var(tree, '{pName}_e'.format(pName=pName))
+    var(tree, '{pName}_pt'.format(pName=pName))
+    var(tree, '{pName}_num'.format(pName=pName))
+
+def fillComponent(tree, pName, component):
+    fill(tree, '{pName}_e'.format(pName=pName), component.e() )
+    fill(tree, '{pName}_pt'.format(pName=pName), component.pt() )
+    fill(tree, '{pName}_num'.format(pName=pName), component.num() )
+    
+    
+pdgids = [211, 22, 130, 11, 13]
+    
 def bookJet( tree, pName ):
     bookParticle(tree, pName )
+    for pdgid in pdgids:
+        bookComponent(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid))
     # var(tree, '{pName}_npart'.format(pName=pName))
 
 def fillJet( tree, pName, jet ):
     fillParticle(tree, pName, jet )
-    # fill(tree, '{pName}_npart'.format(pName=pName), len(jet.particles) )
+    for pdgid in pdgids:
+        component = jet.constituents.get(pdgid, None)
+        if component:
+            fillComponent(tree,
+                          '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid),
+                          component )
 

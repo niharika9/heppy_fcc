@@ -17,7 +17,7 @@ class JetClusterizer(Analyzer):
 
     def validate(self, jet):
         constits = jet.constituents
-        keys = set(jet.constituents.components.keys())
+        keys = set(jet.constituents.keys())
         all_possible = set({211, 22, 130, 11, 13})
         if not keys.issubset(all_possible):
             print constits

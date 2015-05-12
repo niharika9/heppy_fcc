@@ -57,20 +57,17 @@ class JetComponent(list):
         return '\n'.join(result)
         
  
-class JetConstituents(object):
-
-    def __init__(self):
-        self.components = dict()
+class JetConstituents(dict):
 
     def append(self, ptc):
-        self.components.setdefault(group_pdgid(ptc), JetComponent()).append(ptc)
+        self.setdefault(group_pdgid(ptc), JetComponent()).append(ptc)
 
     def sort(self):
-        for ptcs in self.components.values():
+        for ptcs in self.values():
             ptcs.sort(key = lambda ptc: ptc.e(), reverse=True)
 
     def __str__(self):
-        return '\n'.join(map(str, self.components.values()))
+        return '\n'.join(map(str, self.values()))
             
 class Jet(object):
     

@@ -19,16 +19,16 @@ class TestJet(unittest.TestCase):
         jet_const.sort()
         jet = Jet(jetp4)
         self.assertEqual( jet.e(), 8)
-        keys = sorted(list(jet_const.components.keys()))
+        keys = sorted(list(jet_const.keys()))
         self.assertEqual( keys, [22, 211])
-        self.assertEqual(jet_const.components[211], [ptcs[1], ptcs[0]])
-        self.assertEqual(jet_const.components[22], [ptcs[2]])
-        self.assertEqual(jet_const.components[211].e(), 3)
-        self.assertEqual(jet_const.components[22].e(), 5)
-        self.assertEqual(jet_const.components[22].pdgid(), 22)
-        self.assertEqual(jet_const.components[211].pdgid(), 211)
-        self.assertRaises(ValueError, jet_const.components[211].append, ptcs[2])
-        print jet_const.components[211]
+        self.assertEqual(jet_const[211], [ptcs[1], ptcs[0]])
+        self.assertEqual(jet_const[22], [ptcs[2]])
+        self.assertEqual(jet_const[211].e(), 3)
+        self.assertEqual(jet_const[22].e(), 5)
+        self.assertEqual(jet_const[22].pdgid(), 22)
+        self.assertEqual(jet_const[211].pdgid(), 211)
+        self.assertRaises(ValueError, jet_const[211].append, ptcs[2])
+        print jet_const[211]
         
         
 if __name__ == '__main__':
