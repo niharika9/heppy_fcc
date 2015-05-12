@@ -22,7 +22,10 @@ class JetClusterizer(Analyzer):
         if not keys.issubset(all_possible):
             print constits
             assert(False)
-        
+        for component in jet.constituents.values():
+            if component.e > jet.e:
+                import pdb; pdb.set_trace()
+                
     def process(self, event):
         particles = getattr(event, self.cfg_ana.particles)
         # removing neutrinos

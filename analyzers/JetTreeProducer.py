@@ -19,6 +19,7 @@ class JetTreeProducer(Analyzer):
         bookJet(self.tree, 'jet2_gen')
         
     def process(self, event):
+        self.tree.reset()
         if( len(event.rec_jets)>0 ):
             jet = event.rec_jets[0]
             fillJet(self.tree, 'jet1', jet)
