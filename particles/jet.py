@@ -12,12 +12,12 @@ def group_pdgid(ptc):
 
 class JetComponent(list):
 
-    def __init__(self):
+    def __init__(self, pdgid):
         super(JetComponent, self).__init__()
         self._e = 0
         self._pt = 0
         self._num = 0
-        self._pdgid = None
+        self._pdgid = pdgid
 
     def pdgid(self):
         return self._pdgid
@@ -59,9 +59,17 @@ class JetComponent(list):
  
 class JetConstituents(dict):
 
+    def __init__(self):
+        super(JetConstituents, self).__init__()
+        all_pdgids = [211, 22, 130, 11, 13]
+        for pdgid in all_pdgids:
+            self[pdgid] = JetComponent(pdgid)
+    
     def append(self, ptc):
-        self.setdefault(group_pdgid(ptc), JetComponent()).append(ptc)
-
+        pdgid = group_pdgid(ptc)
+        # self.setdefault(pdgid, JetComponent(pdgid)).append(ptc)
+        self[pdgid].append(ptc)
+        
     def sort(self):
         for ptcs in self.values():
             ptcs.sort(key = lambda ptc: ptc.e(), reverse=True)

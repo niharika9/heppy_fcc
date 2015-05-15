@@ -45,8 +45,11 @@ def fillJet( tree, pName, jet ):
     fillParticle(tree, pName, jet )
     for pdgid in pdgids:
         component = jet.constituents.get(pdgid, None)
-        if component:
+        if component is not None:
             fillComponent(tree,
                           '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid),
                           component )
+        else:
+            import pdb; pdb.set_trace()
+            print jet
 
