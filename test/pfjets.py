@@ -67,8 +67,8 @@ class FractionStack(object):
         self.histsum.Draw('same')
 
 c1 = TCanvas()
-res_stack = FractionStack([211,22,130, 11, 13], TH1F('res', '', 50, 0, 2))
-res_stack.Draw(tree, 'jet1_e / jet1_gen_e', 'jet1_gen_e>0')
+res_stack = FractionStack([211,22,130, 11, 13], TH1F('res', '', 100, 0, 2))
+res_stack.Draw(tree, 'jet1_e / jet1_gen_e', 'jet1_e > 0')
 
 # c2 = TCanvas()
 # theta_stack = FractionStack([211,22,130, 11, 13], TH1F('theta', '', 20, -2, 2))
