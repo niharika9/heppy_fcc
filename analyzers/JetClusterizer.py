@@ -22,9 +22,14 @@ class JetClusterizer(Analyzer):
         if not keys.issubset(all_possible):
             print constits
             assert(False)
+        sume = 0. 
         for component in jet.constituents.values():
-            if component.e > jet.e:
+            if component.e() - jet.e() > 1e-5:
                 import pdb; pdb.set_trace()
+            sume += component.e()
+        if jet.e() - sume > 1e-5:
+            import pdb; pdb.set_trace()
+                
                 
     def process(self, event):
         particles = getattr(event, self.cfg_ana.particles)
