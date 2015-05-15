@@ -75,3 +75,7 @@ res_stack.Draw(tree, 'jet1_e / jet1_gen_e', 'jet1_e > 0')
 # theta_stack.Draw(tree, 'jet1_theta', 'jet1_gen_e>0')
 
                 
+c3 = TCanvas()
+pt_stack = FractionStack([211,22,130, 11, 13], TH1F('pt', '', 20, 0, 50))
+pt_stack.Draw(tree, 'jet1_gen_pt', 'jet1_e > 0 && abs(jet1_eta)<1.')
+

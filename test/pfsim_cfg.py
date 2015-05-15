@@ -117,7 +117,7 @@ if __name__ == '__main__':
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
                    nEvents=10000,
-                   nPrint=0,
+                   nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[1]
     display = getattr(pfsim, 'display', None)

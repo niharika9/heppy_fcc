@@ -10,13 +10,17 @@ def fill( tree, varName, value ):
 
 def bookParticle( tree, pName ):
     var(tree, '{pName}_e'.format(pName=pName))
+    var(tree, '{pName}_pt'.format(pName=pName))
     var(tree, '{pName}_theta'.format(pName=pName))
+    var(tree, '{pName}_eta'.format(pName=pName))
     var(tree, '{pName}_phi'.format(pName=pName))
     var(tree, '{pName}_m'.format(pName=pName))
 
 def fillParticle( tree, pName, particle ):
     fill(tree, '{pName}_e'.format(pName=pName), particle.e() )
+    fill(tree, '{pName}_pt'.format(pName=pName), particle.pt() )
     fill(tree, '{pName}_theta'.format(pName=pName), particle.theta() )
+    fill(tree, '{pName}_eta'.format(pName=pName), particle.eta() )
     fill(tree, '{pName}_phi'.format(pName=pName), particle.phi() )
     fill(tree, '{pName}_m'.format(pName=pName), particle.m() )
     
