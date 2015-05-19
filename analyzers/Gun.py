@@ -14,7 +14,7 @@ def particle(pdgid, theta, phi, energy, flat_pt=False):
     tantheta = sintheta / costheta
     cosphi = math.cos(phi)
     sinphi = math.sin(phi)        
-    if do_pt:
+    if flat_pt:
         pt = energy
         momentum = pt / sintheta
         energy = math.sqrt(momentum**2 + mass**2)
