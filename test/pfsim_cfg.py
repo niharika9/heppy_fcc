@@ -6,18 +6,19 @@ import heppy.framework.config as cfg
 # and added to the list of selected components
 inputSample = cfg.Component(
     'albers_example',
-    files = ['zqq.root'],
+    files = ['example.root']
+    # files = ['zqq.root'],
     # files = ['ww.root'],
     # files = ['hz.root'],
     # files = ['ttbar.root'],
     )
 
-# selectedComponents  = [inputSample]
+selectedComponents  = [inputSample]
 
-selectedComponents = []
-for i in range(4):
-    component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
-    selectedComponents.append(component)
+# selectedComponents = []
+# for i in range(4):
+#    component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
+#    selectedComponents.append(component)
     
 from heppy_fcc.analyzers.FCCReader import FCCReader
 reader = cfg.Analyzer(
@@ -32,7 +33,7 @@ gun = cfg.Analyzer(
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
-    display = False,
+    display = True,
     verbose = False
 )
 
@@ -67,8 +68,8 @@ tree = cfg.Analyzer(
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
-    # reader,
-    gun,
+    reader,
+    # gun,
     pfsim,
     jets,
     genjets,
@@ -82,8 +83,8 @@ sequence = cfg.Sequence( [
 # finalization of the configuration object.
 from ROOT import gSystem
 gSystem.Load("libdatamodel")
-# from eventstore import EventStore as Events
-from heppy.framework.eventsgen import Events 
+from eventstore import EventStore as Events
+# from heppy.framework.eventsgen import Events 
 config = cfg.Config(
     components = selectedComponents,
     sequence = sequence,
