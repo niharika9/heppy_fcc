@@ -12,8 +12,13 @@ inputSample = cfg.Component(
     # files = ['ttbar.root'],
     )
 
-selectedComponents  = [inputSample]
+# selectedComponents  = [inputSample]
 
+selectedComponents = []
+for i in range(4):
+    component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
+    selectedComponents.append(component)
+    
 from heppy_fcc.analyzers.FCCReader import FCCReader
 reader = cfg.Analyzer(
     FCCReader
@@ -77,7 +82,8 @@ sequence = cfg.Sequence( [
 # finalization of the configuration object.
 from ROOT import gSystem
 gSystem.Load("libdatamodel")
-from eventstore import EventStore as Events
+# from eventstore import EventStore as Events
+from heppy.framework.eventsgen import Events 
 config = cfg.Config(
     components = selectedComponents,
     sequence = sequence,
@@ -116,7 +122,7 @@ if __name__ == '__main__':
     if len(sys.argv)==2:
         iev = int(sys.argv[1])
     loop = Looper( 'looper', config,
-                   nEvents=10000,
+                   nEvents=20000,
                    nPrint=5,
                    timeReport=True)
     pfsim = loop.analyzers[1]
