@@ -10,5 +10,5 @@ class Particle(BaseParticle):
         self._status = fccptc.read().Core.Status
         self._tlv = TLorentzVector()
         p4 = fccptc.read().Core.P4
-        self._tlv.SetPtEtaPhiM(p4.Pt, p4.Eta, p4.Phi, p4.Mass)
+        self._tlv.SetXYZM(p4.Px, p4.Py, p4.Pz, p4.Mass)
         

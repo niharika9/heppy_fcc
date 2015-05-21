@@ -40,12 +40,13 @@ class PFSim(Analyzer):
         if self.is_display:
             self.display.clear()
         pfsim_particles = []
+        # import pdb; pdb.set_trace()
         for ptc in event.gen_particles_stable:
             if not math.isnan(ptc.pt()) and ptc.pt()>1.:
                 pfsimptc = pfsimparticle(ptc)
                 pfsim_particles.append(pfsimptc)
                 if self.cfg_ana.verbose:
-                    print pyptc
+                    print ptc
         self.simulator.simulate( pfsim_particles )
         if self.is_display:
             self.display.register( GTrajectories(pfsim_particles), layer=1)        
