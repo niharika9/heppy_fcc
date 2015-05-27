@@ -10,7 +10,7 @@ class Resonance(Particle):
 
     """
     def __init__(self, leg1, leg2, pid):
-        leg1, leg2 = (leg2, leg1) if leg2.e()>leg1.e() else leg1, leg2
+        (leg1, leg2) = (leg2, leg1) if leg2.e()>leg1.e() else (leg1, leg2)
         self._leg1 = leg1
         self._leg2 = leg2
         charge = self._leg1.q()+self._leg2.q()
