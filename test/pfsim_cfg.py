@@ -5,9 +5,9 @@ import heppy.framework.config as cfg
 # several input components can be declared,
 # and added to the list of selected components
 
-gen_jobs = None
-do_display = True
-nevents_per_job = 20000
+gen_jobs = 1
+do_display = False
+nevents_per_job = 1000
 
 if gen_jobs>1:
     do_display = False
@@ -44,9 +44,8 @@ from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
     display = do_display,
-    verbose = True
+    verbose = False
 )
-
 
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
 jets = cfg.Analyzer(
@@ -90,11 +89,16 @@ sequence = cfg.Sequence( [
 # inputSample.splitFactor = 2  # splitting the component in 2 chunks
 
 # finalization of the configuration object.
-from ROOT import gSystem
-gSystem.Load("libdatamodel")
-from eventstore import EventStore as Events
+Events = None
 if gen_jobs:
     from heppy.framework.eventsgen import Events 
+elif os.environ.get('FCCEDM'):
+    from ROOT import gSystem
+    gSystem.Load("libdatamodel")
+    from eventstore import EventStore as Events
+elif os.environ.get('CMSSW_BASE'):
+    print 'CMSSW'
+    import sys; sys.exit(1)
 config = cfg.Config(
     components = selectedComponents,
     sequence = sequence,

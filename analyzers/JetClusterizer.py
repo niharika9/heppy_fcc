@@ -3,9 +3,17 @@ from heppy.framework.event import Event
 from heppy_fcc.particles.tlv.jet import Jet
 from heppy_fcc.particles.jet import JetConstituents
 
+import os 
+
 from ROOT import gSystem
-gSystem.Load("libanalysiscpp-tools")
-from ROOT import JetClusterizer as CCJetClusterizer
+CCJetClusterizer = None
+if os.environ.get('ANALYSISCPP'):
+    gSystem.Load("libanalysiscpp-tools")
+    from ROOT import JetClusterizer as CCJetClusterizer
+elif os.environ.get('CMSSW_BASE'):
+    gSystem.Load("libColinPFSim")
+    from ROOT import heppy
+    CCJetClusterizer = heppy.JetClusterizer
 
 import math
     
