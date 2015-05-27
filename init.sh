@@ -1,2 +1,7 @@
 export HEPPY_FCC=$PWD
-export PYTHONPATH=$HEPPY_FCC/..:$ALBERS/python:$PYTHONPATH
+if [ -z ${ALBERS+x} ]; then
+    echo 'albers not set'
+else
+    export PYTHONPATH=$pyalbers/python:$PYTHONPATH
+fi
+export PYTHONPATH=$PWD/..:$PYTHONPATH
