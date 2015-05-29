@@ -31,6 +31,6 @@ class Gun(Analyzer):
     
     def process(self, event):
         theta = random.uniform(-math.pi+0.1, math.pi-0.1)
-        energy = random.uniform(0.1, 50)
-        event.gen_particles = [particle(211, theta, 0., energy, flat_pt=True)]
+        energy = random.uniform( self.cfg_ana.ptmin, self.cfg_ana.ptmax)
+        event.gen_particles = [particle(self.cfg_ana.pdgid, theta, 0., energy, flat_pt=True)]
         event.gen_particles_stable = event.gen_particles

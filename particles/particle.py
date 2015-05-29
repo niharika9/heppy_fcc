@@ -1,7 +1,7 @@
 import math
 
 class Particle(object):
-    
+        
     def p4(self):
         return self._tlv
 
@@ -31,7 +31,13 @@ class Particle(object):
 
     def status(self):
         return self._status
-        
+
+    def start_vertex(self):
+        return self._start_vertex 
+
+    def end_vertex(self):
+        return self._end_vertex
+
     def __str__(self):
         tmp = '{className} : pdgid = {pdgid:3} q = {q:1} e = {e:5.1f}, theta = {theta:5.2f}, phi = {phi:5.2f}, mass = {m:5.2f}'
         return tmp.format(

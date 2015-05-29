@@ -6,8 +6,8 @@ import heppy.framework.config as cfg
 # and added to the list of selected components
 
 gen_jobs = None
-do_display = True
-nevents_per_job = 20000
+do_display = False
+nevents_per_job = 100
 
 if gen_jobs>1:
     do_display = False
@@ -37,14 +37,17 @@ reader = cfg.Analyzer(
 
 from heppy_fcc.analyzers.Gun import Gun
 gun = cfg.Analyzer(
-    Gun
+    Gun,
+    pdgid = 130,
+    ptmin = 0.,
+    ptmax = 10.
 )
 
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
     PFSim,
     display = do_display,
-    verbose = True
+    verbose = False
 )
 
 
