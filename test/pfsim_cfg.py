@@ -1,20 +1,17 @@
 import os
 import heppy.framework.config as cfg
 
-# input component 
-# several input components can be declared,
-# and added to the list of selected components
-
-gen_jobs = 1
+gen_jobs = 0
 do_display = False
-nevents_per_job = 1000
+nevents_per_job = 10000
 
 if gen_jobs>1:
     do_display = False
 
 inputSample = cfg.Component(
     'albers_example',
-    files = ['example.root']
+    # files = ['example.root']
+    files = ['gun_211_0.0to50.0_ME0_GEN_SIM_RECO.root']
     # files = ['zqq.root'],
     # files = ['ww.root'],
     # files = ['hz.root'],
@@ -29,11 +26,23 @@ if gen_jobs:
         component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
         selectedComponents.append(component)
         
-    
-from heppy_fcc.analyzers.FCCReader import FCCReader
-reader = cfg.Analyzer(
-    FCCReader
-)
+
+reader = None
+if os.environ.get('FCCEDM'):
+    from heppy_fcc.analyzers.FCCReader import FCCReader
+    reader = cfg.Analyzer(
+        FCCReader
+        )    
+elif os.environ.get('CMSSW_BASE'):
+    from heppy_fcc.analyzers.CMSReader import CMSReader
+    reader = cfg.Analyzer(
+        CMSReader,
+        gen_particles = 'genParticles',
+        pf_particles = 'particleFlow'
+        )
+else:
+    import sys
+    sys.exit(1)
 
 from heppy_fcc.analyzers.Gun import Gun
 gun = cfg.Analyzer(
@@ -97,8 +106,7 @@ elif os.environ.get('FCCEDM'):
     gSystem.Load("libdatamodel")
     from eventstore import EventStore as Events
 elif os.environ.get('CMSSW_BASE'):
-    print 'CMSSW'
-    import sys; sys.exit(1)
+    from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 config = cfg.Config(
     components = selectedComponents,
     sequence = sequence,
