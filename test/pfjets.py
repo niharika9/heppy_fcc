@@ -63,8 +63,8 @@ class FractionStack(object):
             # self.hists[pdgid].Draw(same)
             # if same == '':
             #     same = 'same'
-        self.stack.Draw()
-        self.histsum.Draw('same')
+        self.stack.Draw('hist')
+        self.histsum.Draw('histsame')
 
 c1 = TCanvas()
 res_stack = FractionStack([211,22,130, 11, 13], TH1F('res', '', 100, 0, 2))
