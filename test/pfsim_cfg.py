@@ -6,7 +6,7 @@ import heppy.framework.config as cfg
 # several input components can be declared,
 # and added to the list of selected components
 
-gen_jobs = None
+gen_jobs = 1
 do_display = True
 nevents_per_job = 5000
 
@@ -130,7 +130,8 @@ sequence = cfg.Sequence( [
     ] )
 
 sequence.extend(jetsequence)
-sequence.extend(pfjetsequence)
+if os.environ.get('CMSSW_BASE'):
+    sequence.extend(pfjetsequence)
 
 # inputSample.files.append('albers_2.root')
 # inputSample.splitFactor = 2  # splitting the component in 2 chunks
