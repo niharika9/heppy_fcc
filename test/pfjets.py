@@ -2,7 +2,7 @@ from ROOT import *
 
 import sys 
 
-rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
+rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_pf/jet_tree.root'
 
 directory = sys.argv[1]
 

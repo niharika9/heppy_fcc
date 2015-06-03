@@ -1,4 +1,5 @@
 import os
+import copy
 import heppy.framework.config as cfg
 
 gen_jobs = 0
@@ -57,11 +58,7 @@ pfsim = cfg.Analyzer(
 )
 
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
-jets = cfg.Analyzer(
-    JetClusterizer,
-    instance_label = 'rec',
-    particles = 'particles'
-)
+
 
 genjets = cfg.Analyzer(
     JetClusterizer,
@@ -69,20 +66,47 @@ genjets = cfg.Analyzer(
     particles = 'gen_particles_stable'
 )
 
+# jets from pfsim 
+
+jets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'rec', 
+    particles = 'particles'
+)
+
 from heppy_fcc.analyzers.JetAnalyzer import JetAnalyzer
 jetana = cfg.Analyzer(
     JetAnalyzer,
+    instance_label = 'rec', 
+    jets = 'rec_jets',
+    genjets = 'gen_jets'
 )
 
-
 from heppy_fcc.analyzers.JetTreeProducer import JetTreeProducer
-tree_rec = cfg.Analyzer(
+tree = cfg.Analyzer(
     JetTreeProducer,
+    instance_label = 'rec',
     tree_name = 'events',
     tree_title = 'jets',
     jets = 'rec_jets'
 )
 
+jetsequence = [
+    jets,
+    jetana, 
+    tree
+]
+
+# pf jet sequence
+
+pfjetsequence = copy.deepcopy(jetsequence)
+for ana in pfjetsequence: 
+    ana.instance_label = 'pf'
+    if hasattr(ana, 'jets'):
+        ana.jets = 'pf_jets'
+    if hasattr(ana, 'particles'):
+        ana.particles = 'pf_particles'
+    
 
 
 # definition of a sequence of analyzers,
@@ -90,11 +114,11 @@ tree_rec = cfg.Analyzer(
 sequence = cfg.Sequence( [
     gun if gen_jobs else reader,
     pfsim,
-    jets,
     genjets,
-    jetana,
-    tree_rec
     ] )
+
+sequence.extend(jetsequence)
+sequence.extend(pfjetsequence)
 
 # inputSample.files.append('albers_2.root')
 # inputSample.splitFactor = 2  # splitting the component in 2 chunks

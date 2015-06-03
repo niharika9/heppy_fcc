@@ -5,8 +5,8 @@ class JetAnalyzer(Analyzer):
 
     
     def process(self, event):
-        jets = event.rec_jets
-        genjets = event.gen_jets
+        jets = getattr(event, self.cfg_ana.jets)
+        genjets = getattr(event, self.cfg_ana.genjets)
         pairs = matchObjectCollection(jets, genjets, 0.3**2)
         for jet in jets:
             jet.gen = pairs[jet]
