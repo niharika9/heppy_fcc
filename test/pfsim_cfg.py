@@ -76,11 +76,13 @@ jetana = cfg.Analyzer(
 
 
 from heppy_fcc.analyzers.JetTreeProducer import JetTreeProducer
-tree = cfg.Analyzer(
+tree_rec = cfg.Analyzer(
     JetTreeProducer,
     tree_name = 'events',
-    tree_title = 'jets'
+    tree_title = 'jets',
+    jets = 'rec_jets'
 )
+
 
 
 # definition of a sequence of analyzers,
@@ -91,7 +93,7 @@ sequence = cfg.Sequence( [
     jets,
     genjets,
     jetana,
-    tree
+    tree_rec
     ] )
 
 # inputSample.files.append('albers_2.root')
