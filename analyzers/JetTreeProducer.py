@@ -20,13 +20,14 @@ class JetTreeProducer(Analyzer):
         
     def process(self, event):
         self.tree.reset()
-        if( len(event.rec_jets)>0 ):
-            jet = event.rec_jets[0]
+        jets = getattr(event, self.cfg_ana.jets)
+        if( len(jets)>0 ):
+            jet = jets[0]
             fillJet(self.tree, 'jet1', jet)
             if jet.gen:
                 fillJet(self.tree, 'jet1_gen', jet.gen)
-        if( len(event.rec_jets)>1 ):
-            jet = event.rec_jets[1]
+        if( len(jets)>1 ):
+            jet = jets[1]
             fillJet(self.tree, 'jet2', jet)
             if jet.gen:
                 fillJet(self.tree, 'jet2_gen', jet.gen)

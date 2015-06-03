@@ -3,7 +3,7 @@ from ROOT import gDirectory
 
 import sys 
 
-rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
+rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_pf/jet_tree.root'
 
 directory = sys.argv[1]
 
@@ -68,9 +68,9 @@ class FractionStack(object):
         self.Draw()
 
     def Draw(self):
-        self.histsum.Draw()
-        self.stack.Draw("same")
-        self.histsum.Draw('same')
+        self.histsum.Draw('hist')
+        self.stack.Draw("histsame")
+        self.histsum.Draw('histsame')
         
 
 pdgids = [211,22,130, 11, 13]
@@ -86,7 +86,6 @@ def prepare_tree(tree):
     tree.SetEventList(elist)
     
 prepare_tree(tree)
-
 
 c1 = TCanvas()
 res_stack = FractionStack(pdgids, TH1F('res', ';E/E_{gen} (GeV)', 100, 0, 2))
