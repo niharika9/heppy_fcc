@@ -1,9 +1,12 @@
 from ROOT import *
 from ROOT import gDirectory
+from OfficialStyle import *
 
 import sys 
 
-rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_pf/jet_tree.root'
+officialStyle(gStyle)
+
+rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
 
 directory = sys.argv[1]
 
@@ -40,6 +43,7 @@ class FractionStack(object):
             hist = hist.Clone(hname)
             self.hists[pdgid] = hist
             hist.SetFillColor(colors[iid])
+            hist.SetFillStyle(1001)
             self.stack.Add(self.hists[pdgid])
         self.histsum.SetLineWidth(1)
         self.histsum.SetLineColor(1)
@@ -71,8 +75,13 @@ class FractionStack(object):
         self.histsum.Draw('hist')
         self.stack.Draw("histsame")
         self.histsum.Draw('histsame')
-        
+        gPad.RedrawAxis()
 
+    def SetYRange(self, min, max):
+        self.histsum.GetYaxis().SetRangeUser(min, max)
+        self.Draw()
+
+        
 pdgids = [211,22,130, 11, 13]
         
 def prepare_tree(tree):
@@ -88,23 +97,25 @@ def prepare_tree(tree):
 prepare_tree(tree)
 
 c1 = TCanvas()
-res_stack = FractionStack(pdgids, TH1F('res', ';E/E_{gen} (GeV)', 100, 0, 2))
+res_stack = FractionStack(pdgids, TH1F('res', ';E/E_{gen} (GeV)', 50, 0, 2))
 res_stack.Project(tree, 'jet1_e / jet1_gen_e', 'jet1_e > 0')
+res_stack.SetYRange(50, 50000)
 
 double_count = res_stack.histsum.Clone("double_count")
-double_count.SetLineStyle(1)
-double_count.SetLineWidth(2)
-double_count.SetLineColor(5)
+double_count.SetLineStyle(2)
+double_count.SetLineWidth(3)
+double_count.SetLineColor(0)
 tree.Draw("jet1_e/jet1_gen_e>>double_count","jet1_211_frac>0. && jet1_211_frac<1.","same")
 
 missed = double_count.Clone("missed")
-missed.SetLineColor(1)
+missed.SetLineColor(5)
 tree.Draw("jet1_e/jet1_gen_e>>missed","jet1_211_frac==0.","same")
 
 pure = double_count.Clone("pure")
 pure.SetLineColor(kGray)
 tree.Draw("jet1_e/jet1_gen_e>>pure","jet1_211_frac==1.","same")
 
+gPad.RedrawAxis()
 
 ntot = res_stack.histsum.GetEntries()
 nmissed = missed.GetEntries()
