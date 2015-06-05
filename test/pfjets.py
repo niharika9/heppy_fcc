@@ -6,7 +6,7 @@ import sys
 
 officialStyle(gStyle)
 
-rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
+rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_pf/jet_tree.root'
 
 directory = sys.argv[1]
 
@@ -99,7 +99,7 @@ prepare_tree(tree)
 c1 = TCanvas()
 res_stack = FractionStack(pdgids, TH1F('res', ';E/E_{gen} (GeV)', 50, 0, 2))
 res_stack.Project(tree, 'jet1_e / jet1_gen_e', 'jet1_e > 0')
-res_stack.SetYRange(50, 50000)
+# res_stack.SetYRange(50, 50000)
 
 double_count = res_stack.histsum.Clone("double_count")
 double_count.SetLineStyle(2)
