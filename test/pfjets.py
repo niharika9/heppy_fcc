@@ -6,7 +6,7 @@ import sys
 
 officialStyle(gStyle)
 
-rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_1/jet_tree.root'
+rootfile = 'heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_pf/jet_tree.root'
 
 directory = sys.argv[1]
 
