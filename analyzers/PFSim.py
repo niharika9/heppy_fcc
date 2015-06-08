@@ -52,6 +52,6 @@ class PFSim(Analyzer):
             self.display.register( GTrajectories(pfsim_particles), layer=1)        
         event.simparticles = sorted( pfsim_particles,
                                      key = lambda ptc: ptc.e(), reverse=True)
-        event.particles = sorted( self.simulator.pfsequence.pfreco.particles,
+        event.particles = sorted( self.simulator.particles,
                                   key = lambda ptc: ptc.e(), reverse=True)
 

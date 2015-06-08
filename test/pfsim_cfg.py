@@ -6,8 +6,8 @@ import heppy.framework.config as cfg
 # several input components can be declared,
 # and added to the list of selected components
 
-gen_jobs = 1
-do_display = False
+gen_jobs = 0
+do_display = True
 nevents_per_job = 5000
 
 GEN = gen_jobs 
@@ -19,9 +19,9 @@ if gen_jobs>1:
 
 inputSample = cfg.Component(
     'albers_example',
-    # files = ['example.root']
+    files = ['example.root']
     # files = ['gun_211_0.0to50.0_ME0_GEN_SIM_RECO.root']
-    files = ['SinglePi_fullsim.root'] 
+    # files = ['SinglePi_fullsim.root'] 
     # files = ['zqq.root'],
     # files = ['ww.root'],
     # files = ['hz.root'],
@@ -59,10 +59,6 @@ else:
     raise ValueError('not a generator job, and experience unrecognized. Set the CMS or FCC environment')
 
 
-from heppy_fcc.analyzers.GenAnalyzer import GenAnalyzer
-genana = cfg.Analyzer(
-    GenAnalyzer
-)
 
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
@@ -136,6 +132,13 @@ sequence.extend(jetsequence)
 if CMS:
     sequence.extend(pfjetsequence)
 
+if FCC:
+    from heppy_fcc.analyzers.GenAnalyzer import GenAnalyzer
+    genana = cfg.Analyzer(
+        GenAnalyzer
+    )
+    # sequence.append(genana)
+    
 # inputSample.files.append('albers_2.root')
 # inputSample.splitFactor = 2  # splitting the component in 2 chunks
 

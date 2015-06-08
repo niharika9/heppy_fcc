@@ -140,9 +140,12 @@ class Particle(BaseParticle):
   
     def __getattr__(self, name):
         if name=='points':
-            if self.path is None:
-                import pdb; pdb.set_trace()
+            # if self.path is None:
+            #     import pdb; pdb.set_trace()
             return self.path.points
+        else:
+            raise AttributeError
+            
         
     def is_em(self):
         kind = abs(self.pdgid())
