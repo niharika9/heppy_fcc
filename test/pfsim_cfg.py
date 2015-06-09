@@ -8,6 +8,7 @@ import heppy.framework.config as cfg
 
 gen_jobs = 0
 do_display = False
+
 nevents_per_job = 5000
 
 GEN = gen_jobs 
@@ -17,8 +18,16 @@ CMS = os.environ.get('CMSSW_BASE', False) and not GEN
 if gen_jobs>1:
     do_display = False
 
-from heppy_fcc.samples.gun_0_50 import guns 
-selectedComponents  = guns 
+selectedComponents = None
+if CMS:
+    from heppy_fcc.samples.gun_0_50 import guns 
+    selectedComponents  = guns
+else: 
+    inputSample = cfg.Component(
+        'albers_example',
+        files = ['example.root']
+    )
+    selectedComponents  = [inputSample]
 
 source = None
 if GEN:
@@ -49,10 +58,6 @@ else:
     raise ValueError('not a generator job, and experience unrecognized. Set the CMS or FCC environment')
 
 
-from heppy_fcc.analyzers.GenAnalyzer import GenAnalyzer
-genana = cfg.Analyzer(
-    GenAnalyzer
-)
 
 from heppy_fcc.analyzers.PFSim import PFSim
 pfsim = cfg.Analyzer(
@@ -69,6 +74,7 @@ genjets = cfg.Analyzer(
     instance_label = 'gen',
     particles = 'gen_particles_stable'
 )
+
 
 # jets from pfsim 
 
@@ -125,6 +131,13 @@ sequence.extend(jetsequence)
 if CMS:
     sequence.extend(pfjetsequence)
 
+if FCC:
+    from heppy_fcc.analyzers.GenAnalyzer import GenAnalyzer
+    genana = cfg.Analyzer(
+        GenAnalyzer
+    )
+    # sequence.append(genana)
+    
 # inputSample.files.append('albers_2.root')
 # inputSample.splitFactor = 2  # splitting the component in 2 chunks
 

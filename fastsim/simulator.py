@@ -3,6 +3,7 @@ from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
 from pfalgo.sequence import PFSequence
 import random
 import sys
+import copy
 
 
 class Simulator(object):
@@ -151,22 +152,42 @@ class Simulator(object):
                                          self.detector.elements['tracker'])
         if smeared_track:
             ptc.track_smeared = smeared_track
-            
+
+    def smear_muon(self, ptc):
+        self.propagate(ptc)
+        smeared = copy.deepcopy(ptc)
+        return smeared
+
+    def smear_electron(self, ptc):
+        ecal = self.detector.elements['ecal']
+        self.prop_helix.propagate_one(ptc,
+                                      ecal.volume.inner,
+                                      self.detector.elements['field'].magnitude )
+        smeared = copy.deepcopy(ptc)
+        return smeared
+    
     def simulate(self, ptcs):
         self.reset()
         self.ptcs = ptcs
+        smeared = []
         for ptc in ptcs:
             if ptc.pdgid() == 22:
                 self.simulate_photon(ptc)
             elif abs(ptc.pdgid()) == 11:
-                self.simulate_electron(ptc)
+                smeared_ptc = self.smear_electron(ptc)
+                smeared.append(smeared_ptc)
+                # self.simulate_electron(ptc)
             elif abs(ptc.pdgid()) == 13:
-                self.simulate_muon(ptc)
+                smeared_ptc = self.smear_muon(ptc)
+                smeared.append(smeared_ptc)
+                # self.simulate_muon(ptc)
             elif abs(ptc.pdgid()) in [12,14,16]:
                 self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid()) > 100: #TODO make sure this is ok
                 self.simulate_hadron(ptc)
         self.pfsequence = PFSequence(self.ptcs, self.detector, self.logger)
+        self.particles = copy.copy(self.pfsequence.pfreco.particles)
+        self.particles.extend(smeared)
         
 if __name__ == '__main__':
 
