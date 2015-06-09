@@ -6,7 +6,7 @@ import heppy.framework.config as cfg
 # several input components can be declared,
 # and added to the list of selected components
 
-gen_jobs = 1
+gen_jobs = 0
 do_display = False
 nevents_per_job = 5000
 
@@ -17,18 +17,8 @@ CMS = os.environ.get('CMSSW_BASE', False) and not GEN
 if gen_jobs>1:
     do_display = False
 
-inputSample = cfg.Component(
-    'albers_example',
-    # files = ['example.root']
-    # files = ['gun_211_0.0to50.0_ME0_GEN_SIM_RECO.root']
-    files = ['SinglePi_fullsim.root'] 
-    # files = ['zqq.root'],
-    # files = ['ww.root'],
-    # files = ['hz.root'],
-    # files = ['ttbar.root'],
-    )
-
-selectedComponents  = [inputSample]
+from heppy_fcc.samples.gun_0_50 import guns 
+selectedComponents  = guns 
 
 source = None
 if GEN:
