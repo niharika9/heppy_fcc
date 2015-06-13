@@ -22,6 +22,8 @@ selectedComponents = None
 if CMS:
     from heppy_fcc.samples.gun_0_50 import guns 
     selectedComponents  = guns
+    for comp in selectedComponents:
+        comp.splitFactor = 4
 else: 
     inputSample = cfg.Component(
         'albers_example',

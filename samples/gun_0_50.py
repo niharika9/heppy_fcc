@@ -12,10 +12,19 @@ gun_11_0_50 = cfg.Component(
     files = getFiles("/Gun_11_0_50/743_v1/RECOSIM", "cbern", ".*.root"),
 ) 
 
+gun_13_0_50 = cfg.Component(
+    'gun_13_0_50',
+    files = getFiles("/Gun_13_0_50/743_v1/RECOSIM", "cbern", ".*.root"),
+) 
+
+gun_12_0_50 = cfg.Component(
+    'gun_12_0_50',
+    files = getFiles("/Gun_12_0_50/743_v1/RECOSIM", "cbern", ".*.root"),
+) 
+
 guns = [
     gun_22_0_50, 
-    gun_11_0_50
+    gun_11_0_50,
+    gun_13_0_50,
+    gun_12_0_50,
 ]
-
-for gun in guns: 
-    gun.splitFactor = 5
