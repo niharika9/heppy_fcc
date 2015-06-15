@@ -61,15 +61,20 @@ class JetConstituents(dict):
 
     def __init__(self):
         super(JetConstituents, self).__init__()
-        all_pdgids = [211, 22, 130, 11, 13]
+        all_pdgids = [211, 22, 130, 11, 13, 
+                      1, 2 #HF had and em 
+                      ]
         for pdgid in all_pdgids:
             self[pdgid] = JetComponent(pdgid)
     
     def append(self, ptc):
         pdgid = group_pdgid(ptc)
         # self.setdefault(pdgid, JetComponent(pdgid)).append(ptc)
-        self[pdgid].append(ptc)
-        
+        try:
+            self[pdgid].append(ptc)
+        except KeyError:
+            import pdb; pdb.set_trace()
+
     def sort(self):
         for ptcs in self.values():
             ptcs.sort(key = lambda ptc: ptc.e(), reverse=True)

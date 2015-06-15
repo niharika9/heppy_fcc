@@ -21,12 +21,13 @@ class JetClusterizer(Analyzer):
 
     def __init__(self, *args, **kwargs):
         super(JetClusterizer, self).__init__(*args, **kwargs)
-        self.clusterizer = CCJetClusterizer()
+        min_e = 0.
+        self.clusterizer = CCJetClusterizer(min_e)
 
     def validate(self, jet):
         constits = jet.constituents
         keys = set(jet.constituents.keys())
-        all_possible = set({211, 22, 130, 11, 13})
+        all_possible = set({211, 22, 130, 11, 13, 1, 2})
         if not keys.issubset(all_possible):
             print constits
             assert(False)
