@@ -12,10 +12,12 @@ class CMSReader(Analyzer):
             self.cfg_ana.gen_particles, 
             'std::vector<reco::GenParticle>'
             )
-        self.handles['pf_particles'] = AutoHandle(
-            self.cfg_ana.pf_particles, 
-            'std::vector<reco::PFCandidate>'
-            )
+        self.read_pf = self.cfg_ana.pf_particles is not None
+        if self.read_pf:
+            self.handles['pf_particles'] = AutoHandle(
+                self.cfg_ana.pf_particles, 
+                'std::vector<reco::PFCandidate>'
+                )
 
     def process(self, event):
         self.readCollections(event.input)
@@ -26,6 +28,7 @@ class CMSReader(Analyzer):
                                       key = lambda ptc: ptc.e(), reverse=True )  
         event.gen_particles_stable = [ptc for ptc in event.gen_particles
                                       if ptc.status()==1 and not math.isnan(ptc.e())]
-        pfp = self.handles['pf_particles'].product()
-        event.pf_particles = map(Particle, pfp)
+        if self.read_pf:
+            pfp = self.handles['pf_particles'].product()
+            event.pf_particles = map(Particle, pfp)
         

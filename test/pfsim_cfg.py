@@ -7,7 +7,8 @@ import heppy.framework.config as cfg
 # and added to the list of selected components
 
 gen_jobs = 0
-do_display = False
+do_display = True
+do_pf = False
 
 nevents_per_job = 5000
 
@@ -20,10 +21,12 @@ if gen_jobs>1:
 
 selectedComponents = None
 if CMS:
-    from heppy_fcc.samples.gun_0_50 import guns 
-    selectedComponents  = guns
+    # from heppy_fcc.samples.gun_0_50 import *  
+    from heppy_fcc.samples.higgs_350 import *  
+    selectedComponents  = samples[:1]
+    # selectedComponents = [gun_211_0_50]
     for comp in selectedComponents:
-        comp.splitFactor = 4
+        comp.splitFactor = 1
 else: 
     inputSample = cfg.Component(
         'albers_example',
@@ -54,7 +57,7 @@ elif CMS:
     source = cfg.Analyzer(
         CMSReader,
         gen_particles = 'genParticles',
-        pf_particles = 'particleFlow'
+        pf_particles = 'particleFlow' if do_pf else None
         )
 else:
     raise ValueError('not a generator job, and experience unrecognized. Set the CMS or FCC environment')
@@ -111,7 +114,7 @@ jetsequence = [
 
 # pf jet sequence
 
-if CMS:
+if CMS and do_pf:
     pfjetsequence = copy.deepcopy(jetsequence)
     for ana in pfjetsequence: 
         ana.instance_label = 'pf'
@@ -130,7 +133,7 @@ sequence = cfg.Sequence( [
     ] )
 
 sequence.extend(jetsequence)
-if CMS:
+if CMS and do_pf:
     sequence.extend(pfjetsequence)
 
 if FCC:

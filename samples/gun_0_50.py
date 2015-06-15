@@ -2,6 +2,11 @@ import heppy.framework.config as cfg
 
 from getFiles import getFiles 
 
+gun_211_0_50 = cfg.Component(
+    'gun_211_0_50',
+    files = getFiles("/Gun_211_0_50/743_v1/RECOSIM"),
+) 
+
 gun_22_0_50 = cfg.Component(
     'gun_22_0_50',
     files = getFiles("/Gun_22_0_50/743_v1/RECOSIM"),
@@ -22,7 +27,7 @@ gun_12_0_50 = cfg.Component(
     files = getFiles("/Gun_12_0_50/743_v1/RECOSIM"),
 ) 
 
-guns = [
+samples = [
     gun_22_0_50, 
     gun_11_0_50,
     gun_13_0_50,
