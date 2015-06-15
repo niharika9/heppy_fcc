@@ -27,7 +27,9 @@ class CMSReader(Analyzer):
         event.gen_particles = sorted( gen_particles,
                                       key = lambda ptc: ptc.e(), reverse=True )  
         event.gen_particles_stable = [ptc for ptc in event.gen_particles
-                                      if ptc.status()==1 and not math.isnan(ptc.e())]
+                                      if ptc.status()==1 and 
+                                      not math.isnan(ptc.e()) and
+                                      not abs(ptc.pdgid()) in [12, 14, 16]]
         if self.read_pf:
             pfp = self.handles['pf_particles'].product()
             event.pf_particles = map(Particle, pfp)

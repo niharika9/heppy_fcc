@@ -22,8 +22,8 @@ if gen_jobs>1:
 selectedComponents = None
 if CMS:
     # from heppy_fcc.samples.gun_0_50 import *  
-    from heppy_fcc.samples.higgs_350 import *  
-    selectedComponents  = samples[:1]
+    from heppy_fcc.samples.higgs_350 import hz_cms  
+    selectedComponents  = [hz_cms]
     # selectedComponents = [gun_211_0_50]
     for comp in selectedComponents:
         comp.splitFactor = 1

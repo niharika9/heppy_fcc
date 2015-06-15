@@ -17,6 +17,9 @@ class Particle(object):
     def theta(self):
         return math.pi/2 - self._tlv.Theta()
 
+    def eta(self):
+        return self._tlv.Eta()
+
     def phi(self):
         return self._tlv.Phi()
 
