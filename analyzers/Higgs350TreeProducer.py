@@ -24,10 +24,12 @@ class Higgs350TreeProducer(Analyzer):
         self.tree.reset()
         fillParticle(self.tree, 'recoil_gen', event.recoil_gen)
         fillParticle(self.tree, 'recoil_visible_gen', event.recoil_visible_gen)
-        fillParticle(self.tree, 'recoil_papas', event.recoil_papas)
-        fillParticle(self.tree, 'recoil_visible_papas', event.recoil_visible_papas)
-        fillParticle(self.tree, 'recoil_cms', event.recoil_cms)
-        fillParticle(self.tree, 'recoil_visible_cms', event.recoil_visible_cms)
+        if hasattr(event, 'recoil_papas'):
+            fillParticle(self.tree, 'recoil_papas', event.recoil_papas)
+            fillParticle(self.tree, 'recoil_visible_papas', event.recoil_visible_papas)
+        if hasattr(event, 'recoil_cms'):
+            fillParticle(self.tree, 'recoil_cms', event.recoil_cms)
+            fillParticle(self.tree, 'recoil_visible_cms', event.recoil_visible_cms)
         self.tree.tree.Fill()
         
         

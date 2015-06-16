@@ -2,15 +2,16 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = True
+debug = False
 
 do_display = False
 do_cms = True
-do_papas = False
+do_papas = True
 nevents_per_job = 1000
 
-from heppy_fcc.samples.higgs_350 import *  
-selectedComponents  = [hz_cms]
+# from heppy_fcc.samples.higgs_350 import *  
+from heppy_fcc.samples.gun_0_50 import gun_22_0_50 as sample
+selectedComponents  = [sample]
 for comp in selectedComponents:
     comp.splitFactor = 10
 if debug:
@@ -41,12 +42,12 @@ pfsim = cfg.Analyzer(
 )
 
 
-cms_recoil = cfg.Analyzer(
-    Recoil,
-    instance_label = 'cms',
-    sqrts = 350.,
-    particles = 'pf_particles'
-)
+# cms_recoil = cfg.Analyzer(
+#     Recoil,
+#     instance_label = 'cms',
+#     sqrts = 350.,
+#     particles = 'pf_particles'
+# )
 
 papas_recoil = cfg.Analyzer(
     Recoil,
@@ -70,14 +71,6 @@ papas_particle_match_g2r = cfg.Analyzer(
     match_particles = 'particles'
 )
 
-
-
-from heppy_fcc.analyzers.Higgs350TreeProducer import Higgs350TreeProducer
-papas_tree = cfg.Analyzer(
-    Higgs350TreeProducer,
-    instance_label = 'papas'
-    )
-
 from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
 papas_particle_tree_r2g = cfg.Analyzer(
     ParticleTreeProducer, 
@@ -90,9 +83,26 @@ papas_particle_tree_g2r = cfg.Analyzer(
     particles = 'gen_particles_stable'
     )
 
+from heppy_fcc.analyzers.Higgs350TreeProducer import Higgs350TreeProducer
+papas_tree = cfg.Analyzer(
+    Higgs350TreeProducer,
+    instance_label = 'papas'
+    )
 
+papas_sequence = [
+    papas_recoil,
+    papas_particle_match_r2g,
+    papas_particle_match_g2r,
+    papas_tree, 
+    papas_particle_tree_r2g,
+    papas_particle_tree_g2r,      
+    ]
 
-
+cms_sequence = copy.deepcopy(papas_sequence)
+for ana in cms_sequence: 
+    ana.instance_label = ana.instance_label.replace('papas', 'cms')
+    if hasattr(ana, 'particles'):
+        ana.particles = 'pf_particles'
 
 
 # definition of a sequence of analyzers,
@@ -101,14 +111,13 @@ sequence = cfg.Sequence( [
     source,
     pfsim,
     gen_recoil, 
-    papas_recoil,
-    cms_recoil,
-    papas_particle_match_r2g,
-    papas_particle_match_g2r,
-    papas_tree, 
-    papas_particle_tree_r2g,
-    papas_particle_tree_g2r,  
     ] )
+
+if do_papas:
+    sequence.extend(papas_sequence)
+if do_cms:
+    sequence.extend(cms_sequence)
+    
 
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 config = cfg.Config(
