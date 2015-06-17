@@ -37,5 +37,5 @@ samples = [
 if __name__ == '__main__':
 
     import pprint 
-    for g in guns:
+    for g in samples:
         print g
