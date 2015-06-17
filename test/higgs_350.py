@@ -7,7 +7,7 @@ do_display = False
 do_cms = True
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 4
+gen_jobs = 0
 
 GEN = gen_jobs>0
 
@@ -33,8 +33,9 @@ if GEN:
     from heppy.framework.eventsgen import Events
 else:
     # from heppy_fcc.samples.higgs_350 import *  
-    from heppy_fcc.samples.gun_0_50 import gun_22_0_50 as sample
-    selectedComponents  = [sample]
+    from heppy_fcc.samples.gun_0_50 import *
+    from heppy_fcc.samples.gun_MatEff_10_50 import *
+    selectedComponents = [gun_211_MatEff_10_50]
     for comp in selectedComponents:
         comp.splitFactor = 10
 

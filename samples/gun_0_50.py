@@ -9,7 +9,7 @@ gun_211_0_50 = cfg.Component(
 
 gun_22_0_50 = cfg.Component(
     'gun_22_0_50',
-    files = getFiles("/Gun_22_0_50/743_v1/RECOSIM"),
+    files = getFiles("/Gun_22_0_50/743_v2/RECOSIM"),
 ) 
 
 gun_11_0_50 = cfg.Component(
@@ -28,6 +28,7 @@ gun_12_0_50 = cfg.Component(
 ) 
 
 samples = [
+    gun_211_0_50,
     gun_22_0_50, 
     gun_11_0_50,
     gun_13_0_50,
