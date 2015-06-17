@@ -98,12 +98,55 @@ papas_sequence = [
     papas_particle_tree_g2r,      
     ]
 
-cms_sequence = copy.deepcopy(papas_sequence)
-for ana in cms_sequence: 
-    ana.instance_label = ana.instance_label.replace('papas', 'cms')
-    if hasattr(ana, 'particles'):
-        ana.particles = 'pf_particles'
 
+cms_recoil = cfg.Analyzer(
+    Recoil,
+    instance_label = 'cms',
+    sqrts = 350.,
+    particles = 'pf_particles'
+)
+
+from heppy_fcc.analyzers.Matcher import Matcher
+cms_particle_match_r2g = cfg.Analyzer(
+    Matcher,
+    instance_label = 'cms_r2g', 
+    particles = 'pf_particles',
+    match_particles = 'gen_particles_stable'
+)
+
+cms_particle_match_g2r = cfg.Analyzer(
+    Matcher,
+    instance_label = 'cms_g2r', 
+    particles = 'gen_particles_stable',
+    match_particles = 'pf_particles'
+)
+
+from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
+cms_particle_tree_r2g = cfg.Analyzer(
+    ParticleTreeProducer, 
+    instance_label = 'cms_r2g',
+    particles = 'pf_particles'
+    )
+cms_particle_tree_g2r = cfg.Analyzer(
+    ParticleTreeProducer, 
+    instance_label = 'cms_g2r',
+    particles = 'gen_particles_stable'
+    )
+
+from heppy_fcc.analyzers.Higgs350TreeProducer import Higgs350TreeProducer
+cms_tree = cfg.Analyzer(
+    Higgs350TreeProducer,
+    instance_label = 'cms'
+    )
+
+cms_sequence = [
+    cms_recoil,
+    cms_particle_match_r2g,
+    cms_particle_match_g2r,
+    cms_tree, 
+    cms_particle_tree_r2g,
+    cms_particle_tree_g2r,      
+    ]
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
