@@ -2,7 +2,7 @@ from cpyroot import *
 from OfficialStyle import *
 
 import sys 
-
+import os 
 
 class Efficiency(object):
 
@@ -62,35 +62,41 @@ cms_rootfile = 'heppy_fcc.analyzers.ParticleTreeProducer.ParticleTreeProducer_cm
 papas_rootfile = '/'.join([sample, papas_rootfile])
 cms_rootfile = '/'.join([sample, cms_rootfile])
 
+do_cms = os.path.isfile(cms_rootfile)
+
 papas = Chain(papas_rootfile)
-cms = Chain(cms_rootfile)
+if do_cms:
+    cms = Chain(cms_rootfile)
 
 
 def efficiencies(name, tree):
     
     e_eff = Efficiency('_'.join([name, 'e']), tree)
-    e_eff.project('ptc_e', '', 'ptc_match_e>0.', 20, 0, 10)
+    e_eff.project('ptc_e', '', 'ptc_match_e>0.', 100, 0, 1)
     e_eff.eff.Draw()
 
     # pt_eff = Efficiency('_'.join([name, 'pt']), tree)
     # pt_eff.project('ptc_pt', '', 'ptc_match_e>0.', 20, 0, 10)
     # pt_eff.eff.Draw()
 
-    eta_eff = Efficiency('_'.join([name, 'eta']), tree)
-    eta_eff.project('ptc_eta', 'ptc_e>3.', 'ptc_match_e>0.', 20, -1.5, 1.5)
-    eta_eff.eff.Draw()
+    # eta_eff = Efficiency('_'.join([name, 'eta']), tree)
+    # eta_eff.project('ptc_eta', 'ptc_e>3.', 'ptc_match_e>0.', 20, -1.5, 1.5)
+    # eta_eff.eff.Draw()
 
-    return [e_eff, eta_eff]
+    return [e_eff]
 
 papas_eff = efficiencies('papas', papas)
-cms_eff = efficiencies('cms', cms)
+if do_cms:
+    cms_eff = efficiencies('cms', cms)
 
 c1 = TCanvas()
 papas_eff[0].eff.Draw()
-sBlue.formatHisto(cms_eff[0].eff)
-cms_eff[0].eff.Draw('same')
+if do_cms:
+    sBlue.formatHisto(cms_eff[0].eff)
+    cms_eff[0].eff.Draw('same')
 
-c2 = TCanvas()
-papas_eff[1].eff.Draw()
-sBlue.formatHisto(cms_eff[0].eff)
-cms_eff[1].eff.Draw('same')
+# c2 = TCanvas()
+# papas_eff[1].eff.Draw()
+# if do_cms:
+#     sBlue.formatHisto(cms_eff[0].eff)
+#     cms_eff[1].eff.Draw('same')

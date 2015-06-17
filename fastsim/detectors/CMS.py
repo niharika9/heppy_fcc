@@ -11,10 +11,10 @@ class ECAL(DetectorElement):
         # mat = material.Material('ECAL', 8.9e-3, 0.25)
         mat = material.Material('ECAL', 8.9e-3, 0.25)
         self.eta_crack = 1.5
-        self.emin = 0.5
+        self.emin = 0.23
         self.eres = [0.07, 0., 0.]
         super(ECAL, self).__init__('ecal', volume,  mat)
-
+        
     def energy_resolution(self, energy, theta=0.):
         return self.eres[0] / math.sqrt(energy)
 

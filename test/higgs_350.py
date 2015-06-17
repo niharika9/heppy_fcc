@@ -2,13 +2,12 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = True
-
+debug = False
 do_display = False
 do_cms = True
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 1
+gen_jobs = 4
 
 GEN = gen_jobs>0
 
@@ -24,9 +23,12 @@ if GEN:
     from heppy_fcc.analyzers.Gun import Gun
     source = cfg.Analyzer(
         Gun,
-        pdgid = 130,
+        pdgid = 22,
         ptmin = 0.,
-        ptmax = 10.
+        ptmax = 1.,
+        thetamin = -1.,
+        thetamax = 1.,
+        flat_pt = False
     )
     from heppy.framework.eventsgen import Events
 else:

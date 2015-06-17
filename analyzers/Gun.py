@@ -30,7 +30,9 @@ def particle(pdgid, theta, phi, energy, flat_pt=False):
 class Gun(Analyzer):
     
     def process(self, event):
-        theta = random.uniform(-math.pi+0.1, math.pi-0.1)
+        theta = random.uniform(self.cfg_ana.thetamin, self.cfg_ana.thetamax)
+        phi = random.uniform(-math.pi, math.pi)
         energy = random.uniform( self.cfg_ana.ptmin, self.cfg_ana.ptmax)
-        event.gen_particles = [particle(self.cfg_ana.pdgid, theta, 0., energy, flat_pt=True)]
+        event.gen_particles = [particle(self.cfg_ana.pdgid, theta, phi, energy,
+                                        flat_pt=self.cfg_ana.flat_pt)]
         event.gen_particles_stable = event.gen_particles
