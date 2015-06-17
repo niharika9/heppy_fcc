@@ -2,29 +2,51 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = False
+debug = True
 
 do_display = False
 do_cms = True
 do_papas = True
 nevents_per_job = 1000
+gen_jobs = 1
 
-# from heppy_fcc.samples.higgs_350 import *  
-from heppy_fcc.samples.gun_0_50 import gun_22_0_50 as sample
-selectedComponents  = [sample]
-for comp in selectedComponents:
-    comp.splitFactor = 10
+GEN = gen_jobs>0
+
+source = None
+selectedComponents = []
+Events = None
+if GEN:
+    do_cms = False
+    do_papas = True
+    for i in range(gen_jobs):
+        component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
+        selectedComponents.append(component)
+    from heppy_fcc.analyzers.Gun import Gun
+    source = cfg.Analyzer(
+        Gun,
+        pdgid = 130,
+        ptmin = 0.,
+        ptmax = 10.
+    )
+    from heppy.framework.eventsgen import Events
+else:
+    # from heppy_fcc.samples.higgs_350 import *  
+    from heppy_fcc.samples.gun_0_50 import gun_22_0_50 as sample
+    selectedComponents  = [sample]
+    for comp in selectedComponents:
+        comp.splitFactor = 10
+
+    from heppy_fcc.analyzers.CMSReader import CMSReader
+    source = cfg.Analyzer(
+        CMSReader,
+        gen_particles = 'genParticles',
+        pf_particles = 'particleFlow' if do_cms else None
+    )
+    from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
+
 if debug:
     selectedComponents = selectedComponents[:1]
     selectedComponents[0].splitFactor =1 
-
-from heppy_fcc.analyzers.CMSReader import CMSReader
-source = cfg.Analyzer(
-    CMSReader,
-    gen_particles = 'genParticles',
-    pf_particles = 'particleFlow' if do_cms else None
-    )
-
 
 from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
@@ -161,8 +183,6 @@ if do_papas:
 if do_cms:
     sequence.extend(cms_sequence)
     
-
-from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 config = cfg.Config(
     components = selectedComponents,
     sequence = sequence,
