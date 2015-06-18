@@ -2,12 +2,12 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = False
+debug = True
 do_display = False
-do_cms = True
+do_cms = False
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 0
+gen_jobs = 1
 
 GEN = gen_jobs>0
 
@@ -23,12 +23,12 @@ if GEN:
     from heppy_fcc.analyzers.Gun import Gun
     source = cfg.Analyzer(
         Gun,
-        pdgid = 22,
+        pdgid = 211,
         ptmin = 0.,
-        ptmax = 1.,
+        ptmax = 5.,
         thetamin = -1.,
         thetamax = 1.,
-        flat_pt = False
+        flat_pt = True
     )
     from heppy.framework.eventsgen import Events
 else:
@@ -93,7 +93,11 @@ papas_particle_match_g2r = cfg.Analyzer(
     Matcher,
     instance_label = 'papas_g2r', 
     particles = 'gen_particles_stable',
-    match_particles = 'particles'
+    match_particles = [
+        ('particles', None),
+        ('particles', 211),
+        ('particles', 130)
+    ] 
 )
 
 from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
@@ -143,7 +147,11 @@ cms_particle_match_g2r = cfg.Analyzer(
     Matcher,
     instance_label = 'cms_g2r', 
     particles = 'gen_particles_stable',
-    match_particles = 'pf_particles'
+    match_particles = [
+        ('particles', None),
+        ('particles', 211),
+        ('particles', 130)
+    ] 
 )
 
 from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
