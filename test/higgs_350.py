@@ -33,9 +33,9 @@ if GEN:
     from heppy.framework.eventsgen import Events
 else:
     # from heppy_fcc.samples.higgs_350 import *  
-    from heppy_fcc.samples.gun_0_50 import *
-    from heppy_fcc.samples.gun_MatEff_10_50 import *
-    selectedComponents = [gun_211_MatEff_10_50]
+    from heppy_fcc.samples.gun import *
+    # from heppy_fcc.samples.gun_MatEff_10_50 import *
+    selectedComponents = [gun_211_MatEff_0_20]
     for comp in selectedComponents:
         comp.splitFactor = 10
 
