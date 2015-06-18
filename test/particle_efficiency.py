@@ -49,6 +49,7 @@ class Efficiency(object):
         print 'num: var = ', var, ' cut = ', numcut
         self.tree.Project(self.num.GetName(), var, numcut)
         self.eff.Divide(self.num, self.denom, 1, 1, 'B')
+        self.eff.GetYaxis().SetRangeUser(0,1)
 
     
         
@@ -90,11 +91,11 @@ papas_eff = efficiencies('papas', papas)
 if do_cms:
     cms_eff = efficiencies('cms', cms)
 
-c1 = TCanvas()
-papas_eff[0].eff.Draw()
-if do_cms:
-    sBlue.formatHisto(cms_eff[0].eff)
-    cms_eff[0].eff.Draw('same')
+# c1 = TCanvas()
+# papas_eff[0].eff.Draw()
+# if do_cms:
+#     sBlue.formatHisto(cms_eff[0].eff)
+#     cms_eff[0].eff.Draw('same')
 
 # c2 = TCanvas()
 # papas_eff[1].eff.Draw()
@@ -110,7 +111,7 @@ if do_cms:
 
 
 pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
-pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 20)
+pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
 pt_eff.eff.Draw()
 
 
