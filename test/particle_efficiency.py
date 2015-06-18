@@ -109,12 +109,14 @@ if do_cms:
 #     sBlue.formatHisto(cms_eff[2].eff)
 #     cms_eff[2].eff.Draw('same')
 
+if do_cms:
+    pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
+    pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
+    pt_eff.eff.Draw()
 
-pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
-pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
-pt_eff.eff.Draw()
+    
+    pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
+    pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
+    pt_eff2.eff.Draw('same')
 
-
-pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
-pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
-pt_eff2.eff.Draw('same')
+    
