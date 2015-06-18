@@ -71,19 +71,20 @@ if do_cms:
 
 def efficiencies(name, tree):
     
-    e_eff = Efficiency('_'.join([name, 'e']), tree)
-    e_eff.project('ptc_e', '', 'ptc_match_e>0.', 100, 0, 1)
-    e_eff.eff.Draw()
+    # e_eff = Efficiency('_'.join([name, 'e']), tree)
+    # e_eff.project('ptc_e', '', 'ptc_match_e>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 5)
+    # e_eff.eff.Draw()
 
-    # pt_eff = Efficiency('_'.join([name, 'pt']), tree)
-    # pt_eff.project('ptc_pt', '', 'ptc_match_e>0.', 20, 0, 10)
+    pt_eff = Efficiency('_'.join([name, 'pt']), tree)
+    # pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 20)
+    pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 40, 0, 20)
     # pt_eff.eff.Draw()
 
     # eta_eff = Efficiency('_'.join([name, 'eta']), tree)
-    # eta_eff.project('ptc_eta', 'ptc_e>3.', 'ptc_match_e>0.', 20, -1.5, 1.5)
+    # eta_eff.project('ptc_eta', 'ptc_pt>2.', 'ptc_match_pt>0.', 50, -3, 3 )
     # eta_eff.eff.Draw()
 
-    return [e_eff]
+    return [pt_eff]
 
 papas_eff = efficiencies('papas', papas)
 if do_cms:
@@ -98,5 +99,21 @@ if do_cms:
 # c2 = TCanvas()
 # papas_eff[1].eff.Draw()
 # if do_cms:
-#     sBlue.formatHisto(cms_eff[0].eff)
+#     sBlue.formatHisto(cms_eff[1].eff)
 #     cms_eff[1].eff.Draw('same')
+
+# c3 = TCanvas()
+# papas_eff[2].eff.Draw()
+# if do_cms:
+#     sBlue.formatHisto(cms_eff[2].eff)
+#     cms_eff[2].eff.Draw('same')
+
+
+pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
+pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 20)
+pt_eff.eff.Draw()
+
+
+pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
+pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
+pt_eff2.eff.Draw('same')
