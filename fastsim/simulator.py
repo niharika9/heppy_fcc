@@ -184,6 +184,9 @@ class Simulator(object):
             elif abs(ptc.pdgid()) in [12,14,16]:
                 self.simulate_neutrino(ptc)
             elif abs(ptc.pdgid()) > 100: #TODO make sure this is ok
+                if ptc.q() and ptc.pt()<0.2:
+                    # to avoid numerical problems in propagation
+                    continue
                 self.simulate_hadron(ptc)
         self.pfsequence = PFSequence(self.ptcs, self.detector, self.logger)
         self.particles = copy.copy(self.pfsequence.pfreco.particles)
