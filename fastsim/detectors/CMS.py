@@ -80,8 +80,8 @@ class Tracker(DetectorElement):
         # return False
         pt = track.pt
         eta = abs(track.p3.Eta())
-        if eta < 2.5 and pt>0.7:
-            return random.uniform(0,1)<0.9 # 90% eff plateau in acceptance
+        if eta < 2.5 and pt>0.5:
+            return random.uniform(0,1)<1. # CMS without tracker material effects 
         else:
             return False
 

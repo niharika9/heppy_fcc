@@ -30,12 +30,13 @@ class Efficiency(object):
         else:
             self.denom.Reset()
         self.denom.Sumw2()
-        sBlue.formatHisto(self.num)
+        sBlue.formatHisto(self.denom)
         if self.eff is None: 
             self.eff = TH1F( self.hname('eff'), self.name, nbins, xmin, xmax)
         else:
             self.eff.Reset()
         self.eff.Sumw2()
+        sBlack.formatHisto(self.eff)
         hists = [self.num, self.denom, self.eff]
         for h in hists:
             h.SetTitle(self.name)
@@ -74,34 +75,31 @@ def efficiencies(name, tree):
     
     # e_eff = Efficiency('_'.join([name, 'e']), tree)
     # e_eff.project('ptc_e', '', 'ptc_match_e>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 5)
-    # e_eff.eff.Draw()
 
     pt_eff = Efficiency('_'.join([name, 'pt']), tree)
     # pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 20)
-    pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 40, 0, 20)
-    # pt_eff.eff.Draw()
+    pt_eff.project('ptc_pt', 'abs(ptc_theta)<1.', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 100, 0, 10)
 
-    # eta_eff = Efficiency('_'.join([name, 'eta']), tree)
-    # eta_eff.project('ptc_eta', 'ptc_pt>2.', 'ptc_match_pt>0.', 50, -3, 3 )
-    # eta_eff.eff.Draw()
+    eta_eff = Efficiency('_'.join([name, 'eta']), tree)
+    eta_eff.project('ptc_theta', 'ptc_pt>2.', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 100, -3, 3 )
 
-    return [pt_eff]
+    return [pt_eff, eta_eff]
 
 papas_eff = efficiencies('papas', papas)
 if do_cms:
     cms_eff = efficiencies('cms', cms)
 
-# c1 = TCanvas()
-# papas_eff[0].eff.Draw()
-# if do_cms:
-#     sBlue.formatHisto(cms_eff[0].eff)
-#     cms_eff[0].eff.Draw('same')
+c1 = TCanvas()
+papas_eff[0].eff.Draw()
+if do_cms:
+    sBlue.formatHisto(cms_eff[0].eff)
+    cms_eff[0].eff.Draw('same')
 
-# c2 = TCanvas()
-# papas_eff[1].eff.Draw()
-# if do_cms:
-#     sBlue.formatHisto(cms_eff[1].eff)
-#     cms_eff[1].eff.Draw('same')
+c2 = TCanvas()
+papas_eff[1].eff.Draw()
+if do_cms:
+    sBlue.formatHisto(cms_eff[1].eff)
+    cms_eff[1].eff.Draw('same')
 
 # c3 = TCanvas()
 # papas_eff[2].eff.Draw()
@@ -109,14 +107,14 @@ if do_cms:
 #     sBlue.formatHisto(cms_eff[2].eff)
 #     cms_eff[2].eff.Draw('same')
 
-if do_cms:
-    pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
-    pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
-    pt_eff.eff.Draw()
+# if do_cms:
+#     pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
+#     pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
+#     pt_eff.eff.Draw()
 
     
-    pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
-    pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
-    pt_eff2.eff.Draw('same')
+#     pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
+#     pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
+#     pt_eff2.eff.Draw('same')
 
     
