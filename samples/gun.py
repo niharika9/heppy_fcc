@@ -4,12 +4,17 @@ from getFiles import getFiles
 
 gun_211_0_20 = cfg.Component(
     'gun_211_0_20',
-    files = getFiles("/Gun_221_0_20_ptflat/743_v1/AODSIM", cache=False),
+    files = getFiles("/Gun_221_0_20_ptflat/743_v1/AODSIM", cache=True),
+) 
+
+gun_211_0_10 = cfg.Component(
+    'gun_211_0_10',
+    files = getFiles("/Gun_211_0_10_ptflat/743_v1/AODSIM"),
 ) 
 
 gun_211_MatEff_0_20 = cfg.Component(
     'gun_211_MatEff_0_20',
-    files = getFiles("/Gun_221_MatEff_0_20_ptflat/743_v1/AODSIM", cache=False),
+    files = getFiles("/Gun_221_MatEff_0_20_ptflat/743_v1/AODSIM", cache=True),
 ) 
 
 gun_22_0_50 = cfg.Component(

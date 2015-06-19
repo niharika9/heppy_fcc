@@ -108,6 +108,9 @@ class Jet(object):
     def m(self):
         return self.tlv.M()
 
+    def pdgid(self):
+        return 0
+
     def __str__(self):
         tmp = '{className} : e = {e:5.1f}, theta = {theta:5.2f}, phi = {phi:5.2f}, mass = {m:5.2f}'
         return tmp.format(
