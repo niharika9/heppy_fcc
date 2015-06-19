@@ -80,14 +80,25 @@ class PFReconstructor(object):
             hcals = [elem for elem in group if elem.layer=='hcal_in']
             for hcal in hcals:
                 particles.extend(self.reconstruct_hcal(hcal))
-            #TODO deal with ecal-ecal
-            ecals = [elem for elem in group if elem.layer=='ecal_in'
-                     and not elem.locked]
-            for ecal in ecals:
-                linked_layers = [linked.layer for linked in ecal.linked]
-                # assert('tracker' not in linked_layers) #TODO electrons
-                self.log.warning( 'DEAL WITH ELECTRONS!' ) 
-                particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
+            tracks = [elem for elem in group if elem.layer=='tracker'
+                      and not elem.locked]
+            for track in tracks:
+                # unused tracks, so not linked to HCAL
+                # reconstructing charged hadrons.
+                # ELECTRONS TO BE DEALT WITH.
+                particles.append(self.reconstruct_track(elem))
+                for elem in track.linked:
+                    # tracks possibly linked to ecal->locking cluster
+                    assert(elem.layer == 'ecal_in')
+                    elem.locked = True
+            # #TODO deal with ecal-ecal
+            # ecals = [elem for elem in group if elem.layer=='ecal_in'
+            #          and not elem.locked]
+            # for ecal in ecals:
+            #     linked_layers = [linked.layer for linked in ecal.linked]
+            #     # assert('tracker' not in linked_layers) #TODO electrons
+            #     self.log.warning( 'DEAL WITH ELECTRONS!' ) 
+            #     particles.append(self.reconstruct_cluster(ecal, 'ecal_in'))
             #TODO deal with track-ecal
         return particles 
 
