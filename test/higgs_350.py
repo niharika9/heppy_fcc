@@ -2,14 +2,17 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = True
+debug = False
 do_display = False
 do_cms = False
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 1
+gen_jobs = 4
 
 GEN = gen_jobs>0
+
+if debug:
+    print 'DEBUG MODE IS ON!'
 
 source = None
 selectedComponents = []
@@ -24,10 +27,10 @@ if GEN:
     source = cfg.Analyzer(
         Gun,
         pdgid = 211,
-        ptmin = 0.,
+        ptmin = 0,
         ptmax = 5.,
-        thetamin = -1.,
-        thetamax = 1.,
+        thetamin = -3.,
+        thetamax = 3.,
         flat_pt = True
     )
     from heppy.framework.eventsgen import Events
@@ -96,7 +99,8 @@ papas_particle_match_g2r = cfg.Analyzer(
     match_particles = [
         ('particles', None),
         ('particles', 211),
-        ('particles', 130)
+        ('particles', 130),
+        ('particles', 22)
     ] 
 )
 
@@ -210,7 +214,7 @@ if __name__ == '__main__':
     # next 2 lines necessary to deal with reimports from ipython
     logging.shutdown()
     reload(logging)
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.INFO)
 
     import random
     # for reproducible results
