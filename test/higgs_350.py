@@ -26,12 +26,12 @@ if GEN:
     from heppy_fcc.analyzers.Gun import Gun
     source = cfg.Analyzer(
         Gun,
-        pdgid = 211,
+        pdgid = 22,
         ptmin = 0,
-        ptmax = 5.,
+        ptmax = 20.,
         thetamin = -3.,
         thetamax = 3.,
-        flat_pt = True
+        flat_pt = False
     )
     from heppy.framework.eventsgen import Events
 else:

@@ -11,12 +11,15 @@ class ECAL(DetectorElement):
         # mat = material.Material('ECAL', 8.9e-3, 0.25)
         mat = material.Material('ECAL', 8.9e-3, 0.25)
         self.eta_crack = 1.5
-        self.emin = 0.23
-        self.eres = [0.07, 0., 0.]
+        self.emin = 0.4
+        self.eres = [0.073, 0.1, 0.005]
         super(ECAL, self).__init__('ecal', volume,  mat)
         
     def energy_resolution(self, energy, theta=0.):
-        return self.eres[0] / math.sqrt(energy)
+        stoch = self.eres[0] / math.sqrt(energy)
+        noise = self.eres[1] / energy
+        constant = self.eres[2]
+        return math.sqrt( stoch**2 + noise**2 + constant**2) 
 
     def cluster_size(self, ptc):
         pdgid = abs(ptc.pdgid())
