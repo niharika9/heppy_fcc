@@ -4,10 +4,10 @@ import heppy.framework.config as cfg
 
 debug = False
 do_display = False
-do_cms = False
+do_cms = True
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 4
+gen_jobs = 0
 
 GEN = gen_jobs>0
 
@@ -38,7 +38,7 @@ else:
     # from heppy_fcc.samples.higgs_350 import *  
     from heppy_fcc.samples.gun import *
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
-    selectedComponents = [gun_211_MatEff_0_20]
+    selectedComponents = [gun_211_0_10]
     for comp in selectedComponents:
         comp.splitFactor = 10
 
@@ -51,14 +51,23 @@ else:
     from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 
 if debug:
-    selectedComponents = selectedComponents[:1]
-    selectedComponents[0].splitFactor =1 
+    comp = selectedComponents[0]
+    comp.splitFactor =1 
+    comp.files = selectedComponents[0].files[:1]
+    selectedComponents = [comp]
 
 from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
     Recoil,
     instance_label = 'gen',
     sqrts = 350.,
+    particles = 'gen_particles_stable'
+)
+
+from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
+gen_jets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'gen',
     particles = 'gen_particles_stable'
 )
 
@@ -70,12 +79,28 @@ pfsim = cfg.Analyzer(
 )
 
 
-# cms_recoil = cfg.Analyzer(
-#     Recoil,
-#     instance_label = 'cms',
-#     sqrts = 350.,
-#     particles = 'pf_particles'
-# )
+papas_jets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'papas', 
+    particles = 'particles'
+)
+
+from heppy_fcc.analyzers.JetAnalyzer import JetAnalyzer
+papas_jet_ana = cfg.Analyzer(
+    JetAnalyzer,
+    instance_label = 'papas', 
+    jets = 'papas_jets',
+    genjets = 'gen_jets'
+)
+
+from heppy_fcc.analyzers.JetTreeProducer import JetTreeProducer
+papas_jet_tree = cfg.Analyzer(
+    JetTreeProducer,
+    instance_label = 'papas',
+    tree_name = 'events',
+    tree_title = 'jets',
+    jets = 'papas_jets'
+)
 
 papas_recoil = cfg.Analyzer(
     Recoil,
@@ -123,13 +148,45 @@ papas_tree = cfg.Analyzer(
     )
 
 papas_sequence = [
+    pfsim, 
+    papas_jets, 
+    papas_jet_ana,
+    papas_jet_tree,
     papas_recoil,
-    papas_particle_match_r2g,
+    # papas_particle_match_r2g,
     papas_particle_match_g2r,
     papas_tree, 
-    papas_particle_tree_r2g,
+    # papas_particle_tree_r2g,
     papas_particle_tree_g2r,      
     ]
+
+
+from heppy_fcc.analyzers.FastsimCleaner import FastsimCleaner 
+cms_fastsim_cleaner = cfg.Analyzer(
+    FastsimCleaner, 
+    particles = 'pf_particles'
+)
+
+cms_jets = cfg.Analyzer(
+    JetClusterizer,
+    instance_label = 'cms', 
+    particles = 'pf_particles'
+)
+
+cms_jet_ana = cfg.Analyzer(
+    JetAnalyzer,
+    instance_label = 'cms', 
+    jets = 'cms_jets',
+    genjets = 'gen_jets'
+)
+
+cms_jet_tree = cfg.Analyzer(
+    JetTreeProducer,
+    instance_label = 'cms',
+    tree_name = 'events',
+    tree_title = 'jets',
+    jets = 'cms_jets'
+)
 
 
 cms_recoil = cfg.Analyzer(
@@ -152,9 +209,9 @@ cms_particle_match_g2r = cfg.Analyzer(
     instance_label = 'cms_g2r', 
     particles = 'gen_particles_stable',
     match_particles = [
-        ('particles', None),
-        ('particles', 211),
-        ('particles', 130)
+        ('pf_particles', None),
+        ('pf_particles', 211),
+        ('pf_particles', 130)
     ] 
 )
 
@@ -177,11 +234,15 @@ cms_tree = cfg.Analyzer(
     )
 
 cms_sequence = [
+    cms_fastsim_cleaner,
+    cms_jets, 
+    cms_jet_ana,
+    cms_jet_tree,
     cms_recoil,
-    cms_particle_match_r2g,
+    # cms_particle_match_r2g,
     cms_particle_match_g2r,
     cms_tree, 
-    cms_particle_tree_r2g,
+    # cms_particle_tree_r2g,
     cms_particle_tree_g2r,      
     ]
 
@@ -189,14 +250,18 @@ cms_sequence = [
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     source,
-    pfsim,
-    gen_recoil, 
+    gen_recoil,
+    gen_jets,
     ] )
 
 if do_papas:
     sequence.extend(papas_sequence)
 if do_cms:
     sequence.extend(cms_sequence)
+
+# sequence = cfg.Sequence(
+#    [source, cms_fastsim_cleaner]
+#)
     
 config = cfg.Config(
     components = selectedComponents,
