@@ -76,45 +76,32 @@ def efficiencies(name, tree):
     # e_eff = Efficiency('_'.join([name, 'e']), tree)
     # e_eff.project('ptc_e', '', 'ptc_match_e>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 5)
 
+    found = 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid'
+
     pt_eff = Efficiency('_'.join([name, 'pt']), tree)
-    # pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 20, 0, 20)
-    pt_eff.project('ptc_pt', 'abs(ptc_theta)<1.', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 100, 0, 10)
+    pt_eff.project('ptc_pt', 'abs(ptc_theta)<1.', found, 100, 0, 10)
+
+    e_eff = Efficiency('_'.join([name, 'e']), tree)
+    e_eff.project('ptc_e', 'abs(ptc_theta)<1.', found, 100, 0, 10)
+
+    theta_eff = Efficiency('_'.join([name, 'theta']), tree)
+    theta_eff.project('ptc_theta', 'ptc_e>2.', found, 100, -3, 3 )
 
     eta_eff = Efficiency('_'.join([name, 'eta']), tree)
-    eta_eff.project('ptc_theta', 'ptc_pt>2.', 'ptc_match_pt>0. && ptc_match_pdgid==ptc_pdgid', 100, -3, 3 )
+    eta_eff.project('ptc_eta', 'ptc_e>2.', found, 100, -4, 4 )
 
-    return [pt_eff, eta_eff]
+    return [pt_eff, e_eff, theta_eff, eta_eff]
 
 papas_eff = efficiencies('papas', papas)
+cms_eff = [None]*len(papas_eff)
 if do_cms:
     cms_eff = efficiencies('cms', cms)
 
-c1 = TCanvas()
-papas_eff[0].eff.Draw()
-if do_cms:
-    sBlue.formatHisto(cms_eff[0].eff)
-    cms_eff[0].eff.Draw('same')
+canvases = [] 
+for pp, cm in zip(papas_eff, cms_eff):
+        canvases.append(TCanvas())
+        pp.eff.Draw()
+        if cm:
+            sBlue.formatHisto(cm.eff)
+            cm.eff.Draw('same')
 
-c2 = TCanvas()
-papas_eff[1].eff.Draw()
-if do_cms:
-    sBlue.formatHisto(cms_eff[1].eff)
-    cms_eff[1].eff.Draw('same')
-
-# c3 = TCanvas()
-# papas_eff[2].eff.Draw()
-# if do_cms:
-#     sBlue.formatHisto(cms_eff[2].eff)
-#     cms_eff[2].eff.Draw('same')
-
-# if do_cms:
-#     pt_eff = Efficiency('_'.join(['cms1', 'pt']), cms)
-#     pt_eff.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_211_pt>0.', 20, 0, 20)
-#     pt_eff.eff.Draw()
-
-    
-#     pt_eff2 = Efficiency('_'.join(['cms2', 'pt']), cms)
-#     pt_eff2.project('ptc_pt', 'abs(ptc_eta)<1.5', 'ptc_match_pt>0. && ptc_match_pdgid==130', 20, 0, 20)
-#     pt_eff2.eff.Draw('same')
-
-    
