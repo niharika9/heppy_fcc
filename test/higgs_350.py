@@ -38,7 +38,8 @@ else:
     # from heppy_fcc.samples.higgs_350 import *  
     from heppy_fcc.samples.gun import *
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
-    selectedComponents = [gun_211_0_10]
+    # selectedComponents = [gun_22_0_50]
+    selectedComponents = [gun_22_0_50_eta3]
     for comp in selectedComponents:
         comp.splitFactor = 10
 
@@ -53,7 +54,8 @@ else:
 if debug:
     comp = selectedComponents[0]
     comp.splitFactor =1 
-    comp.files = selectedComponents[0].files[:1]
+    # comp.files = selectedComponents[0].files[:1]
+    # comp.files = ['gun_211_0to10_ME0_RECOSIM.root'] 
     selectedComponents = [comp]
 
 from heppy_fcc.analyzers.Recoil import Recoil
