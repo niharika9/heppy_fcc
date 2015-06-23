@@ -25,6 +25,19 @@ def fillParticle( tree, pName, particle ):
     fill(tree, '{pName}_eta'.format(pName=pName), particle.eta() )
     fill(tree, '{pName}_phi'.format(pName=pName), particle.phi() )
     fill(tree, '{pName}_m'.format(pName=pName), particle.m() )
+
+def bookCluster( tree, name ):
+    var(tree, '{name}_e'.format(name=name))
+    var(tree, '{name}_layer'.format(name=name))
+
+layers = dict(
+    ecal_in = 0,
+    hcal_in = 1
+)
+    
+def fillCluster( tree, name, cluster ):
+    fill(tree, '{name}_e'.format(name=name), cluster.energy )
+    fill(tree, '{name}_layer'.format(name=name), layers[cluster.layer] )
     
 # jet
 
