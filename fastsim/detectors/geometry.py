@@ -25,9 +25,9 @@ class VolumeCylinder(object):
 
     def contains(self, point):
         perp = point.Perp()
-        if point.Z()<self.inner.z:
+        if abs(point.Z())<self.inner.z:
             return perp >= self.inner.rad and perp < self.outer.rad
-        elif point.Z()<self.outer.z:
+        elif abs(point.Z())<self.outer.z:
             return perp < self.outer.rad
         else:
             return False
