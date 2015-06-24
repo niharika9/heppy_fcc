@@ -26,8 +26,8 @@ if GEN:
     from heppy_fcc.analyzers.Gun import Gun
     source = cfg.Analyzer(
         Gun,
-        pdgid = 22,
-        ptmin = 0,
+        pdgid = 130,
+        ptmin = 1,
         ptmax = 20.,
         thetamin = -3.,
         thetamax = 3.,
@@ -39,7 +39,8 @@ else:
     from heppy_fcc.samples.gun import *
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
     # selectedComponents = [gun_22_0_50]
-    selectedComponents = [gun_22_0_50_eta3]
+    # selectedComponents = [gun_22_0_50_eta3]
+    selectedComponents = [gun_130_007_20]
     for comp in selectedComponents:
         comp.splitFactor = 10
 
@@ -261,6 +262,8 @@ if do_papas:
 if do_cms:
     sequence.extend(cms_sequence)
 
+# sequence = cfg.Sequence([source])
+
 # sequence = cfg.Sequence(
 #    [source, cms_fastsim_cleaner]
 #)
@@ -306,10 +309,11 @@ if __name__ == '__main__':
                    nEvents=nevents_per_job,
                    nPrint=0,
                    timeReport=True)
-    pfsim = loop.analyzers[1]
-    display = getattr(pfsim, 'display', None)
-    simulator = pfsim.simulator
-    detector = simulator.detector
+    # pfsim = loop.analyzers[1]
+    # display = getattr(pfsim, 'display', None)
+    display = None
+    # simulator = pfsim.simulator
+    # detector = simulator.detector
     if iev is not None:
         process(iev)
     else:
