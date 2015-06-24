@@ -1,13 +1,16 @@
 from cpyroot import *
 from heppy.statistics.value import Value
 
+import copy
+
 class Resolution(object):
 
     def __init__(self, name, tree, style=sBlack):
         self.name = name
         self.tree = tree
         self.h2d = None
-        self.style = style
+        self.style = copy.copy(style)
+        self.style.fillStyle = 0
         
     def hname(self, name):
         return '_'.join([self.name, name])
