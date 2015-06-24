@@ -1,5 +1,4 @@
 from cpyroot import *
-from OfficialStyle import *
 
 class Efficiency(object):
 
