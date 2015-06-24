@@ -4,8 +4,9 @@ import heppy.framework.config as cfg
 
 debug = True
 do_display = False
-do_cms = True
+do_cms = False
 do_papas = True
+do_fcc = True
 particle_matching = False
 nevents_per_job = 1000
 gen_jobs = 0
@@ -21,6 +22,7 @@ Events = None
 if GEN:
     do_cms = False
     do_papas = True
+    do_fcc = False
     for i in range(gen_jobs):
         component = cfg.Component(''.join(['sample_Chunk',str(i)]), files=['dummy.root'])
         selectedComponents.append(component)
@@ -35,7 +37,7 @@ if GEN:
         flat_pt = False
     )
     from heppy.framework.eventsgen import Events
-else:
+elif do_cms:
     # from heppy_fcc.samples.higgs_350 import *  
     # from heppy_fcc.samples.gun import *
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
@@ -53,7 +55,21 @@ else:
         pf_particles = 'particleFlow' if do_cms else None
     )
     from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
+elif do_fcc:
+    comp = cfg.Component(
+        'pythiafcc',
+        files = ['ee_qq.root']
+    )
+    selectedComponents = [comp]
+    from heppy_fcc.analyzers.FCCReader import FCCReader
+    source = cfg.Analyzer(
+        FCCReader
+    )  
+    from ROOT import gSystem
+    gSystem.Load("libdatamodel")
+    from eventstore import EventStore as Events
 
+    
 if debug:
     comp = selectedComponents[0]
     comp.splitFactor =1 

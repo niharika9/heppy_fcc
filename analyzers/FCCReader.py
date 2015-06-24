@@ -17,6 +17,9 @@ class FCCReader(Analyzer):
                                       key = lambda ptc: ptc.e(),
                                       reverse=True )  
         event.gen_particles_stable = [ptc for ptc in event.gen_particles
-                                      if ptc.status()==1 and \
-                                      not math.isnan(ptc.e())]
+                                      if ptc.status()==1 and 
+                                      not math.isnan(ptc.e()) and
+                                      ptc.e()>1e-5 and 
+                                      ptc.pt()>1e-5 and
+                                      not abs(ptc.pdgid()) in [12, 14, 16]]
         # event.genbrowser = GenBrowser(event.gen_particles, event.gen_vertices)
