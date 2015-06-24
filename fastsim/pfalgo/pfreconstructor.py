@@ -9,11 +9,11 @@ import pprint
 class PFReconstructor(object):
 
     def __init__(self, links, detector, logger):
+        self.eres_factor = 1.5
         self.links = links
         self.detector = detector
         self.log = logger
         self.reconstruct(links)
-        self.eres_factor = 1.5
 
     def reconstruct(self, links):
         self.unused = []
