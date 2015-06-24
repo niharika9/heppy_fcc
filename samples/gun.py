@@ -27,6 +27,16 @@ gun_22_0_50_eta3 = cfg.Component(
     files = getFiles("/Gun_22_0_50_eta3/743_v2/AODSIM"),
 ) 
 
+gun_130_0_50 = cfg.Component(
+    'gun_130_0_50',
+    files = getFiles("/Gun_130_0_50/743_v1/RECOSIM"),
+) 
+
+gun_130_007_20 = cfg.Component(
+    'gun_130_007_20',
+    files = getFiles("/Gun_130_007_20/743_v1/RECOSIM"),
+)
+
 gun_11_0_50 = cfg.Component(
     'gun_11_0_50',
     files = getFiles("/Gun_11_0_50/743_v1/RECOSIM"),
