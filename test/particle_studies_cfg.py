@@ -7,7 +7,7 @@ do_display = False
 do_cms = True
 do_papas = True
 nevents_per_job = 1000
-gen_jobs = 0
+gen_jobs = 4
 
 GEN = gen_jobs>0
 
@@ -27,10 +27,10 @@ if GEN:
     source = cfg.Analyzer(
         Gun,
         pdgid = 130,
-        ptmin = 1,
+        ptmin = 0.7,
         ptmax = 20.,
-        thetamin = -3.,
-        thetamax = 3.,
+        thetamin = -1.5,
+        thetamax = 1.5,
         flat_pt = False
     )
     from heppy.framework.eventsgen import Events

@@ -13,6 +13,7 @@ class ParticleTreeProducer(Analyzer):
                               'recreate')
         self.tree = Tree('particles', '')
         bookParticle(self.tree, 'ptc')
+        bookCluster(self.tree, 'ptc_ecal')
         bookParticle(self.tree, 'ptc_match')
         var(self.tree, 'dr')
         bookParticle(self.tree, 'ptc_match_211')
@@ -28,6 +29,11 @@ class ParticleTreeProducer(Analyzer):
             self.tree.reset()
             fillParticle(self.tree, 'ptc', ptc)
             m211 = m22 = False
+            if hasattr(ptc, 'clusters'):
+                # sim particle
+                ecal = ptc.clusters.get('ecal_in', None)
+                if ecal:
+                    fillCluster(self.tree, 'ptc_ecal', ecal)
             if hasattr(ptc, 'match') and ptc.match:
                 fillParticle(self.tree, 'ptc_match', ptc.match)
                 fill(self.tree, 'dr', ptc.dr)
