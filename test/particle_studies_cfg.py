@@ -2,12 +2,13 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = False
+debug = True
 do_display = False
 do_cms = True
 do_papas = True
+particle_matching = False
 nevents_per_job = 1000
-gen_jobs = 4
+gen_jobs = 0
 
 GEN = gen_jobs>0
 
@@ -36,11 +37,12 @@ if GEN:
     from heppy.framework.eventsgen import Events
 else:
     # from heppy_fcc.samples.higgs_350 import *  
-    from heppy_fcc.samples.gun import *
+    # from heppy_fcc.samples.gun import *
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
     # selectedComponents = [gun_22_0_50]
     # selectedComponents = [gun_22_0_50_eta3]
-    selectedComponents = [gun_130_007_20]
+    from heppy_fcc.samples.ee import *
+    selectedComponents = [ee_qq]
     for comp in selectedComponents:
         comp.splitFactor = 10
 
@@ -156,12 +158,14 @@ papas_sequence = [
     papas_jet_ana,
     papas_jet_tree,
     papas_recoil,
-    # papas_particle_match_r2g,
-    papas_particle_match_g2r,
     papas_tree, 
-    # papas_particle_tree_r2g,
-    papas_particle_tree_g2r,      
     ]
+
+if particle_matching: 
+    papas_sequence.extend([
+            papas_particle_match_g2r,
+            papas_particle_tree_g2r,      
+            ])
 
 
 from heppy_fcc.analyzers.FastsimCleaner import FastsimCleaner 
@@ -242,12 +246,15 @@ cms_sequence = [
     cms_jet_ana,
     cms_jet_tree,
     cms_recoil,
-    # cms_particle_match_r2g,
-    cms_particle_match_g2r,
     cms_tree, 
-    # cms_particle_tree_r2g,
-    cms_particle_tree_g2r,      
     ]
+
+if particle_matching: 
+    cms_sequence.extend([
+            cms_particle_match_g2r,
+            cms_particle_tree_g2r,      
+            ])
+
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
