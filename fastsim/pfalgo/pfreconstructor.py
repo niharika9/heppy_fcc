@@ -86,7 +86,7 @@ class PFReconstructor(object):
                 # unused tracks, so not linked to HCAL
                 # reconstructing charged hadrons.
                 # ELECTRONS TO BE DEALT WITH.
-                particles.append(self.reconstruct_track(elem))
+                particles.append(self.reconstruct_track(track))
                 for elem in track.linked:
                     # tracks possibly linked to ecal->locking cluster
                     assert(elem.layer == 'ecal_in')
@@ -190,10 +190,7 @@ class PFReconstructor(object):
     def reconstruct_track(self, track):
         vertex = track.path.points['vertex']
         pdg_id = 211 * track.charge
-        try: 
-            mass, charge = particle_data[pdg_id]
-        except KeyError:
-            import pdb; pdb.set_trace()
+        mass, charge = particle_data[pdg_id]
         p4 = TLorentzVector()
         p4.SetVectM(track.p3, mass)
         particle = Particle(p4, vertex, charge, pdg_id)
