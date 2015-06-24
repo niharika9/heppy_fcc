@@ -13,7 +13,7 @@ def e_ecal(tree, cut, same=''):
     tree.Draw('ptc_match_22_e/ptc_e:ptc_e',
               '(ptc_match_22_e>0)&&({cut})'.format(cut=cut), 'prof'+same)
 
-cut = 'abs(ptc_eta)<1.4'
+cut = 'abs(ptc_eta)>1.4'
  
 c1 = TCanvas()
 prob_ecal(papas, cut)

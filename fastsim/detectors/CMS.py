@@ -7,7 +7,7 @@ import random
 class ECAL(DetectorElement):
 
     def __init__(self):
-        volume = VolumeCylinder('ecal', 1.55, 2.25, 1.30, 2. )
+        volume = VolumeCylinder('ecal', 1.55, 2.1, 1.30, 2. )
         mat = material.Material('ECAL', 8.9e-3, 0.275)
         self.eta_crack = 1.5
         self.emin = 0.4
