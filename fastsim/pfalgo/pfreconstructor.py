@@ -13,6 +13,7 @@ class PFReconstructor(object):
         self.detector = detector
         self.log = logger
         self.reconstruct(links)
+        self.eres_factor = 1.5
 
     def reconstruct(self, links):
         self.unused = []
@@ -131,7 +132,7 @@ class PFReconstructor(object):
             for track in tracks:
                 particles.append(self.reconstruct_track(track))
             delta_e_rel = (hcal_energy + ecal_energy) / track_energy - 1.
-            calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
+            calo_eres = self.eres_factor * self.detector.elements['hcal'].energy_resolution(track_energy)
             self.log.info( 'dE/p, res = {derel}, {res} '.format(
                 derel = delta_e_rel,
                 res = calo_eres ))
