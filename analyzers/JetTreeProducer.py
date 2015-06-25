@@ -24,13 +24,13 @@ class JetTreeProducer(Analyzer):
         if( len(jets)>0 ):
             jet = jets[0]
             fillJet(self.tree, 'jet1', jet)
-            if jet.gen:
-                fillJet(self.tree, 'jet1_gen', jet.gen)
+            if jet.match:
+                fillJet(self.tree, 'jet1_gen', jet.match)
         if( len(jets)>1 ):
             jet = jets[1]
             fillJet(self.tree, 'jet2', jet)
-            if jet.gen:
-                fillJet(self.tree, 'jet2_gen', jet.gen)
+            if jet.match:
+                fillJet(self.tree, 'jet2_gen', jet.match)
         self.tree.tree.Fill()
         
         

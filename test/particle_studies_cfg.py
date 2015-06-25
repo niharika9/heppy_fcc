@@ -106,12 +106,12 @@ papas_jets = cfg.Analyzer(
     particles = 'particles'
 )
 
-from heppy_fcc.analyzers.JetAnalyzer import JetAnalyzer
-papas_jet_ana = cfg.Analyzer(
-    JetAnalyzer,
+from heppy_fcc.analyzers.Matcher import Matcher
+papas_jet_match = cfg.Analyzer(
+    Matcher,
     instance_label = 'papas', 
-    jets = 'papas_jets',
-    genjets = 'gen_jets'
+    match_particles = 'gen_jets',
+    particles = 'papas_jets'
 )
 
 from heppy_fcc.analyzers.JetTreeProducer import JetTreeProducer
@@ -171,7 +171,7 @@ papas_tree = cfg.Analyzer(
 papas_sequence = [
     pfsim, 
     papas_jets, 
-    papas_jet_ana,
+    papas_jet_match,
     papas_jet_tree,
     papas_recoil,
     papas_tree, 
@@ -196,11 +196,11 @@ cms_jets = cfg.Analyzer(
     particles = 'pf_particles'
 )
 
-cms_jet_ana = cfg.Analyzer(
-    JetAnalyzer,
+cms_jet_match = cfg.Analyzer(
+    Matcher,
     instance_label = 'cms', 
-    jets = 'cms_jets',
-    genjets = 'gen_jets'
+    match_particles = 'gen_jets',
+    particles = 'cms_jets'
 )
 
 cms_jet_tree = cfg.Analyzer(
@@ -259,7 +259,7 @@ cms_tree = cfg.Analyzer(
 cms_sequence = [
     cms_fastsim_cleaner,
     cms_jets, 
-    cms_jet_ana,
+    cms_jet_match,
     cms_jet_tree,
     cms_recoil,
     cms_tree, 
