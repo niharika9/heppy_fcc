@@ -26,7 +26,7 @@ def efficiencies(name, tree):
     return [pt_eff, e_eff, theta_eff, eta_eff]
 
 
-papas, cms = init()
+papas, cms = init('particles')
 
 papas_eff = efficiencies('papas', papas)
 cms_eff = [None]*len(papas_eff)
