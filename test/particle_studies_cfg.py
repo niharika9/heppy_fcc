@@ -2,7 +2,7 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = True
+debug = False
 do_display = False
 do_cms = False
 do_papas = True
