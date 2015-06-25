@@ -90,7 +90,7 @@ class Tracker(DetectorElement):
     def pt_resolution(self, track):
         # TODO: depends on the field
         pt = track.pt
-        return 0.01
+        return 5e-3
 
     
 
