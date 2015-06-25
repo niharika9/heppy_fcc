@@ -9,12 +9,11 @@ import pprint
 class PFReconstructor(object):
 
     def __init__(self, links, detector, logger):
-        self.eres_factor = 1.5
         self.links = links
         self.detector = detector
         self.log = logger
         self.reconstruct(links)
-
+        
     def reconstruct(self, links):
         self.unused = []
         self.particles = []
@@ -103,6 +102,27 @@ class PFReconstructor(object):
             #TODO deal with track-ecal
         return particles 
 
+    def neutral_hadron_energy_resolution(self, hcal):
+        '''WARNING CMS SPECIFIC! 
+
+        http://cmslxr.fnal.gov/source/RecoParticleFlow/PFProducer/src/PFAlgo.cc#3350 
+        '''
+        energy = max(hcal.energy, 1.)
+        stoch, const = 1.02, 0.065
+        if abs(hcal.position.Eta())>1.48:
+            stoch, const = 1.2, 0.028
+        resol = math.sqrt(stoch**2/energy + const**2)
+        return resol
+
+    def nsigma_hcal(self, cluster):
+        '''WARNING CMS SPECIFIC! 
+        
+        http://cmslxr.fnal.gov/source/RecoParticleFlow/PFProducer/src/PFAlgo.cc#3365 
+        '''
+        
+        return 1. + math.exp(-cluster.energy/100.)
+        
+        
     def reconstruct_hcal(self, hcal):
         particles = []
         tracks = []
@@ -132,11 +152,13 @@ class PFReconstructor(object):
             for track in tracks:
                 particles.append(self.reconstruct_track(track))
             delta_e_rel = (hcal_energy + ecal_energy) / track_energy - 1.
-            calo_eres = self.eres_factor * self.detector.elements['hcal'].energy_resolution(track_energy)
+            # WARNING
+            # calo_eres = self.detector.elements['hcal'].energy_resolution(track_energy)
+            calo_eres = self.neutral_hadron_energy_resolution(hcal)
             self.log.info( 'dE/p, res = {derel}, {res} '.format(
                 derel = delta_e_rel,
                 res = calo_eres ))
-            if delta_e_rel > calo_eres:
+            if delta_e_rel > self.nsigma_hcal(hcal) * calo_eres:
                 excess = delta_e_rel * track_energy
                 self.log.info( 'excess = {excess:5.2f}, ecal_E = {ecal_e:5.2f}, diff = {diff:5.2f}'.format(
                     excess=excess, ecal_e = ecal_energy, diff=excess-ecal_energy)) 

@@ -6,10 +6,10 @@ debug = True
 do_display = False
 do_cms = False
 do_papas = True
-do_fcc = True
-particle_matching = False
+do_fcc = False
+particle_matching = True
 nevents_per_job = 1000
-gen_jobs = 0
+gen_jobs = 4
 
 GEN = gen_jobs>0
 
@@ -29,12 +29,12 @@ if GEN:
     from heppy_fcc.analyzers.Gun import Gun
     source = cfg.Analyzer(
         Gun,
-        pdgid = 130,
-        ptmin = 0.7,
+        pdgid = 211,
+        ptmin = 0,
         ptmax = 20.,
         thetamin = -1.5,
         thetamax = 1.5,
-        flat_pt = False
+        flat_pt = True
     )
     from heppy.framework.eventsgen import Events
 elif do_cms:

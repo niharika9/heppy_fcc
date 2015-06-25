@@ -24,7 +24,7 @@ if cms:
 c1 = TCanvas()
 
 def process_tree(tree, name):
-    res_stack = FractionStack(pdgids, TH1F(name, ';E/E_{gen} (GeV)', 100, 0.5, 1.5))
+    res_stack = FractionStack(pdgids, TH1F(name, ';E/E_{gen} (GeV)', 100, 0., 2))
     cut = 'jet1_pt>15 && abs(jet1_eta<1.2)'
     res_stack.Project(tree, 'jet1_e / jet1_gen_e', cut)
     # res_stack.SetYRange(50, 50000)
