@@ -2,14 +2,14 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = False
+debug = True
 do_display = False
-do_cms = False
-do_papas = True
+do_cms = True
+do_papas = False
 do_fcc = False
 particle_matching = True
 nevents_per_job = 1000
-gen_jobs = 4
+gen_jobs = 0
 
 GEN = gen_jobs>0
 
@@ -43,10 +43,13 @@ elif do_cms:
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
     # selectedComponents = [gun_22_0_50]
     # selectedComponents = [gun_22_0_50_eta3]
-    from heppy_fcc.samples.ee import *
-    selectedComponents = [ee_qq]
+    # from heppy_fcc.samples.gun import *
+    # selectedComponents = [gun_211_0_20]
+    from heppy_fcc.samples.gun_fullsim import *
+    selectedComponents = [gun_piplus]
     for comp in selectedComponents:
         comp.splitFactor = 10
+        comp.isMC = True
 
     from heppy_fcc.analyzers.CMSReader import CMSReader
     source = cfg.Analyzer(
@@ -156,6 +159,7 @@ papas_particle_tree_r2g = cfg.Analyzer(
     instance_label = 'papas_r2g',
     particles = 'particles'
     )
+
 papas_particle_tree_g2r = cfg.Analyzer(
     ParticleTreeProducer, 
     instance_label = 'papas_g2r',
@@ -224,7 +228,12 @@ cms_particle_match_r2g = cfg.Analyzer(
     Matcher,
     instance_label = 'cms_r2g', 
     particles = 'pf_particles',
-    match_particles = 'gen_particles_stable'
+    match_particles = [
+        ('gen_particles_stable', None),
+        ('gen_particles_stable', 211),
+        ('gen_particles_stable', 130),
+        ('gen_particles_stable', 22)
+    ] 
 )
 
 cms_particle_match_g2r = cfg.Analyzer(
@@ -237,6 +246,18 @@ cms_particle_match_g2r = cfg.Analyzer(
         ('pf_particles', 130)
     ] 
 )
+
+from heppy_fcc.analyzers.PFAnalyzer import PFAnalyzer
+cms_pfanalyzer = cfg.Analyzer(
+    PFAnalyzer,
+    particles = 'pf_particles'
+)
+
+from heppy_cms.analyzers.core.JSONAnalyzer import JSONAnalyzer
+cms_json = cfg.Analyzer(
+    JSONAnalyzer, 
+    json = None
+    )
 
 from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
 cms_particle_tree_r2g = cfg.Analyzer(
@@ -257,6 +278,7 @@ cms_tree = cfg.Analyzer(
     )
 
 cms_sequence = [
+    cms_json,
     cms_fastsim_cleaner,
     cms_jets, 
     cms_jet_match,
@@ -288,8 +310,12 @@ if do_cms:
 # sequence = cfg.Sequence([source])
 
 # sequence = cfg.Sequence(
-#    [source, cms_fastsim_cleaner]
-#)
+#     [source, 
+#      cms_fastsim_cleaner,
+#      cms_particle_match_r2g,
+#      cms_pfanalyzer
+#      ]
+#     )
     
 config = cfg.Config(
     components = selectedComponents,
