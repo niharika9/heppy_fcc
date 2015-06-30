@@ -2,14 +2,14 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = False
+debug = True
 do_display = False
 do_cms = False
 do_papas = True
-do_fcc = False
-particle_matching = True
+do_fcc = True
+particle_matching = False
 nevents_per_job = 1000
-gen_jobs = 4
+gen_jobs = 0
 
 GEN = gen_jobs>0
 
