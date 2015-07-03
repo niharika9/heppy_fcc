@@ -19,7 +19,7 @@ Installation
 Every time you want to use the package set up your environment by sourcing
 the following script:
 
-    source init.sh
+    source ./init.sh
 
 
 Examples
