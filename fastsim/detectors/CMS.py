@@ -46,7 +46,7 @@ class HCAL(DetectorElement):
     def __init__(self):
         volume = VolumeCylinder('hcal', 2.9, 3.6, 1.9, 2.6 )
         mat = material.Material('HCAL', None, 0.17)
-        self.eres = [1.0, 0., 0.]
+        self.eres = [1.1, 0., 0.]
         super(HCAL, self).__init__('ecal', volume, mat)
 
     def energy_resolution(self, energy, theta=0.):
