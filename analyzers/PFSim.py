@@ -61,6 +61,7 @@ class PFSim(Analyzer):
         self.is_display = True
         
     def process(self, event):
+        event.simulator = self 
         if self.is_display:
             self.display.clear()
         pfsim_particles = []
