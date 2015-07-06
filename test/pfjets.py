@@ -74,8 +74,8 @@ def process_tree(tree, name):
     return res_stack
 
 if papas:
-    papas_can = TCanvas()
+    papas_can = TCanvas('papas', 'papas')
     papas_stack = process_tree(papas, 'papas') 
 if cms:
-    cms_can = TCanvas()
+    cms_can = TCanvas('cms', 'cms')
     cms_stack = process_tree(cms, 'cms')

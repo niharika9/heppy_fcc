@@ -2,7 +2,7 @@ from heppy.framework.analyzer import Analyzer
 from heppy_fcc.particles.fcc.particle import Particle 
 
 import math
-from heppy_fcc.fastsim.detectors.CMS import CMS
+# from heppy_fcc.fastsim.detectors.CMS import CMS
 from heppy_fcc.fastsim.simulator import Simulator
 from heppy_fcc.fastsim.vectors import Point
 from heppy_fcc.fastsim.pfobjects import Particle as PFSimParticle
@@ -24,8 +24,11 @@ class PFSim(Analyzer):
 
     def __init__(self, *args, **kwargs):
         super(PFSim, self).__init__(*args, **kwargs)
-        self.detector = CMS()
-        self.simulator = Simulator(self.detector, self.mainLogger)
+        # self.detector = CMS()
+        self.simulator = Simulator(self.cfg_ana.detector,
+                                   self.mainLogger)
+        self.simname = '_'.join([self.instance_label,  self.cfg_ana.sim_particles])
+        self.recname = '_'.join([self.instance_label,  self.cfg_ana.rec_particles])
         self.is_display = self.cfg_ana.display
         if self.is_display:
             self.init_display()        
@@ -40,16 +43,18 @@ class PFSim(Analyzer):
         if self.is_display:
             self.display.clear()
         pfsim_particles = []
-        for ptc in event.gen_particles_stable:
+        gen_particles = getattr(event, self.cfg_ana.gen_particles)
+        for ptc in gen_particles:
             pfsimptc = pfsimparticle(ptc)
             pfsim_particles.append(pfsimptc)
             if self.cfg_ana.verbose:
                 print ptc
         self.simulator.simulate( pfsim_particles )
         if self.is_display:
-            self.display.register( GTrajectories(pfsim_particles), layer=1)        
-        event.simparticles = sorted( pfsim_particles,
-                                     key = lambda ptc: ptc.e(), reverse=True)
-        event.particles = sorted( self.simulator.particles,
-                                  key = lambda ptc: ptc.e(), reverse=True)
-
+            self.display.register( GTrajectories(pfsim_particles), layer=1)
+        simparticles = sorted( pfsim_particles,
+                               key = lambda ptc: ptc.e(), reverse=True)
+        particles = sorted( self.simulator.particles,
+                            key = lambda ptc: ptc.e(), reverse=True)
+        setattr(event, self.simname, simparticles)
+        setattr(event, self.recname, particles)
