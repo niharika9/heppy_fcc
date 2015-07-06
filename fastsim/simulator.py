@@ -1,10 +1,23 @@
 from heppy_fcc.fastsim.propagator import StraightLinePropagator, HelixPropagator
 from heppy_fcc.fastsim.pfobjects import Cluster, SmearedCluster, SmearedTrack
+from heppy_fcc.fastsim.pfobjects import Particle as PFSimParticle
+
 from pfalgo.sequence import PFSequence
 import random
 import sys
 import copy
 
+from ROOT import TVector3
+
+def pfsimparticle(ptc):
+    '''Create a PFSimParticle from a particle.
+    The PFSimParticle will have the same p4, vertex, charge, pdg ID.
+    '''
+    tp4 = ptc.p4()
+    vertex = TVector3()
+    charge = ptc.q()
+    pid = ptc.pdgid()
+    return PFSimParticle(tp4, vertex, charge, pid) 
 
 class Simulator(object):
 
@@ -168,9 +181,10 @@ class Simulator(object):
     
     def simulate(self, ptcs):
         self.reset()
-        self.ptcs = ptcs
+        self.ptcs = []
         smeared = []
-        for ptc in ptcs:
+        for gen_ptc in ptcs:
+            ptc = pfsimparticle(gen_ptc)
             if ptc.pdgid() == 22:
                 self.simulate_photon(ptc)
             elif abs(ptc.pdgid()) == 11:
@@ -188,6 +202,7 @@ class Simulator(object):
                     # to avoid numerical problems in propagation
                     continue
                 self.simulate_hadron(ptc)
+            self.ptcs.append(ptc)
         self.pfsequence = PFSequence(self.ptcs, self.detector, self.logger)
         self.particles = copy.copy(self.pfsequence.pfreco.particles)
         self.particles.extend(smeared)

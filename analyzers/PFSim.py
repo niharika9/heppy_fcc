@@ -12,15 +12,6 @@ from heppy_fcc.display.pfobjects import GTrajectories
 
 from ROOT import TLorentzVector, TVector3
 
-def pfsimparticle(ptc):
-    '''Create a PFSimParticle from a particle.
-    The PFSimParticle will have the same p4, vertex, charge, pdg ID.
-    '''
-    tp4 = ptc.p4()
-    vertex = TVector3()
-    charge = ptc.q()
-    pid = ptc.pdgid()
-    return PFSimParticle(tp4, vertex, charge, pid) 
         
 class PFSim(Analyzer):
     '''Runs PAPAS, the PArametrized Particle Simulation.
@@ -54,7 +45,8 @@ class PFSim(Analyzer):
 
     def __init__(self, *args, **kwargs):
         super(PFSim, self).__init__(*args, **kwargs)
-        self.simulator = Simulator(self.cfg_ana.detector,
+        self.detector = self.cfg_ana.detector
+        self.simulator = Simulator(self.detector,
                                    self.mainLogger)
         self.simname = '_'.join([self.instance_label,  self.cfg_ana.sim_particles])
         self.recname = '_'.join([self.instance_label,  self.cfg_ana.rec_particles])
@@ -73,14 +65,11 @@ class PFSim(Analyzer):
             self.display.clear()
         pfsim_particles = []
         gen_particles = getattr(event, self.cfg_ana.gen_particles)
-        for ptc in gen_particles:
-            pfsimptc = pfsimparticle(ptc)
-            pfsim_particles.append(pfsimptc)
-            if self.cfg_ana.verbose:
-                print ptc
-        self.simulator.simulate( pfsim_particles )
+        self.simulator.simulate( gen_particles )
+        pfsim_particles = self.simulator.ptcs
         if self.is_display:
-            self.display.register( GTrajectories(pfsim_particles), layer=1)
+            self.display.register( GTrajectories(pfsim_particles),
+                                   layer=1)
         simparticles = sorted( pfsim_particles,
                                key = lambda ptc: ptc.e(), reverse=True)
         particles = sorted( self.simulator.particles,
