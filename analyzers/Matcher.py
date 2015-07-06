@@ -4,7 +4,53 @@ from heppy.utils.deltar import matchObjectCollection, deltaR
 import collections
 
 class Matcher(Analyzer):
+    '''Particle matcher. 
 
+    Works with any kind of object with a p4 function. 
+
+    Simple example configuration: 
+    
+    from heppy_fcc.analyzers.Matcher import Matcher
+    papas_jet_match = cfg.Analyzer(
+      Matcher,
+      instance_label = 'papas', 
+      match_particles = 'gen_jets',
+      particles = 'papas_jets'
+    )
+
+    particles: Name of the collection containing the particles to be matched. 
+    match_particles: Name of the collection containing the particles where a match 
+               is to be found. 
+
+    In this particular case, each jet in "papas_jets" will end up with a new 
+    attribute called "match". This attribute can be either the closest gen jet in the 
+    "gen_jets" collection in case a gen_jet is found within delta R = 0.3, 
+    or None in case a match cannot be found in this cone.
+
+    More complex example configuration: 
+
+    papas_particle_match_g2r = cfg.Analyzer(
+      Matcher,
+      instance_label = 'papas_g2r', 
+      particles = 'gen_particles_stable',
+      match_particles = [
+        ('papas_rec_particles', None),
+        ('papas_rec_particles', 211),
+        ('papas_rec_particles', 130),
+        ('papas_rec_particles', 22)
+      ] 
+      )
+
+    In this case, each gen particle in gen_particles_stable will end up with the following 
+    new attributes: 
+      - "match"    : closest reconstructed particle in "papas_rec_particles", if any. 
+      - "match_211": closest reconstructed particle of pdgId 211 in "papas_rec_particles", 
+                     if any. 
+      - etc. 
+
+    '''
+    
+    
     def beginLoop(self, setup):
         super(Matcher, self).beginLoop(setup)
         self.match_collections = []

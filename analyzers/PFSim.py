@@ -2,7 +2,6 @@ from heppy.framework.analyzer import Analyzer
 from heppy_fcc.particles.fcc.particle import Particle 
 
 import math
-# from heppy_fcc.fastsim.detectors.CMS import CMS
 from heppy_fcc.fastsim.simulator import Simulator
 from heppy_fcc.fastsim.vectors import Point
 from heppy_fcc.fastsim.pfobjects import Particle as PFSimParticle
@@ -14,6 +13,9 @@ from heppy_fcc.display.pfobjects import GTrajectories
 from ROOT import TLorentzVector, TVector3
 
 def pfsimparticle(ptc):
+    '''Create a PFSimParticle from a particle.
+    The PFSimParticle will have the same p4, vertex, charge, pdg ID.
+    '''
     tp4 = ptc.p4()
     vertex = TVector3()
     charge = ptc.q()
@@ -21,10 +23,37 @@ def pfsimparticle(ptc):
     return PFSimParticle(tp4, vertex, charge, pid) 
         
 class PFSim(Analyzer):
+    '''Runs PAPAS, the PArametrized Particle Simulation.
+
+    Example configuration: 
+
+    from heppy_fcc.analyzers.PFSim import PFSim
+    from heppy_fcc.fastsim.detectors.CMS import CMS
+    papas = cfg.Analyzer(
+        PFSim,
+        instance_label = 'papas',              
+        detector = CMS(),
+        gen_particles = 'gen_particles_stable',
+        sim_particles = 'sim_particles',
+        rec_particles = 'rec_particles',
+        display = False,                   
+        verbose = False
+    )
+
+    detector:      Detector model to be used. 
+    gen_particles: Name of the input gen particle collection
+    sim_particles: Name extension for the output sim particle collection. 
+                   Note that the instance label is prepended to this name. 
+                   Therefore, in this particular case, the name of the output 
+                   sim particle collection is "papas_sim_particles".
+    rec_particles: Name extension for the output reconstructed particle collection.
+                   Same comments as for the sim_particles parameter above. 
+    display      : Enable the event display
+    verbose      : Enable the detailed printout.
+    '''
 
     def __init__(self, *args, **kwargs):
         super(PFSim, self).__init__(*args, **kwargs)
-        # self.detector = CMS()
         self.simulator = Simulator(self.cfg_ana.detector,
                                    self.mainLogger)
         self.simname = '_'.join([self.instance_label,  self.cfg_ana.sim_particles])
