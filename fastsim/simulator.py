@@ -6,6 +6,7 @@ from pfalgo.sequence import PFSequence
 import random
 import sys
 import copy
+import shelve
 
 from ROOT import TVector3
 
@@ -31,9 +32,15 @@ class Simulator(object):
         self.logger = logger
         self.prop_helix = HelixPropagator()
         self.prop_straight = StraightLinePropagator()
+
+    def write_ptcs(self, dbname):
+        db = shelve.open(dbname)
+        db['ptcs'] = self.ptcs
+        db.close()
         
     def reset(self):
         self.particles = None
+        self.ptcs = None
         Cluster.max_energy = 0.
         SmearedCluster.max_energy = 0.
         

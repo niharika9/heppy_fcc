@@ -136,6 +136,8 @@ class PFReconstructor(object):
                 for ecal in elem.linked:
                     if ecal.layer!='ecal_in':
                         continue
+                    if ecal.locked:
+                        continue
                     ecals.append(ecal)
                     ecal.locked = True
                 # ecals.extend([te for te in elem.linked if te.layer=='ecal_in'])
@@ -161,7 +163,7 @@ class PFReconstructor(object):
             if delta_e_rel > self.nsigma_hcal(hcal) * calo_eres:
                 excess = delta_e_rel * track_energy
                 self.log.info( 'excess = {excess:5.2f}, ecal_E = {ecal_e:5.2f}, diff = {diff:5.2f}'.format(
-                    excess=excess, ecal_e = ecal_energy, diff=excess-ecal_energy)) 
+                    excess=excess, ecal_e = ecal_energy, diff=excess-ecal_energy))
                 if excess <= ecal_energy:
                     particles.append(self.reconstruct_cluster(hcal, 'ecal_in',
                                                               excess))
