@@ -27,7 +27,7 @@ from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
     Recoil,
     instance_label = 'gen',
-    sqrts = 350.,
+    sqrts = 91.,
     particles = 'gen_particles_stable'
 )
 

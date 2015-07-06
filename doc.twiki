@@ -69,10 +69,9 @@ It also contains a [[https://github.com/HEP-FCC/heppy/tree/master/scripts][scrip
 The code is documented. To get more information on a given class, use the python docstring functionality, for example:
 <verbatim>
 python
-from heppy.framework.looper import Looper
-help(Looper)
+import math
+help(math)
 </verbatim>
-Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/scripts/heppy_loop.py][heppy_loop.py]] (no need to understand this code :-) ).
 
 ---++ Installation
 
@@ -295,5 +294,41 @@ The second command adds the root files (with hadd), the cut-flow counters, and t
 
 %T% When debugging your code, make sure to have only one thread. 
 
+
+---+++ 5- Using PAPAS, the particle flow simulation
+
+PAPAS (PAramatrized PArticle Simulation) is a simulation of the particle flow.
+It propagates stable generated particles through a simple detector model.
+
+In the tracker, charged particles may be detected as tracks, taking into account the acceptance, efficiency, and momentum resolution of this detector.
+
+In the calorimeters, particles are detected as energy deposits. The blobs are modelled by taking into account the following detector properties: energy resolution, acceptance, energy thresholds, and characteristic size. The latter is defined as the distance between two clusters below which the two clusters cannot be resolved and are considered as a single cluster.
+
+A particle flow algorithm then runs over the simulated tracks and clusters to identify and reconstruct charged hadrons, photons, and neutral hadrons. These particles can then be used as an input to higher-level algorithms like jet clustering, or directly in the analysis.
+
+Electrons and muons are passed through PAPAS without any modification, and the user is responsible for applying is own efficiency and resolution models.
+
+A [[[https://github.com/HEP-FCC/heppy_fcc/blob/master/fastsim/detectors/CMS.py][CMS-like]] detector model is provided as an example, and used in [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_papas_cfg.py][simple_papas_cfg.py]]. Please have a detailed look at this configuration file.
+
+To run it, do:
+<pre>
+heppy_loop.py Papas simple_papas_cfg.py -N 1000
+</pre>
+
+Then, check the output jet tree:
+<verbatim>
+ipython 
+from ROOT import TFile
+f = TFile('Papas/example/heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_papas/jet_tree.root')
+f.ls()
+t = f.Get('events')
+t.Print()
+t.Draw('jet1_e/jet1_gen_e>>h(40, 0, 2)', 'jet1_gen_e>10 && abs(jet1_gen_eta)<3.')
+</verbatim>
+
+%T% This exercise shows how to run papas to produce a collection of reconstructed particles. You can then build on this example to add analysis modules and customized tree producers. 
+
+%WARNING% *PAPAS is still in an experimental phase! Please report bugs to Colin.*
+ 
 
 -- Main.ColinBernet - 08 Oct 2014

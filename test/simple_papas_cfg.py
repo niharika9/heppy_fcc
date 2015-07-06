@@ -40,7 +40,7 @@ papas = cfg.Analyzer(
     sim_particles = 'sim_particles',
     rec_particles = 'rec_particles',
     display = False,
-    verbose = False
+    verbose = True
 )
 
 papas_jets = cfg.Analyzer(
@@ -67,6 +67,7 @@ papas_jet_tree = cfg.Analyzer(
 )
 
 
+
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
@@ -75,7 +76,7 @@ sequence = cfg.Sequence( [
     papas,
     papas_jets,
     papas_jet_match,
-    papas_jet_tree
+    papas_jet_tree,
     ] )
  
 config = cfg.Config(
