@@ -182,7 +182,7 @@ Analyzer: heppy_fcc.analyzers.Recoil.Recoil_gen
         class_object   :   <class 'heppy_fcc.analyzers.Recoil.Recoil'>
         instance_label :   gen
         particles      :   gen_particles_stable
-        sqrts          :   350.0
+        sqrts          :   91.0
         verbose        :   False :
 2 :
 Analyzer: heppy_fcc.analyzers.JetClusterizer.JetClusterizer_gen
@@ -197,6 +197,7 @@ Analyzer: heppy_fcc.analyzers.SimpleTreeProducer.SimpleTreeProducer_1
         verbose        :   False :
 </pre>
 
+Now quit ipython.
 
 %T% all objects created in this cfg file are just configuration objects. These configuration objects will be passed to the actual analyzers that contain your analysis code. 
 
@@ -212,7 +213,7 @@ from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
     Recoil,
     instance_label = 'gen',
-    sqrts = 350.,
+    sqrts = 91.,
     particles = 'gen_particles_stable'
 )
 </pre>
@@ -232,7 +233,7 @@ Run:
 heppy_loop.py Out simple_analysis_cfg.py -N 1000
 </pre>
 
-You should see a healhy printout with at the end:  
+You should see a healhy printout with, towards the end:  
 <pre>
 number of events processed: 1000
 </pre>
@@ -261,8 +262,7 @@ cp example.root example_2.root
 </pre>
 
 Edit [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]
-and add the following lines, after the creation of the =comp= component object, 
-and before the creation of the config object.  
+and add the following lines, after the creation of the =comp= component object. 
 <pre>
 comp.files.append('example_2.root')
 comp.splitFactor = 2  # splitting the component in 2 chunks 
@@ -302,15 +302,15 @@ It propagates stable generated particles through a simple detector model.
 
 In the tracker, charged particles may be detected as tracks, taking into account the acceptance, efficiency, and momentum resolution of this detector.
 
-In the calorimeters, particles are detected as energy deposits. The blobs are modelled by taking into account the following detector properties: energy resolution, acceptance, energy thresholds, and characteristic size. The latter is defined as the distance between two clusters below which the two clusters cannot be resolved and are considered as a single cluster.
+In the calorimeters, particles are detected as energy deposits. The energy deposits are modelled by taking into account the following detector properties: energy resolution, acceptance, energy thresholds, and characteristic size. The latter is defined as the distance between two clusters below which the two clusters cannot be resolved and are considered as a single cluster.
 
 A particle flow algorithm then runs over the simulated tracks and clusters to identify and reconstruct charged hadrons, photons, and neutral hadrons. These particles can then be used as an input to higher-level algorithms like jet clustering, or directly in the analysis.
 
-Electrons and muons are passed through PAPAS without any modification, and the user is responsible for applying is own efficiency and resolution models.
+%T% *Electrons and muons are passed through PAPAS without any modification, and the user is responsible for applying is own efficiency and resolution models. The hadronic decay products of tau leptons are simulated just like other hadrons and photons.*
 
-A [[[https://github.com/HEP-FCC/heppy_fcc/blob/master/fastsim/detectors/CMS.py][CMS-like]] detector model is provided as an example, and used in [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_papas_cfg.py][simple_papas_cfg.py]]. Please have a detailed look at this configuration file.
+A [[https://github.com/HEP-FCC/heppy_fcc/blob/master/fastsim/detectors/CMS.py][CMS-like]] detector model is provided as an example, and used in [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_papas_cfg.py][simple_papas_cfg.py]]. Please inspect both modules carefully.
 
-To run it, do:
+To run this confirguration file, do:
 <pre>
 heppy_loop.py Papas simple_papas_cfg.py -N 1000
 </pre>
@@ -326,9 +326,23 @@ t.Print()
 t.Draw('jet1_e/jet1_gen_e>>h(40, 0, 2)', 'jet1_gen_e>10 && abs(jet1_gen_eta)<3.')
 </verbatim>
 
+This jet response plot is characteristic of what is to be expected with particle flow. It is quite close from what would be obtained with the CMS full simulation. 
+
+If you want to see an event display of event 10, do:
+<pre>
+ipython
+%run simple_papas_cfg.py 10
+# and for next events:
+next()
+next()
+# and so on
+</pre>
+
+If you see nothing, it could be because the Z boson decayed into neutrinos. In that case, just proceed to next event. 
+
 %T% This exercise shows how to run papas to produce a collection of reconstructed particles. You can then build on this example to add analysis modules and customized tree producers. 
 
-%WARNING% *PAPAS is still in an experimental phase! Please report bugs to Colin.*
+%T% *PAPAS is still in an experimental phase! No guarantee whatsoever, please report bugs to Colin.*
  
 
 -- Main.ColinBernet - 08 Oct 2014

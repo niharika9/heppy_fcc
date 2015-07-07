@@ -110,6 +110,6 @@ class CMS(Detector):
         self.elements['tracker'] = Tracker()
         self.elements['ecal'] = ECAL()
         self.elements['hcal'] = HCAL()
-        self.elements['field'] = Field(1.0)
+        self.elements['field'] = Field(3.8)
 
 cms = CMS()
