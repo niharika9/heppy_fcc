@@ -7,7 +7,7 @@ do_display = False
 do_cms = True
 do_papas = False
 do_fcc = False
-particle_matching = True
+particle_matching = False
 nevents_per_job = 1000
 gen_jobs = 0
 
@@ -43,10 +43,10 @@ elif do_cms:
     # from heppy_fcc.samples.gun_MatEff_10_50 import *
     # selectedComponents = [gun_22_0_50]
     # selectedComponents = [gun_22_0_50_eta3]
-    # from heppy_fcc.samples.gun import *
-    # selectedComponents = [gun_211_0_20]
-    from heppy_fcc.samples.gun_fullsim import *
-    selectedComponents = [gun_piplus]
+    from heppy_fcc.samples.ee import ee_qq
+    selectedComponents = [ee_qq]
+    # from heppy_fcc.samples.gun_fullsim import *
+    # selectedComponents = [gun_piplus]
     for comp in selectedComponents:
         comp.splitFactor = 10
         comp.isMC = True
@@ -79,6 +79,7 @@ if debug:
     # comp.files = selectedComponents[0].files[:1]
     # comp.files = ['gun_211_0to10_ME0_RECOSIM.root'] 
     selectedComponents = [comp]
+
 
 from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
