@@ -20,6 +20,7 @@ Events = None
 # selectedComponents = [gun_22_0_50_eta3]
 from heppy_fcc.samples.qcd import qcd
 selectedComponents = [qcd]
+qcd.files = ['qcd_mu_enriched.root']
 # from heppy_fcc.samples.gun_fullsim import *
 # selectedComponents = [gun_piplus]
 for comp in selectedComponents:
@@ -86,10 +87,10 @@ cms_json = cfg.Analyzer(
 
 cms_sequence = [
     cms_json,
-    cms_fastsim_cleaner,
+    # cms_fastsim_cleaner,
     cms_jets, 
-    cms_jet_match,
-    cms_jet_tree,
+    # cms_jet_match,
+    # cms_jet_tree,
     ]
 
 # definition of a sequence of analyzers,
