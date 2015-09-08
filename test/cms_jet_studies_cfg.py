@@ -2,7 +2,7 @@ import os
 import copy
 import heppy.framework.config as cfg
 
-debug = True
+debug = False
 
 if debug:
     print 'DEBUG MODE IS ON!'
@@ -16,9 +16,9 @@ Events = None
 # from heppy_fcc.samples.gun_MatEff_10_50 import *
 # selectedComponents = [gun_22_0_50]
 # selectedComponents = [gun_22_0_50_eta3]
-from heppy_fcc.samples.qcd import qcd
+from heppy_fcc.samples.qcd import qcd_em as qcd
 selectedComponents = [qcd]
-qcd.files = ['qcd_mu_enriched.root']
+# qcd.files = ['qcd_mu_enriched.root']
 # from heppy_fcc.samples.gun_fullsim import *
 # selectedComponents = [gun_piplus]
 for comp in selectedComponents:
