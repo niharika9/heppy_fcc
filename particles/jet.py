@@ -67,7 +67,7 @@ class JetConstituents(dict):
         for pdgid in all_pdgids:
             self[pdgid] = JetComponent(pdgid)
 
-    def validate(self, jet_energy, tolerance = 1e-3):
+    def validate(self, jet_energy, tolerance = 1e-2):
         '''Calls pdb if total component energy != jet energy'''
         tote = sum([comp.e() for comp in self.values()]) 
         if abs(jet_energy-tote)>tolerance: 

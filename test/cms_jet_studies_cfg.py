@@ -30,7 +30,9 @@ source = cfg.Analyzer(
     CMSJetReader,
     gen_jets = 'ak4GenJetsNoNu',
     gen_jet_pt = 20, 
-    jets = 'ak4PFJets'
+    jets = 'ak4PFJets', 
+    jet_pt = 20,
+    nlead = 2 
  
 )
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
@@ -89,8 +91,8 @@ cms_sequence = [
     cms_json,
     # cms_fastsim_cleaner,
     # cms_jets, 
-    # cms_jet_match,
-    # cms_jet_tree,
+    cms_jet_match,
+    cms_jet_tree,
     ]
 
 # definition of a sequence of analyzers,
