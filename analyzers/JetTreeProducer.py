@@ -38,6 +38,8 @@ class JetTreeProducer(Analyzer):
             fillJet(self.tree, 'jet1', jet)
             if jet.match:
                 fillJet(self.tree, 'jet1_gen', jet.match)
+                # if jet.e()/jet.match.e() > 2.:
+                #     import pdb; pdb.set_trace()
         if( len(jets)>1 ):
             jet = jets[1]
             fillJet(self.tree, 'jet2', jet)

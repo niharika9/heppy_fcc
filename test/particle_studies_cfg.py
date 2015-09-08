@@ -4,12 +4,13 @@ import heppy.framework.config as cfg
 
 debug = True
 do_display = False
-do_cms = True
-do_papas = False
-do_fcc = False
+
+do_cms = False
+do_papas = True
+do_fcc = True
 particle_matching = False
 nevents_per_job = 1000
-gen_jobs = 0
+gen_jobs = 1
 
 GEN = gen_jobs>0
 
@@ -97,8 +98,14 @@ gen_jets = cfg.Analyzer(
 )
 
 from heppy_fcc.analyzers.PFSim import PFSim
+from heppy_fcc.fastsim.detectors.CMS import CMS
 pfsim = cfg.Analyzer(
     PFSim,
+    instance_label = 'papas',
+    detector = CMS(),
+    gen_particles = 'gen_particles_stable',
+    sim_particles = 'sim_particles',
+    rec_particles = 'rec_particles',
     display = do_display,
     verbose = False
 )
@@ -107,7 +114,7 @@ pfsim = cfg.Analyzer(
 papas_jets = cfg.Analyzer(
     JetClusterizer,
     instance_label = 'papas', 
-    particles = 'particles'
+    particles = 'papas_rec_particles'
 )
 
 from heppy_fcc.analyzers.Matcher import Matcher
@@ -131,14 +138,14 @@ papas_recoil = cfg.Analyzer(
     Recoil,
     instance_label = 'papas',
     sqrts = 350.,
-    particles = 'particles'
+    particles = 'papas_rec_particles'
 )
 
 from heppy_fcc.analyzers.Matcher import Matcher
 papas_particle_match_r2g = cfg.Analyzer(
     Matcher,
     instance_label = 'papas_r2g', 
-    particles = 'particles',
+    particles = 'papas_rec_particles',
     match_particles = 'gen_particles_stable'
 )
 
@@ -147,10 +154,10 @@ papas_particle_match_g2r = cfg.Analyzer(
     instance_label = 'papas_g2r', 
     particles = 'gen_particles_stable',
     match_particles = [
-        ('particles', None),
-        ('particles', 211),
-        ('particles', 130),
-        ('particles', 22)
+        ('papas_rec_particles', None),
+        ('papas_rec_particles', 211),
+        ('papas_rec_particles', 130),
+        ('papas_rec_particles', 22)
     ] 
 )
 
@@ -158,7 +165,7 @@ from heppy_fcc.analyzers.ParticleTreeProducer import ParticleTreeProducer
 papas_particle_tree_r2g = cfg.Analyzer(
     ParticleTreeProducer, 
     instance_label = 'papas_r2g',
-    particles = 'particles'
+    particles = 'papas_rec_particles'
     )
 
 papas_particle_tree_g2r = cfg.Analyzer(

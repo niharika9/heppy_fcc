@@ -15,16 +15,19 @@ def prepare_tree(tree):
     # elist = TEventList("elist")
     # tree.Draw(">>elist", "jet1_gen_211_e>0 && abs(jet1_gen_eta)<2. && abs(jet1_gen_pt>2.)")
     # tree.SetEventList(elist)
-    
-prepare_tree(papas)
+
+if papas:
+    prepare_tree(papas)
 if cms: 
     prepare_tree(cms)
 
 
 c1 = TCanvas()
 
+hists = []
+
 def process_tree(tree, name):
-    res_stack = FractionStack(pdgids, TH1F(name, ';E/E_{gen} (GeV)', 40, 0., 2))
+    res_stack = FractionStack(pdgids, TH1F(name, ';E/E_{gen} (GeV)', 40, 0., 3))
     cut = 'jet1_pt>0. &&  abs(jet1_eta<1.2) && jet1_211_frac>0.'
     # cut = 'jet1_pt>0. &&  abs(jet1_eta<1.2) && jet1_211_frac>0. && jet1_22_frac==0.'
     res_stack.Project(tree, 'jet1_e / jet1_gen_e', cut)
@@ -45,13 +48,15 @@ def process_tree(tree, name):
               "same")
 
     pure = double_count.Clone("pure")
-    pure.SetLineColor(kGray)
+    pure.SetLineColor(4)
     tree.Draw("jet1_e/jet1_gen_e>>pure",
-              "jet1_211_frac==1. && ({cut})".format(cut=cut),
+              "jet1_211_frac==1. && jet1_211_num==2 && ({cut})".format(cut=cut),
               "same")
 
     gPad.RedrawAxis()
     gPad.SetLogy()
+
+    hists.extend([double_count, missed, pure])
     
     ntot = res_stack.histsum.GetEntries()
     nmissed = missed.GetEntries()
@@ -68,8 +73,9 @@ def process_tree(tree, name):
     print 'pure = ', pure_prob
     return res_stack
 
-papas_can = TCanvas()
-papas_stack = process_tree(papas, 'papas') 
+if papas:
+    papas_can = TCanvas('papas', 'papas')
+    papas_stack = process_tree(papas, 'papas') 
 if cms:
-    cms_can = TCanvas()
+    cms_can = TCanvas('cms', 'cms')
     cms_stack = process_tree(cms, 'cms')

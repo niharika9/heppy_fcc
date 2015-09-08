@@ -18,6 +18,22 @@ elif os.environ.get('CMSSW_BASE'):
 import math
     
 class JetClusterizer(Analyzer):
+    '''Jet clusterizer. 
+    
+    Makes use of the JetClusterizer class compiled in the analysis-cpp package. 
+
+    Example configuration: 
+
+    papas_jets = cfg.Analyzer(
+       JetClusterizer,
+       instance_label = 'papas', 
+       particles = 'papas_rec_particles'
+    )
+
+    particles: Name of the input particle collection.
+    The output jet collection name is built from the instance_label, 
+    in this case "papas_jets".
+    '''
 
     def __init__(self, *args, **kwargs):
         super(JetClusterizer, self).__init__(*args, **kwargs)

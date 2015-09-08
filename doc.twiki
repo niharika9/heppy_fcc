@@ -5,7 +5,10 @@
 
 ---++ Prerequisites
 
+*You must follow FccSoftwareEDM first*.
+
 *You should be familiar with python to follow this tutorial*. 
+
 I strongly advise to carefully follow [[http://docs.python.org/tutorial/index.html][the python tutorial]] if not yet done. It will take you a few hours now, but will gain you many days in the future. 
 
 Why python? In short: 
@@ -20,12 +23,12 @@ Why python? In short:
 ---+++ The ntuplizer
 
 This goal of the ntuplizer system is to produce a flat tree for each of the datasets (also called "components") used in the analysis. 
-Any operation requiring a manual loop on the events can be done while producing the flat tree, so that the resulting trees can be used with simple TTree.Draw commands. 
+Any operation requiring a user-written loop on the events can be done while producing the flat tree, so that the resulting trees can be used with simple TTree.Draw or TTree.Project commands. 
 
-For example, the ntuplizer allows to: 
+For example, the ntuplizer makes it possible to: 
    * read events from an albers root file produced using the FCC software framework.  
    * create python physics objects to hold the C++ objects from the albers root file. These objects have the exact same interface as the C++ objects, and can be extended with more information. For example, you could write your own muon ID function for your python Muon object, or add attributes to your python Muons along the processing flow, like the 4-momentum of the closest jet or the closest generated muon. 
-   * create new python objects, e.g. a VBF object to hold VBF quantities.
+   * create new python objects, e.g. a Z object containing two leptons.
    * compute event-by-event weights
    * select a trigger path, and match to the corresponding trigger objects
    * define and write simple flat trees 
@@ -40,12 +43,12 @@ If you decide to run several processes, you can split a single component in as m
    * 6 chunks from the DYJet component, using 6 processors of your local machine, assuming you have more than 6 input DYJet ROOT files. 
    * 200 chunks from the DYJet component, 300 from your 5 data components altogether, and 300 jobs from all the remaing components (e.g. di-boson, TTJets, ...) on LSF. 
 
-The ntuplizer is based on python, pyroot, and the albers event data model (EDM). The analysis could be a simple python macro based on ROOT and albers.
-Instead, it was decided to keep the design of typical full frameworks for high-energy physics (e.g. CMS, ATLAS, FCC), and to implement it in python. This design boils down to:
+The ntuplizer is based on python, pyroot, and the albers event data model (EDM). It could have been written as a simple python macro based on ROOT and albers.
+Instead, it was decided to keep the design of typical high-energy physics software frameworks (e.g. CMSSW, Athena, FCCSW), and to implement it in python. This design boils down to:
    * a python configuration system, similar to the one we use in HEP full frameworks like Gaudi. 
-   * a Looper which allows to access the albers EDM events and runs a sequence of analyzers on each event. 
+   * a Looper accessing the albers EDM events and running a sequence of analyzers on each event. 
    * a common python event, created at the beginning of the processing of each albers EDM event, and read/modified by the analyzers.
-the python event allows you to build the information you want into your event, and allows the analyzers to communicate. At the end of the processing of a given EDM event, the python event can be filled into a flat tree using a specific kind of analyzer, [[https://github.com/HEP-FCC/heppy/blob/master/analyzers/SimpleTreeProducer.py][like this one]]. 
+the python event allows you to build the information you want into your event, and allows the analyzers to communicate. At the end of the processing of a given EDM event, the python event can be filled into a flat tree using a specific kind of analyzer [[https://github.com/HEP-FCC/heppy/blob/master/analyzers/SimpleTreeProducer.py][like this one]]. 
 
 *The code consists of two packages:*
 
@@ -57,90 +60,83 @@ the python event allows you to build the information you want into your event, a
 It also contains a [[https://github.com/HEP-FCC/heppy/tree/master/scripts][scripts]] directory.
 
 [[https://github.com/HEP-FCC/heppy_fcc/tree/master][The FCC-specific package]] contains the following packages:
-   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/analyzers][analyzers]] : FCC-specific analyzers
-   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/particles][particles]] : python physics objects for the FCC.
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/analyzers][analyzers]] : FCC-specific analyzers;
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/particles][particles]] : python physics objects;
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/fastsim][fastsim]] : PAPAS fast simulation;
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/fastsim][display]] : event display;
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master/tools][tools]] : various tools, like generated particle history analysis.
 
 The code is documented. To get more information on a given class, use the python docstring functionality, for example:
 <verbatim>
 python
-from heppy.framework.looper import Looper
-help(Looper)
+import math
+help(math)
 </verbatim>
-Note: the Looper is used in [[https://github.com/HEP-FCC/heppy/blob/master/scripts/heppy_loop.py][heppy_loop.py]] (no need to understand this code :-) ).
 
 ---++ Installation
 
-Move to a directory in your afs account:
-For example: 
+We assume that you have followed FccSoftwareEDM, which means that you should have a base directory =$FCC= containing the following packages:
+   * albers-core
+   * fcc-edm
+   * analysis-cpp
+For this tutorial, these three packages are all needed.
+
+First, make sure the =FCC= environment variable is set properly. Do:
 <pre>
-mkdir HeppyTutorial 
-cd HeppyTutorial
+echo $FCC
+</pre>
+If the command returns the path to the directory containing the 3 packages described above, you're all set.
+Otherwise, go to this directory and do:
+<pre>
+export FCC=$PWD
 </pre>
 
-The software packages needed for this tutorial are: 
-   * albers: experimental package for the FCC event data model. 
-      * will be used to create an input root file for this tutorial
-      * contains a mandatory shared library describing the EDM classes
-   * heppy: this python analysis framework
+We will now install the two heppy packages and a pythia inferface to the FCC EDM:
+   * [[https://github.com/HEP-FCC/heppy/tree/master][heppy]]
+   * [[https://github.com/HEP-FCC/heppy_fcc/tree/master][heppy_fcc]]
+   * [[https://github.com/HEP-FCC/pythiafcc/tree/master][pythiafcc]]
 
----+++ albers
-
-To install albers: 
+   
+Go back to your base directory and install the core heppy package:
 <pre>
-git clone https://github.com/HEP-FCC/albers.git
-cd albers 
-</pre>
-and follow the installation instructions in the README.md file (don't run the read and write programs, instructions to do so are in the next paragraph).
-
-Now create the input root file:
-<pre>
-cd ../install/examples
-./write 
-ls example.root
-</pre>
-
-And try to read it using a C++ program: 
-<pre>
-./read
-</pre>
-
-Try to load the albers event interface module in python:
-<pre>
-python
-import eventstore
-</pre>
-No message is good! You can also ignore messages of this type:
-<pre>
->>> import eventstore
-Error in <TGClient::TGClient>: can't open display "localhost:14.0", switching to batch mode...
- In case you run from a remote ssh session, reconnect with ssh -Y
-</pre>
-You might however want to reconnect with =ssh -Y= as proposed to open windows later on for plotting. 
-
-
-If all the above is working, you're ready for analysis in python and can proceed to the next section. 
-
----+++ heppy
-
-Go back to your tutorial directory, =HeppyTutorial=, and install the core heppy package:
-<pre>
-git clone https://github.com/HEP-FCC/heppy.git
+cd $FCC
+git clone git@github.com:HEP-FCC/heppy.git
 cd heppy
 </pre>
 Follow the instructions in the README.md file.
 
-Go back to your tutorial directory, =HeppyTutorial=, and install the specific heppy_fcc package:
+Go back to your base directory and install the specific heppy_fcc package:
 <pre>
-git clone https://github.com/HEP-FCC/heppy_fcc.git
+cd $FCC
+git clone git@github.com:HEP-FCC/heppy_fcc.git
 cd heppy_fcc
 </pre>
-Follow the installation instructions in the README.md file, but do not try to run yet. 
+Follow the installation instructions in the README.md file, *but do not try to run yet*. 
 
-First, prepare to read an albers file:
+Go back to your base directory and install the pythiafcc package:
 <pre>
-cd test
-ln -s $ALBERS/examples/example.root 
+cd $FCC
+git clone git@github.com:HEP-FCC/pythiafcc.git
+cd pythiafcc
 </pre>
+Follow the installation instructions in the README.md file.
+
+
+---++ Generating an EDM root file with pythia
+
+[[https://github.com/HEP-FCC/pythiafcc/tree/master][pythiafcc]] is a pythia8 executable that writes all generated particles and vertices to an FCC EDM root file.
+
+It is currently set to produce inclusive gamma star/Z events at the Z pole. 
+Later on you can modify the pythia8 cards in [[https://github.com/HEP-FCC/pythiafcc/blob/master/example/generate.cc][generate.cc]] and recompile if you want a different kind of events.
+
+For now, just do: 
+
+<pre>
+cd $HEPPY_FCC/test
+pythiafcc-generate
+</pre>
+
+You should get a file called =example.root= that are going to read in the following exercises.
 
 
 ---++ Exercises
@@ -151,18 +147,56 @@ Have a detailed look at the configuration file, [[https://github.com/HEP-FCC/hep
 
 Load it in python: 
 <verbatim>
-python -i simple_analysis_cfg.py
+ipython -i simple_analysis_cfg.py
 </verbatim>
 
-Get info on one of the analyzers:
+Print the component:
+
 <pre>
-print muana
+print selectedComponents[0]
+
+->
+Component: example
+        dataset_entries:   0
+        files          :   ['example.root']
+        isData         :   False
+        isEmbed        :   False
+        isMC           :   False
+        tree_name      :   None
+        triggers       :   None
 </pre>
 
-Get help on this object: 
+Print the sequence of analyzers:
+
 <pre>
-help(muana)
+print sequence
+
+->
+0 :
+Analyzer: heppy_fcc.analyzers.FCCReader.FCCReader_1
+        class_object   :   <class 'heppy_fcc.analyzers.FCCReader.FCCReader'>
+        instance_label :   1
+        verbose        :   False :
+1 :
+Analyzer: heppy_fcc.analyzers.Recoil.Recoil_gen
+        class_object   :   <class 'heppy_fcc.analyzers.Recoil.Recoil'>
+        instance_label :   gen
+        particles      :   gen_particles_stable
+        sqrts          :   350.0
+        verbose        :   False :
+2 :
+Analyzer: heppy_fcc.analyzers.JetClusterizer.JetClusterizer_gen
+        class_object   :   <class 'heppy_fcc.analyzers.JetClusterizer.JetClusterizer'>
+        instance_label :   gen
+        particles      :   gen_particles_stable
+        verbose        :   False :
+3 :
+Analyzer: heppy_fcc.analyzers.SimpleTreeProducer.SimpleTreeProducer_1
+        class_object   :   <class 'heppy_fcc.analyzers.SimpleTreeProducer.SimpleTreeProducer'>
+        instance_label :   1
+        verbose        :   False :
 </pre>
+
 
 %T% all objects created in this cfg file are just configuration objects. These configuration objects will be passed to the actual analyzers that contain your analysis code. 
 
@@ -171,25 +205,25 @@ help(muana)
 ---+++ 2- Finding existing analysis code
 
 Open [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
+
 The configuration fragments for the analyzers look like: 
 <pre>
-# lepton analyzer for muons (type 4)
-from heppy_fcc.analyzers.FCCLeptonAnalyzer import FCCLeptonAnalyzer
-muana = cfg.Analyzer(
-    FCCLeptonAnalyzer,
-    'muons',
-    id = 4,   # selected particle id
-    pt = 10., # pt cut
-    eta = 3., # eta cut 
-    coll_name = 'muons' # will create a list of leptons with this name in the event
-    )
+from heppy_fcc.analyzers.Recoil import Recoil
+gen_recoil = cfg.Analyzer(
+    Recoil,
+    instance_label = 'gen',
+    sqrts = 350.,
+    particles = 'gen_particles_stable'
+)
 </pre>
-The first argument is a class object coming from [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]]. The framework will use this class object to create an instance of this class. 
 
-The second argument, ='muons'=, is an instance label. This argument is optional, and is used in case several analyzers of the same class are requested. 
+The first argument is a class object coming from [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/Recoil.py][Recoil.py]]. The framework will use this class object to create an instance of this class. 
 
-Have a look at the [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/FCCLeptonAnalyzer.py][FCCLeptonAnalyzer.py]] module, and study the code. Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
+The second argument, =instance_label=, is an instance label. This argument is optional, and is useful in case several analyzers of the same class are requested.
 
+Have a look at the [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/Recoil.py][Recoil.py]] module, and study the code. In particular, note how the analyzer reads from the event and writes to it, and how it makes use of the parameters defined in its configuration fragment.
+
+Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
 
 ---+++ 3- Running interactively on one component
 
@@ -203,7 +237,7 @@ You should see a healhy printout with at the end:
 number of events processed: 1000
 </pre>
 
-In the ouput =Out= directory, you can find a component directory, =albers_example=.
+In the ouput =Out= directory, you can find a component directory, =example=.
 Investigate the contents of this component directory, and of all directories within.
 Have a look at the text files, but ignore the =.pck= files
 
@@ -211,12 +245,12 @@ Fire up root (here we choose to use ipython + pyroot), and check the main output
 
 <verbatim>
 ipython 
-from ROOT import TFile 
-f = TFile('Out/albers_example/heppy_fcc.analyzers.FCCJetTreeProducer.FCCJetTreeProducer_1/jet_tree.root')
+from ROOT import TFile
+f = TFile('Out/example/heppy_fcc.analyzers.SimpleTreeProducer.SimpleTreeProducer_1/tree.root')
 f.ls()
-t = f.Get('tree')
+t = f.Get('events')
 t.Print()
-t.Draw('lep1_iso')
+t.Draw('recoil_visible_gen_m')
 </verbatim>
 
 ---+++ 4- Multiprocessing on a single machine
@@ -227,15 +261,15 @@ cp example.root example_2.root
 </pre>
 
 Edit [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]
-and add the following lines, after the creation of the inputSample component object, 
+and add the following lines, after the creation of the =comp= component object, 
 and before the creation of the config object.  
 <pre>
-inputSample.files.append('example_2.root')
-inputSample.splitFactor = 2  # splitting the component in 2 chunks
+comp.files.append('example_2.root')
+comp.splitFactor = 2  # splitting the component in 2 chunks 
 </pre>
 
 As usual, load the configutation script in python, 
-and print the =config= object.
+and print the =config= object. You should be able to see that the component now has two input files and a splitFactor equal to 2. 
 
 Run again: 
 <verbatim>
@@ -253,10 +287,6 @@ heppy_hadd.py .
 
 The first command checks that all chunks terminated correctly. 
 The second command adds the root files (with hadd), the cut-flow counters, and the averages. 
-For example, you can see that this cut flow counter has been added correctly:
-<verbatim>
-cat albers_example/mu/leptons.txt 
-</verbatim>
 
 %T% To do multiprocessing, you can also define several components corresponding to the samples you need to process. Each of these components can have its own split factor. 
 
@@ -264,5 +294,41 @@ cat albers_example/mu/leptons.txt
 
 %T% When debugging your code, make sure to have only one thread. 
 
+
+---+++ 5- Using PAPAS, the particle flow simulation
+
+PAPAS (PAramatrized PArticle Simulation) is a simulation of the particle flow.
+It propagates stable generated particles through a simple detector model.
+
+In the tracker, charged particles may be detected as tracks, taking into account the acceptance, efficiency, and momentum resolution of this detector.
+
+In the calorimeters, particles are detected as energy deposits. The blobs are modelled by taking into account the following detector properties: energy resolution, acceptance, energy thresholds, and characteristic size. The latter is defined as the distance between two clusters below which the two clusters cannot be resolved and are considered as a single cluster.
+
+A particle flow algorithm then runs over the simulated tracks and clusters to identify and reconstruct charged hadrons, photons, and neutral hadrons. These particles can then be used as an input to higher-level algorithms like jet clustering, or directly in the analysis.
+
+Electrons and muons are passed through PAPAS without any modification, and the user is responsible for applying is own efficiency and resolution models.
+
+A [[[https://github.com/HEP-FCC/heppy_fcc/blob/master/fastsim/detectors/CMS.py][CMS-like]] detector model is provided as an example, and used in [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_papas_cfg.py][simple_papas_cfg.py]]. Please have a detailed look at this configuration file.
+
+To run it, do:
+<pre>
+heppy_loop.py Papas simple_papas_cfg.py -N 1000
+</pre>
+
+Then, check the output jet tree:
+<verbatim>
+ipython 
+from ROOT import TFile
+f = TFile('Papas/example/heppy_fcc.analyzers.JetTreeProducer.JetTreeProducer_papas/jet_tree.root')
+f.ls()
+t = f.Get('events')
+t.Print()
+t.Draw('jet1_e/jet1_gen_e>>h(40, 0, 2)', 'jet1_gen_e>10 && abs(jet1_gen_eta)<3.')
+</verbatim>
+
+%T% This exercise shows how to run papas to produce a collection of reconstructed particles. You can then build on this example to add analysis modules and customized tree producers. 
+
+%WARNING% *PAPAS is still in an experimental phase! Please report bugs to Colin.*
+ 
 
 -- Main.ColinBernet - 08 Oct 2014

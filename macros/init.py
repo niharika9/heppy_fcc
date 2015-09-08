@@ -17,11 +17,12 @@ def init(treetype):
         
     papas_rootfile = '/'.join([sample, papas_rootfile])
     cms_rootfile = '/'.join([sample, cms_rootfile])
-    
-    do_cms = os.path.isfile(cms_rootfile)
 
+    do_papas = os.path.isfile(papas_rootfile)
+    do_cms = os.path.isfile(cms_rootfile)
+    
     # import pdb; pdb.set_trace()
-    papas = Chain(papas_rootfile)
+    papas = Chain(papas_rootfile) if do_papas else None
     cms = Chain(cms_rootfile) if do_cms else None
     return papas, cms
 
