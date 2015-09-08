@@ -14,13 +14,9 @@ class Jet(BaseJet):
 
     def convert_constituents(self):
         constits = []
-        # for ic in range(self.nConstituents()):
-        #     constits.append(self.getJetConstituent(i).get())
-        #     print constits[-1].pdgId(), constits[-1].pt()
         constits = map(Particle, self.getJetConstituents()) 
         self.constituents = JetConstituents()
         for ptc in constits:
-            print ptc
             self.constituents.append(ptc) 
 
     def __getattr__(self, attr): 

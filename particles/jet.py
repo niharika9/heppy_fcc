@@ -66,10 +66,15 @@ class JetConstituents(dict):
                       ]
         for pdgid in all_pdgids:
             self[pdgid] = JetComponent(pdgid)
+
+    def validate(self, jet_energy, tolerance = 1e-3):
+        '''Calls pdb if total component energy != jet energy'''
+        tote = sum([comp.e() for comp in self.values()]) 
+        if abs(jet_energy-tote)>tolerance: 
+            import pdb; pdb.set_trace()
     
     def append(self, ptc):
         pdgid = group_pdgid(ptc)
-        # self.setdefault(pdgid, JetComponent(pdgid)).append(ptc)
         try:
             self[pdgid].append(ptc)
         except KeyError:

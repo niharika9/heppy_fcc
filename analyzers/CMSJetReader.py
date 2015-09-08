@@ -26,5 +26,6 @@ class CMSJetReader(Analyzer):
         # gen_jets = [jet for jet in gen_jets if jet.pt()>self.cfg_ana.gen_jet_pt]
         event.gen_jets = sorted( gen_jets,
                                  key = lambda ptc: ptc.pt(), reverse=True )  
-
-  
+        
+        for jet in event.gen_jets:
+            jet.constituents.validate(jet.e())
