@@ -48,20 +48,20 @@ class JetClusterizer(Analyzer):
         for ptc in particles:
             self.clusterizer.add_p4( ptc.p4() )
         self.clusterizer.clusterize()
-        self.mainLogger.info( 'njets = {n}'.format(
-            n=self.clusterizer.n_jets())
-        )
+        # self.mainLogger.info( 'njets = {n}'.format(
+        #    n=self.clusterizer.n_jets())
+        #)
         jets = []
         for jeti in range(self.clusterizer.n_jets()):
             jet = Jet( self.clusterizer.jet(jeti) )
             jet.constituents = JetConstituents()
             jets.append( jet )
-            self.mainLogger.info( '\t{jet}'.format(jet=jet))
+            # self.mainLogger.info( '\t{jet}'.format(jet=jet))
             for consti in range(self.clusterizer.n_constituents(jeti)):
                 constituent_index = self.clusterizer.constituent_index(jeti, consti)
                 constituent = particles[constituent_index]
                 jet.constituents.append(constituent)
             jet.constituents.sort()
-            self.mainLogger.info( '{jet}'.format(jet=str(jet.constituents)))
+            # self.mainLogger.info( '{jet}'.format(jet=str(jet.constituents)))
             self.validate(jet)
         setattr(event, '_'.join([self.instance_label,'jets']), jets)

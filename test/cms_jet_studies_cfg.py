@@ -4,8 +4,6 @@ import heppy.framework.config as cfg
 
 debug = True
 
-nevents_per_job = 1000
-
 if debug:
     print 'DEBUG MODE IS ON!'
 
@@ -27,11 +25,13 @@ for comp in selectedComponents:
     comp.splitFactor = 10
     comp.isMC = True
 
-from heppy_fcc.analyzers.CMSReader import CMSReader
+from heppy_fcc.analyzers.CMSJetReader import CMSJetReader
 source = cfg.Analyzer(
-    CMSReader,
-    gen_particles = 'genParticles',
-    pf_particles = 'particleFlow' 
+    CMSJetReader,
+    gen_jets = 'ak4GenJetsNoNu',
+    gen_jet_pt = 20, 
+    jets = 'ak4PFJets'
+ 
 )
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
   
@@ -88,7 +88,7 @@ cms_json = cfg.Analyzer(
 cms_sequence = [
     cms_json,
     # cms_fastsim_cleaner,
-    cms_jets, 
+    # cms_jets, 
     # cms_jet_match,
     # cms_jet_tree,
     ]
@@ -97,7 +97,7 @@ cms_sequence = [
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     source,
-    gen_jets,
+    # gen_jets,
     ] )
 sequence.extend(cms_sequence)
 

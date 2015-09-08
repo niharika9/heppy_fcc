@@ -1,6 +1,5 @@
 from heppy_fcc.particles.particle import Particle as BaseParticle
 from ROOT import TLorentzVector
-import math
 
 class Particle(BaseParticle):
     def __init__(self, candidate):
