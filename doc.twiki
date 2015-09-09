@@ -126,7 +126,7 @@ Follow the installation instructions in the README.md file.
 
 [[https://github.com/HEP-FCC/pythiafcc/tree/master][pythiafcc]] is a pythia8 executable that writes all generated particles and vertices to an FCC EDM root file.
 
-It is currently set to produce inclusive gamma star/Z events at the Z pole. 
+It is currently set to produce inclusive gamma star/Z events at the Z pole, decaying into d dbar. 
 Later on you can modify the pythia8 cards in [[https://github.com/HEP-FCC/pythiafcc/blob/master/example/generate.cc][generate.cc]] and recompile if you want a different kind of events.
 
 For now, just do: 
@@ -144,6 +144,8 @@ You should get a file called =example.root= that are going to read in the follow
 ---+++ 1- Understanding the configuration file
 
 Have a detailed look at the configuration file, [[https://github.com/HEP-FCC/heppy_fcc/blob/master/test/simple_analysis_cfg.py][simple_analysis_cfg.py]]. 
+
+*For these exercises, we use ipython, an enhanced python interpreter. If you don't have ipython, just use python instead.*
 
 Load it in python: 
 <verbatim>
@@ -224,7 +226,13 @@ The second argument, =instance_label=, is an instance label. This argument is op
 
 Have a look at the [[https://github.com/HEP-FCC/heppy_fcc/blob/master/analyzers/Recoil.py][Recoil.py]] module, and study the code. In particular, note how the analyzer reads from the event and writes to it, and how it makes use of the parameters defined in its configuration fragment.
 
-Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]].
+Then study the code of the base class in [[https://github.com/HEP-FCC/heppy/blob/master/framework/analyzer.py][analyzer.py]] to see which methods are available in analyzers. You may also simply have a look at the documentation of this class:
+
+<pre>
+ipython
+from heppy_fcc.analyzers.Recoil import Recoil
+help(Recoil)
+</pre>
 
 ---+++ 3- Running interactively on one component
 
