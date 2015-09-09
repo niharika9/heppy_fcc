@@ -17,12 +17,24 @@ class JetTreeProducer(Analyzer):
         bookJet(self.tree, 'jet1_gen')
         bookJet(self.tree, 'jet2')
         bookJet(self.tree, 'jet2_gen')
-        
+        var(self.tree, 'event')
+        var(self.tree, 'lumi')
+        var(self.tree, 'run')
+ 
+
     def process(self, event):
         self.tree.reset()
+        if hasattr(event, 'eventId'): 
+            fill(self.tree, 'event', event.eventId)
+            fill(self.tree, 'lumi', event.lumi)
+            fill(self.tree, 'run', event.run)
         jets = getattr(event, self.cfg_ana.jets)
         if( len(jets)>0 ):
             jet = jets[0]
+            comp211 = jet.constituents.get(211, None)
+            if comp211: 
+                if comp211.num==2:
+                    import pdb; pdb.set_trace()
             fillJet(self.tree, 'jet1', jet)
             if jet.match:
                 fillJet(self.tree, 'jet1_gen', jet.match)
