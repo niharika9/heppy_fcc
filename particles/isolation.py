@@ -19,7 +19,7 @@ class Circle(Area):
 class Isolation(object):
 
     def __init__(self, lepton, particles, on_areas, off_areas=None,
-                 pt_thresh=0, e_thresh=0):
+                 pt_thresh=0, e_thresh=0, label=''):
         self.lepton = lepton
         self.particles = particles
         self.on_areas = on_areas
@@ -27,12 +27,15 @@ class Isolation(object):
             off_areas = []
         self.off_areas = off_areas
         self.pt_thresh = pt_thresh
-        self.e_thresh = e_thresh 
+        self.e_thresh = e_thresh
+        self.label = label
         self.compute()
 
     def compute(self):
-        on_ptcs = []
+        self.on_ptcs = []
         for ptc in self.particles:
+            if ptc is self.lepton:
+                continue
             is_on = False
             for area in self.on_areas:
                 if area.is_inside(self.lepton.eta(), self.lepton.phi(),
@@ -47,8 +50,8 @@ class Isolation(object):
                     is_on = False
                     break
             if is_on:
-                on_ptcs.append(ptc)
-        self.sumpt, self.sume, self.num = self.iso_quantities(on_ptcs)
+                self.on_ptcs.append(ptc)        
+        self.sumpt, self.sume, self.num = self.iso_quantities(self.on_ptcs)
                                 
     def iso_quantities(self, ptcs):
         sumpt = 0.
@@ -61,6 +64,11 @@ class Isolation(object):
                 num += 1
         return sumpt, sume, num 
 
-
-        
+    def __str__(self):
+        return 'iso {label:>3}: sumpt = {sumpt:5.2f}, sume = {sume:5.2f}, num = {num}'.format(
+            label = self.label,
+            sumpt = self.sumpt,
+            sume = self.sume,
+            num = self.num
+        )
                 
