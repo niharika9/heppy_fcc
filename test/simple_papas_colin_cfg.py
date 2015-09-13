@@ -58,6 +58,15 @@ papas_muons = cfg.Analyzer(
     pdgid = 13
 )
 
+from heppy_fcc.analyzers.LeptonTreeProducer import LeptonTreeProducer
+papas_muons_tree = cfg.Analyzer(
+    LeptonTreeProducer,
+    instance_label = 'papas',
+    tree_name = 'events',
+    tree_title = 'leptons',
+    leptons = 'papas_muons'
+)
+
 from heppy_fcc.analyzers.Matcher import Matcher
 papas_jet_match = cfg.Analyzer(
     Matcher,
@@ -84,6 +93,7 @@ sequence = cfg.Sequence( [
     gen_jets,
     papas,
     papas_muons,
+    papas_muons_tree,
     papas_jets,
     papas_jet_match,
     papas_jet_tree,

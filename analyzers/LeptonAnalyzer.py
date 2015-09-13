@@ -15,9 +15,7 @@ class LeptonAnalyzer(Analyzer):
         for lepton in sel_leptons:
             for pdgid in pdgids:
                 self.set_isolation(lepton, particles, pdgid)
-        print lepton.iso_211
-        print lepton.iso_22
-        print lepton.iso_130
+        setattr(event, self.instance_label, sel_leptons)
                 
     def sel_lepton(self, ptc):
         if abs(ptc.pdgid()) == self.cfg_ana.pdgid:

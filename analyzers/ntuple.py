@@ -72,3 +72,25 @@ def fillJet( tree, pName, jet ):
             import pdb; pdb.set_trace()
             print jet
 
+iso_pdgids = [211, 22, 130]
+
+def bookIso(tree, pName):
+    var(tree, '{pName}_e'.format(pName=pName))
+    var(tree, '{pName}_pt'.format(pName=pName))
+    var(tree, '{pName}_num'.format(pName=pName))    
+    
+def fillIso(tree, pName, iso):
+    fill(tree, '{pName}_e'.format(pName=pName), iso.sume )
+    fill(tree, '{pName}_pt'.format(pName=pName), iso.sumpt )
+    fill(tree, '{pName}_num'.format(pName=pName), iso.num )    
+
+def bookLepton( tree, pName ):
+    bookParticle(tree, pName )
+    for pdgid in iso_pdgids:
+        bookIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid))
+
+def fillLepton( tree, pName, lepton ):
+    fillParticle(tree, pName, lepton )
+    for pdgid in iso_pdgids:
+        iso = getattr(lepton, 'iso_{pdgid:d}'.format(pdgid=pdgid))
+        fillIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid), iso)
