@@ -100,9 +100,9 @@ def fillLepton( tree, pName, lepton ):
 
 def bookIsoParticle(tree, pName):
     bookParticle(tree, pName )
-    bookParticle(tree, '{pName}_lep'.format(pName=pName) )
+    bookLepton(tree, '{pName}_lep'.format(pName=pName) )
 
 def fillIsoParticle(tree, pName, ptc, lepton):
     fillParticle(tree, pName, ptc)
-    fillParticle(tree, '{pName}_lep'.format(pName=pName), lepton)
+    fillLepton(tree, '{pName}_lep'.format(pName=pName), lepton)
     
