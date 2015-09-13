@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.WARNING)
 
 comp = cfg.Component(
     'example',
-    files = ['pythia_zmumu.root']
+    files = ['top_mu.root']
 )
 selectedComponents = [comp]
 

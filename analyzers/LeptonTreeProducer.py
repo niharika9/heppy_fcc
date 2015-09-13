@@ -20,12 +20,10 @@ class LeptonTreeProducer(Analyzer):
     def process(self, event):
         self.tree.reset()
         leptons = getattr(event, self.cfg_ana.leptons)
-        if len(leptons) < 1:
-            return 
-        fillLepton(self.tree, 'lep1', leptons[0])
-        if len(leptons) < 2:
-            return 
-        fillLepton(self.tree, 'lep2', leptons[1])
+        if len(leptons) > 0:
+            fillLepton(self.tree, 'lep1', leptons[0])
+        if len(leptons) > 1:
+            fillLepton(self.tree, 'lep2', leptons[1])
         self.tree.tree.Fill()
         
         
