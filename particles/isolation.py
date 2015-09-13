@@ -22,6 +22,7 @@ class Isolation(object):
                  pt_thresh=0, e_thresh=0, label=''):
         self.lepton = lepton
         self.particles = particles
+        self.on_ptcs = []
         self.on_areas = on_areas
         if off_areas is None:
             off_areas = []

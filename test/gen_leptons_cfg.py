@@ -41,6 +41,15 @@ gen_muons_tree = cfg.Analyzer(
     leptons = 'gen_muons'
 )
 
+from heppy_fcc.analyzers.IsoParticleTreeProducer import IsoParticleTreeProducer
+gen_muons_tree = cfg.Analyzer(
+    IsoParticleTreeProducer,
+    instance_label = 'gen',
+    tree_name = 'ptcs',
+    tree_title = 'isolation particles',
+    leptons = 'gen_muons'
+)
+
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
