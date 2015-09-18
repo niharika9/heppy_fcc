@@ -229,7 +229,7 @@ if __name__ == '__main__':
     display_on = True
     detector = cms
 
-    logging.basicConfig(level='ERROR')
+    logging.basicConfig(level='INFO')
     logger = logging.getLogger('Simulator')
     logger.addHandler( logging.StreamHandler(sys.stdout) )
     
@@ -240,12 +240,12 @@ if __name__ == '__main__':
         # particles = monojet([211, -211, 130, 22, 22, 22], math.pi/2., math.pi/2., 2, 50)
         particles = [
             # particle(211, math.pi/2., math.pi/2., 100),
-            particle(211, math.pi/2 + 0.5, 0., 20.),
+            particle(211, math.pi/2 + 0.5, 0., 40.),
             # particle(130, math.pi/2., math.pi/2.+0., 100.),
-            particle(22, math.pi/2., math.pi/2.+0.0, 10.)
+            # particle(22, math.pi/2., math.pi/2.+0.0, 10.)
         ]
         simulator.simulate(particles)
-        
+
     if display_on:
         display = Display(['xy', 'yz',
                            'ECAL_thetaphi',
@@ -253,7 +253,7 @@ if __name__ == '__main__':
                        ])
         gdetector = GDetector(detector)
         display.register(gdetector, 0)
-        gtrajectories = GTrajectories(particles)
+        gtrajectories = GTrajectories(simulator.ptcs)
         display.register(gtrajectories,1)
         display.draw()
     
