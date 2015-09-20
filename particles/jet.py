@@ -66,10 +66,15 @@ class JetConstituents(dict):
                       ]
         for pdgid in all_pdgids:
             self[pdgid] = JetComponent(pdgid)
+
+    def validate(self, jet_energy, tolerance = 1e-2):
+        '''Calls pdb if total component energy != jet energy'''
+        tote = sum([comp.e() for comp in self.values()]) 
+        if abs(jet_energy-tote)>tolerance: 
+            import pdb; pdb.set_trace()
     
     def append(self, ptc):
         pdgid = group_pdgid(ptc)
-        # self.setdefault(pdgid, JetComponent(pdgid)).append(ptc)
         try:
             self[pdgid].append(ptc)
         except KeyError:
@@ -85,37 +90,39 @@ class JetConstituents(dict):
 class Jet(object):
     
     def p4(self):
-        return self.tlv
+        return self._tlv
 
     def p3(self):
-        return self.tlv.Vect()
+        return self._tlv.Vect()
     
     def e(self):
-        return self.tlv.E()
+        return self._tlv.E()
 
     def pt(self):
-        return self.tlv.Pt()
+        return self._tlv.Pt()
     
     def theta(self):
-        return math.pi/2 - self.tlv.Theta()
+        return math.pi/2 - self._tlv.Theta()
 
     def eta(self):
-        return self.tlv.Eta()
+        return self._tlv.Eta()
 
     def phi(self):
-        return self.tlv.Phi()
+        return self._tlv.Phi()
 
     def m(self):
-        return self.tlv.M()
+        return self._tlv.M()
 
     def pdgid(self):
         return 0
 
     def __str__(self):
-        tmp = '{className} : e = {e:5.1f}, theta = {theta:5.2f}, phi = {phi:5.2f}, mass = {m:5.2f}'
+        tmp = '{className} : pt = {pt:5.1f}, e = {e:5.1f}, eta = {eta:2.2f}, theta = {theta:2.2f}, phi = {phi:2.2f}, mass = {m:5.2f}'
         return tmp.format(
             className = self.__class__.__name__,
+            pt = self.pt(),
             e = self.e(),
+            eta = self.eta(),
             theta = self.theta(),
             phi = self.phi(),
             m = self.m()
