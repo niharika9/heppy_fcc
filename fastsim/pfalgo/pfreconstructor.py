@@ -182,7 +182,7 @@ class PFReconstructor(object):
                 assert(elem.layer=='hcal_in')
                 # ecal hcal links have been cut
             particles.append(self.reconstruct_cluster(hcal, 'hcal_in'))
-           
+        hcal.locked = True
         return particles 
                 
     def reconstruct_cluster(self, cluster, layer, energy=None, vertex=None):
@@ -208,11 +208,11 @@ class PFReconstructor(object):
         path = StraightLine(p4, vertex)
         path.points[layer] = cluster.position
         particle.set_path(path)
-        particle.clusters_smeared[layer] = cluster
+        particle.clusters[layer] = cluster
         cluster.locked = True
         return particle
         
-    def reconstruct_track(self, track):
+    def reconstruct_track(self, track, clusters=None):
         vertex = track.path.points['vertex']
         pdg_id = 211 * track.charge
         mass, charge = particle_data[pdg_id]
@@ -220,6 +220,7 @@ class PFReconstructor(object):
         p4.SetVectM(track.p3, mass)
         particle = Particle(p4, vertex, charge, pdg_id)
         particle.set_path(track.path)
+        particle.clusters = clusters
         track.locked = True
         return particle
 
