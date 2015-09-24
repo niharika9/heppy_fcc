@@ -29,7 +29,8 @@ Several examples are provided in the test/ directory:
 
     cd test/
 
-Read a root file and print each event:
+Follow the tutorial on the twiki to see how to use them:
 
-    ${FCCEDM}/bin/fccedm-write
-    heppy_loop.py  Output simple_analysis_cfg.py -N 1000
+https://twiki.cern.ch/twiki/bin/view/FCC/FccSoftwareHeppy
+
+
