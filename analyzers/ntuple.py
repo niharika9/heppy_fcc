@@ -26,6 +26,7 @@ def fillParticle( tree, pName, particle ):
     fill(tree, '{pName}_phi'.format(pName=pName), particle.phi() )
     fill(tree, '{pName}_m'.format(pName=pName), particle.m() )
 
+
 def bookCluster( tree, name ):
     var(tree, '{name}_e'.format(name=name))
     var(tree, '{name}_layer'.format(name=name))
@@ -106,3 +107,13 @@ def fillIsoParticle(tree, pName, ptc, lepton):
     fillParticle(tree, pName, ptc)
     fillLepton(tree, '{pName}_lep'.format(pName=pName), lepton)
     
+def bookZed(tree, pName):
+    bookParticle(tree, pName )
+    bookParticle(tree, '{pName}_leg1'.format(pName=pName)  )
+    bookParticle(tree, '{pName}_leg2'.format(pName=pName)  )
+
+def fillZed(tree, pName, zed):
+    fillParticle(tree, pName, zed)
+    fillParticle(tree, '{pName}_leg1'.format(pName=pName), zed.leg1 )
+    fillParticle(tree, '{pName}_leg2'.format(pName=pName), zed.leg2 )
+
