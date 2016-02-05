@@ -16,9 +16,14 @@ class TTbarTreeProducer(Analyzer):
         bookParticle(self.tree, 'jet2')
         bookParticle(self.tree, 'jet3')
         bookParticle(self.tree, 'm3')
+        bookLepton(self.tree, 'lepton')
         
     def process(self, event):
         self.tree.reset()
+        leptons = getattr(event, self.cfg_ana.leptons)
+        if len(leptons)==0:
+            return # NOT FILLING THE TREE IF NO LEPTON
+        fillLepton(self.tree, 'lepton', leptons[0])
         jets = getattr(event, self.cfg_ana.jets)
         for ijet, jet in enumerate(jets):
             if ijet==3:
