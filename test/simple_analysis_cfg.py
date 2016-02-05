@@ -12,6 +12,9 @@ comp = cfg.Component(
     'example',
     files = ['example.root']
 )
+comp.files.append("example2.root")
+
+comp.splitFactor = 2
 selectedComponents = [comp]
 
 from heppy_fcc.analyzers.FCCReader import FCCReader
@@ -21,7 +24,7 @@ source = cfg.Analyzer(
 
 from ROOT import gSystem
 gSystem.Load("libdatamodel")
-from eventstore import EventStore as Events
+from EventStore import EventStore as Events
 
 from heppy_fcc.analyzers.Recoil import Recoil
 gen_recoil = cfg.Analyzer(
