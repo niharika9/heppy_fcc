@@ -14,6 +14,7 @@ comp = cfg.Component(
 )
 selectedComponents = [comp]
 
+
 from heppy_fcc.analyzers.FCCReader import FCCReader
 source = cfg.Analyzer(
     FCCReader

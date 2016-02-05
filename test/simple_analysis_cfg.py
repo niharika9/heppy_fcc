@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.WARNING)
 
 comp = cfg.Component(
     'example',
-    files = ['example.root']
+    files = ['hh_ttbar.root']
 )
 selectedComponents = [comp]
 
@@ -22,14 +22,6 @@ source = cfg.Analyzer(
 from ROOT import gSystem
 gSystem.Load("libdatamodel")
 from eventstore import EventStore as Events
-
-from heppy_fcc.analyzers.Recoil import Recoil
-gen_recoil = cfg.Analyzer(
-    Recoil,
-    instance_label = 'gen',
-    sqrts = 91.,
-    particles = 'gen_particles_stable'
-)
 
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
 gen_jets = cfg.Analyzer(
@@ -47,9 +39,7 @@ gen_tree = cfg.Analyzer(
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     source,
-    gen_recoil,
     gen_jets,
-    gen_tree
     ] )
 
 # comp.files.append('example_2.root')
