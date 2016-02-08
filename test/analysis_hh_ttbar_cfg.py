@@ -57,6 +57,14 @@ iso_leptons = cfg.Analyzer(
 
 # need to remove jets corresponding to leptons
 
+from heppy_fcc.analyzers.Matcher import Matcher
+match_jet_leptons = cfg.Analyzer(
+    Matcher,
+    delta_r = 0.3,
+    match_particles = 'iso_leptons',
+    particles = 'gen_jets'
+)
+
 from heppy_fcc.analyzers.M3Builder import M3Builder
 m3 = cfg.Analyzer(
     M3Builder,
@@ -80,6 +88,7 @@ sequence = cfg.Sequence( [
     # gen_jets,
     leptons,
     iso_leptons,
+    match_jet_leptons,
     m3, 
     gen_tree
     ] )

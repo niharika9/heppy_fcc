@@ -62,13 +62,14 @@ class Particle(object):
         return self._end_vertex
 
     def __str__(self):
-        tmp = '{className} : pdgid = {pdgid:5}, status = {status:3}, q = {q:2} e = {e:5.1f}, theta = {theta:5.2f}, phi = {phi:5.2f}, mass = {m:5.2f}'
+        tmp = '{className} : pdgid = {pdgid:5}, status = {status:3}, q = {q:2} e = {e:5.1f}, eta = {eta:5.2f}, theta = {theta:5.2f}, phi = {phi:5.2f}, mass = {m:5.2f}'
         return tmp.format(
             className = self.__class__.__name__,
             pdgid = self.pdgid(),
             status = self.status(),
             q = self.q(),
             e = self.e(),
+            eta = self.eta(),
             theta = self.theta(),
             phi = self.phi(),
             m = self.m()
