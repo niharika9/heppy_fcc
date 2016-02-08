@@ -3,6 +3,22 @@ from heppy.utils.deltar import matchObjectCollection, deltaR
 
 import collections
 
+class MatchInfo(object):
+    '''Carries matching information.'''
+    def __init__(self, obj, distance):
+        '''
+        Paramaters:
+          - obj: the matched object.
+          - distance: the distance to the matched object (an angle, delta r, delta r**2, ...)
+        '''
+        self.obj = obj
+        self.distance = distance
+
+    def __str__(self):
+        return '{obj} ({dr2:5.1f})'.format(obj=str(self.obj), dr2=self.distance)
+
+    
+
 class Matcher(Analyzer):
     '''Particle matcher. 
 
@@ -70,35 +86,16 @@ class Matcher(Analyzer):
     '''
     def beginLoop(self, setup):
         super(Matcher, self).beginLoop(setup)
-        self.match_collections = []
-        if isinstance( self.cfg_ana.match_particles, basestring):
-            self.match_collections.append( (self.cfg_ana.match_particles, None) )
-        else:
-            self.match_collections = self.cfg_ana.match_particles
         self.dr2=self.cfg_ana.delta_r**2
         
     def process(self, event):
         particles = getattr(event, self.cfg_ana.particles)
-        # match_particles = getattr(event, self.cfg_ana.match_particles)
-        for collname, pdgid in self.match_collections:
-            match_ptcs = getattr(event, collname)
-            match_ptcs_filtered = match_ptcs
-            if pdgid is not None:
-                match_ptcs_filtered = [ptc for ptc in match_ptcs
-                                       if ptc.pdgid()==pdgid]
-            pairs = matchObjectCollection(particles, match_ptcs_filtered,
-                                          self.dr2)
-            for ptc in particles:
-                matchname = 'match'
-                if pdgid: 
-                    matchname = 'match_{pdgid}'.format(pdgid=pdgid)
-                match = pairs[ptc]
-                setattr(ptc, matchname, match)
-                if match:
-                    drname = 'dr'
-                    if pdgid:
-                        drname = 'dr_{pdgid}'.format(pdgid=pdgid)
-                    dr = deltaR(ptc.theta(), ptc.phi(),
-                                match.theta(), match.phi())
-                    setattr(ptc, drname, dr)
-                    # print dr, ptc, match
+        match_particles = getattr(event, self.cfg_ana.match_particles)
+        pairs = matchObjectCollection(particles, match_particles,
+                                      self.dr2)
+        for ptc in particles:
+            match = pairs[ptc]
+            if match:
+                dr = deltaR(ptc.theta(), ptc.phi(),
+                            match.theta(), match.phi())
+                setattr(ptc, self.instance_label, MatchInfo(match, dr))

@@ -40,6 +40,7 @@ gen_jets = cfg.Analyzer(
 from heppy_fcc.analyzers.Filter import Filter
 leptons = cfg.Analyzer(
     Filter,
+    'sel_leptons',
     output = 'leptons',
     input_objects = 'gen_particles_stable',
     filter_func = lambda ptc: ptc.pt()>30 and abs(ptc.pdgid()) in [11, 13]
@@ -55,21 +56,49 @@ iso_leptons = cfg.Analyzer(
     iso_area = Circle(0.4)
 )
 
-# need to remove jets corresponding to leptons
+#TODO: Colin: would be better to have a lepton class
+def relative_isolation(lepton):
+    sumpt = lepton.iso_211.sumpt + lepton.iso_22.sumpt + lepton.iso_130.sumpt
+    sumpt /= lepton.pt()
+    return sumpt
+
+sel_iso_leptons = cfg.Analyzer(
+    Filter,
+    'sel_iso_leptons',
+    output = 'sel_iso_leptons',
+    input_objects = 'leptons',
+    filter_func = lambda lep : relative_isolation(lep)<0.25
+)
+
+gen_jets_30 = cfg.Analyzer(
+    Filter,
+    'gen_jets_30',
+    output = 'gen_jets_30',
+    input_objects = 'gen_jets',
+    filter_func = lambda jet: jet.pt()>30.
+)
 
 from heppy_fcc.analyzers.Matcher import Matcher
 match_jet_leptons = cfg.Analyzer(
     Matcher,
-    delta_r = 0.3,
-    match_particles = 'iso_leptons',
-    particles = 'gen_jets'
+    delta_r = 0.4,
+    match_particles = 'sel_iso_leptons',
+    particles = 'gen_jets_30'
+)
+
+sel_jets_nolepton = cfg.Analyzer(
+    Filter,
+    'sel_jets_nolepton',
+    output = 'sel_jets_nolepton',
+    input_objects = 'gen_jets_30',
+    filter_func = lambda jet: not hasattr(jet, 'sel_iso_leptons')
 )
 
 from heppy_fcc.analyzers.M3Builder import M3Builder
 m3 = cfg.Analyzer(
     M3Builder,
     instance_label = 'gen_m3',
-    jets = 'gen_jets', # see FCC reader
+    jets = 'sel_jets_nolepton', 
     filter_func = lambda x : x.pt()>30.
 )
 
@@ -88,7 +117,10 @@ sequence = cfg.Sequence( [
     # gen_jets,
     leptons,
     iso_leptons,
+    gen_jets_30,
+    sel_iso_leptons,
     match_jet_leptons,
+    sel_jets_nolepton,
     m3, 
     gen_tree
     ] )

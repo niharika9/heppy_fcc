@@ -2,6 +2,8 @@ from heppy.framework.analyzer import Analyzer
 from heppy.utils.deltar import matchObjectCollection, deltaR
 from heppy_fcc.particles.isolation import Isolation
 
+
+
 class LeptonAnalyzer(Analyzer):
 
     def beginLoop(self, setup):
