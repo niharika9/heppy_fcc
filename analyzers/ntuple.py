@@ -75,8 +75,8 @@ def fillJet( tree, pName, jet ):
 
 
 # isolation
-
-iso_pdgids = [211, 22, 130]
+from LeptonAnalyzer import pdgids as iso_pdgids
+# iso_pdgids = [211, 22, 130]
 
 def bookIso(tree, pName):
     var(tree, '{pName}_e'.format(pName=pName))
@@ -91,14 +91,18 @@ def fillIso(tree, pName, iso):
 def bookLepton( tree, pName ):
     bookParticle(tree, pName )
     for pdgid in iso_pdgids:
-        bookIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid))
-
+        bookIso(tree, '{pName}_iso{pdgid:d}'.format(pName=pName, pdgid=pdgid))
+    bookIso(tree, '{pName}_iso'.format(pName=pName))
+        
+        
 def fillLepton( tree, pName, lepton ):
     fillParticle(tree, pName, lepton )
     for pdgid in iso_pdgids:
         iso = getattr(lepton, 'iso_{pdgid:d}'.format(pdgid=pdgid))
-        fillIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid), iso)
-
+        fillIso(tree, '{pName}_iso{pdgid:d}'.format(pName=pName, pdgid=pdgid), iso)
+    fillIso(tree, '{pName}_iso'.format(pName=pName), lepton.iso)
+    
+        
 def bookIsoParticle(tree, pName):
     bookParticle(tree, pName )
     bookLepton(tree, '{pName}_lep'.format(pName=pName) )

@@ -34,7 +34,7 @@ gen_jets = cfg.Analyzer(
     particles = 'gen_particles_stable'
 )
 
-# now treating electrons and muons transparently.
+# currently treating electrons and muons transparently.
 # could use the same modules to have a collection of electrons
 # and a collection of muons 
 from heppy_fcc.analyzers.Filter import Filter
@@ -47,13 +47,12 @@ leptons = cfg.Analyzer(
 )
 
 from heppy_fcc.analyzers.LeptonAnalyzer import LeptonAnalyzer
-from heppy_fcc.particles.isolation import Circle
+from heppy_fcc.particles.isolation import EtaPhiCircle
 iso_leptons = cfg.Analyzer(
     LeptonAnalyzer,
-    output = 'iso_leptons',
     leptons = 'leptons',
     particles = 'gen_particles_stable',
-    iso_area = Circle(0.4)
+    iso_area = EtaPhiCircle(0.4)
 )
 
 #TODO: Colin: would be better to have a lepton class
@@ -107,7 +106,7 @@ gen_tree = cfg.Analyzer(
     TTbarTreeProducer,
     jets = 'gen_jets',
     m3 = 'gen_m3',
-    leptons = 'iso_leptons'
+    leptons = 'leptons'
 )
 
 # definition of a sequence of analyzers,
