@@ -26,6 +26,13 @@ from ROOT import gSystem
 gSystem.Load("libdatamodel")
 from eventstore import EventStore as Events
 
+from heppy_fcc.analyzers.METBuilder import METBuilder
+gen_met = cfg.Analyzer(
+    METBuilder,
+    instance_label = 'gen_met',
+    particles = 'gen_particles_stable'
+)
+
 # in case we want to redo jet clustering, not used at the moment.
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
 gen_jets = cfg.Analyzer(
@@ -106,14 +113,18 @@ gen_tree = cfg.Analyzer(
     TTbarTreeProducer,
     jets = 'gen_jets',
     m3 = 'gen_m3',
+    met = 'gen_met',
     leptons = 'leptons'
 )
+
+
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     source,
     # gen_jets,
+    gen_met,
     leptons,
     iso_leptons,
     gen_jets_30,

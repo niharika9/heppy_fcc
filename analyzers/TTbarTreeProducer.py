@@ -16,6 +16,7 @@ class TTbarTreeProducer(Analyzer):
         bookParticle(self.tree, 'jet2')
         bookParticle(self.tree, 'jet3')
         bookParticle(self.tree, 'm3')
+        bookMet(self.tree, 'met')
         bookLepton(self.tree, 'lepton')
         
     def process(self, event):
@@ -32,6 +33,8 @@ class TTbarTreeProducer(Analyzer):
         m3 = getattr(event, self.cfg_ana.m3)
         if m3: 
             fillParticle(self.tree, 'm3', m3)
+        met = getattr(event, self.cfg_ana.met)
+        fillMet(self.tree, 'met', met)
         self.tree.tree.Fill()
         
     def write(self, setup):

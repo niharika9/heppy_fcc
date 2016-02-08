@@ -121,3 +121,14 @@ def fillZed(tree, pName, zed):
     fillParticle(tree, '{pName}_leg1'.format(pName=pName), zed.leg1 )
     fillParticle(tree, '{pName}_leg2'.format(pName=pName), zed.leg2 )
 
+def bookMet(tree, pName):
+    var(tree, '{pName}_pt'.format(pName=pName)  )
+    var(tree, '{pName}_sumet'.format(pName=pName)  )    
+    var(tree, '{pName}_phi'.format(pName=pName)  )
+
+def fillMet(tree, pName, met):
+    fill(tree, '{pName}_pt'.format(pName=pName), met.pt() )
+    fill(tree, '{pName}_sumet'.format(pName=pName), met.sum_et() )
+    fill(tree, '{pName}_phi'.format(pName=pName), met.phi() )
+
+
