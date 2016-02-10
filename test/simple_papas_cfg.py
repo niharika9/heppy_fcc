@@ -14,20 +14,62 @@ comp = cfg.Component(
 )
 selectedComponents = [comp]
 
+
 from heppy_fcc.analyzers.FCCReader import FCCReader
 source = cfg.Analyzer(
     FCCReader
 )  
 
+from heppy_fcc.analyzers.ResonanceBuilder import ResonanceBuilder
+ztomumu = cfg.Analyzer(
+    ResonanceBuilder,
+    'ztomumu',
+    leg_collection = 'gen_particles_stable',
+    filter_func = lambda x : abs(x.pdgid()) == 13,
+    pdgid = 23,
+)  
+
+ztoee = cfg.Analyzer(
+    ResonanceBuilder,
+    'ztoee',
+    leg_collection = 'gen_particles_stable',
+    filter_func = lambda x : abs(x.pdgid()) == 11,
+    pdgid = 23,
+)  
+
+higgstojj = cfg.Analyzer(
+    ResonanceBuilder,
+    'higgstojj',
+    leg_collection = 'gen_jets_qcd',
+    filter_func = lambda x : x.e()>10.,
+    pdgid = 25,
+)
+
 from ROOT import gSystem
 gSystem.Load("libdatamodelDict")
 from EventStore import EventStore as Events
+
+from heppy_fcc.analyzers.ParticlesForJets import ParticlesForJets
+gen_particles_for_jets = cfg.Analyzer(
+    ParticlesForJets,
+    'gen_particles_for_jets',
+    particles = 'gen_particles_stable',
+    resonances = ['ztomumu']
+)
+
+from heppy_fcc.analyzers.Filter import Filter
+gen_jets_qcd = cfg.Analyzer(
+    Filter, 
+    'gen_jets_qcd',
+    input_objects = 'gen_jets',
+    filter_func = lambda x : x.constituents[22].e()/x.e()<0.9
+)
 
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
 gen_jets = cfg.Analyzer(
     JetClusterizer,
     instance_label = 'gen',
-    particles = 'gen_particles_stable'
+    particles = 'gen_particles_for_jets'
 )
 
 from heppy_fcc.analyzers.PFSim import PFSim
@@ -67,12 +109,26 @@ papas_jet_tree = cfg.Analyzer(
 )
 
 
+from heppy_fcc.analyzers.HiggsTreeProducer import HiggsTreeProducer
+gen_higgs_tree = cfg.Analyzer(
+    HiggsTreeProducer,
+    tree_name = 'events',
+    tree_title = 'higgs tree',
+)
+
+
 
 # definition of a sequence of analyzers,
 # the analyzers will process each event in this order
 sequence = cfg.Sequence( [
     source,
+    ztomumu,
+#     ztoee,
+    gen_particles_for_jets, 
     gen_jets,
+    gen_jets_qcd,
+    higgstojj,
+    gen_higgs_tree,
     papas,
     papas_jets,
     papas_jet_match,
@@ -114,7 +170,10 @@ if __name__ == '__main__':
                    nEvents=100,
                    nPrint=0,
                    timeReport=True)
-    simulation = loop.analyzers[2]
+    simulation = None
+    for ana in loop.analyzers: 
+        if hasattr(ana, 'display'):
+            simulation = ana
     display = getattr(simulation, 'display', None)
     simulator = simulation.simulator
     detector = simulator.detector

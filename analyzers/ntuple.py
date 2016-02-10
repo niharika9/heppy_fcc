@@ -26,6 +26,7 @@ def fillParticle( tree, pName, particle ):
     fill(tree, '{pName}_phi'.format(pName=pName), particle.phi() )
     fill(tree, '{pName}_m'.format(pName=pName), particle.m() )
 
+
 def bookCluster( tree, name ):
     var(tree, '{name}_e'.format(name=name))
     var(tree, '{name}_layer'.format(name=name))
@@ -74,8 +75,8 @@ def fillJet( tree, pName, jet ):
 
 
 # isolation
-
-iso_pdgids = [211, 22, 130]
+from LeptonAnalyzer import pdgids as iso_pdgids
+# iso_pdgids = [211, 22, 130]
 
 def bookIso(tree, pName):
     var(tree, '{pName}_e'.format(pName=pName))
@@ -90,14 +91,18 @@ def fillIso(tree, pName, iso):
 def bookLepton( tree, pName ):
     bookParticle(tree, pName )
     for pdgid in iso_pdgids:
-        bookIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid))
-
+        bookIso(tree, '{pName}_iso{pdgid:d}'.format(pName=pName, pdgid=pdgid))
+    bookIso(tree, '{pName}_iso'.format(pName=pName))
+        
+        
 def fillLepton( tree, pName, lepton ):
     fillParticle(tree, pName, lepton )
     for pdgid in iso_pdgids:
         iso = getattr(lepton, 'iso_{pdgid:d}'.format(pdgid=pdgid))
-        fillIso(tree, '{pName}_{pdgid:d}'.format(pName=pName, pdgid=pdgid), iso)
-
+        fillIso(tree, '{pName}_iso{pdgid:d}'.format(pName=pName, pdgid=pdgid), iso)
+    fillIso(tree, '{pName}_iso'.format(pName=pName), lepton.iso)
+    
+        
 def bookIsoParticle(tree, pName):
     bookParticle(tree, pName )
     bookLepton(tree, '{pName}_lep'.format(pName=pName) )
@@ -106,3 +111,24 @@ def fillIsoParticle(tree, pName, ptc, lepton):
     fillParticle(tree, pName, ptc)
     fillLepton(tree, '{pName}_lep'.format(pName=pName), lepton)
     
+def bookZed(tree, pName):
+    bookParticle(tree, pName )
+    bookParticle(tree, '{pName}_leg1'.format(pName=pName)  )
+    bookParticle(tree, '{pName}_leg2'.format(pName=pName)  )
+
+def fillZed(tree, pName, zed):
+    fillParticle(tree, pName, zed)
+    fillParticle(tree, '{pName}_leg1'.format(pName=pName), zed.leg1 )
+    fillParticle(tree, '{pName}_leg2'.format(pName=pName), zed.leg2 )
+
+def bookMet(tree, pName):
+    var(tree, '{pName}_pt'.format(pName=pName)  )
+    var(tree, '{pName}_sumet'.format(pName=pName)  )    
+    var(tree, '{pName}_phi'.format(pName=pName)  )
+
+def fillMet(tree, pName, met):
+    fill(tree, '{pName}_pt'.format(pName=pName), met.pt() )
+    fill(tree, '{pName}_sumet'.format(pName=pName), met.sum_et() )
+    fill(tree, '{pName}_phi'.format(pName=pName), met.phi() )
+
+

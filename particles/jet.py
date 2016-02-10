@@ -116,6 +116,9 @@ class Jet(object):
     def pdgid(self):
         return 0
 
+    def q(self):
+        return 0
+
     def __str__(self):
         tmp = '{className} : pt = {pt:5.1f}, e = {e:5.1f}, eta = {eta:2.2f}, theta = {theta:2.2f}, phi = {phi:2.2f}, mass = {m:5.2f}'
         return tmp.format(
