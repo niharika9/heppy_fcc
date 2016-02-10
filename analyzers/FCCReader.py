@@ -31,6 +31,7 @@ class FCCReader(Analyzer):
                                           not abs(ptc.pdgid()) in [12, 14, 16]]
             gen_vertices = store.get("GenVertex")
             event.gen_vertices = map(Vertex, gen_vertices)
-        event.gen_jets = map(Jet, store.get(self.cfg_ana.gen_jets))
-        event.gen_jets.sort(key = self.sort_key, reverse=True)
+        if hasattr(self.cfg_ana, 'gen_jets'):
+            event.gen_jets = map(Jet, store.get(self.cfg_ana.gen_jets))
+            event.gen_jets.sort(key = self.sort_key, reverse=True)
         # event.genbrowser = GenBrowser(event.gen_particles, event.gen_vertices)

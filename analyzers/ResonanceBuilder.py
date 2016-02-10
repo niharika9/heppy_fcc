@@ -1,5 +1,5 @@
 from heppy.framework.analyzer import Analyzer
-from heppy_fcc.particles.tlv.resonance import Resonance2 
+from heppy_fcc.particles.tlv.resonance import Resonance2 as Resonance
 
 import pprint 
 import itertools
