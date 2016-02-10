@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.WARNING)
 
 comp = cfg.Component(
     'example',
-    files = ['example.root']
+    files = 'example.root'
 )
 selectedComponents = [comp]
 
@@ -20,8 +20,8 @@ source = cfg.Analyzer(
 )  
 
 from ROOT import gSystem
-gSystem.Load("libdatamodel")
-from eventstore import EventStore as Events
+gSystem.Load("libdatamodelDict")
+from EventStore import EventStore as Events
 
 from heppy_fcc.analyzers.JetClusterizer import JetClusterizer
 gen_jets = cfg.Analyzer(
