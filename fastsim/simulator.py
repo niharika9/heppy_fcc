@@ -132,6 +132,9 @@ class Simulator(object):
         self.propagate(ptc)
         
     def simulate_hadron(self, ptc):
+        '''Simulate a hadron, neutral or charged.
+        ptc should behave as pfobjects.Particle.
+        '''
         ecal = self.detector.elements['ecal']
         hcal = self.detector.elements['hcal']        
         frac_ecal = 0.

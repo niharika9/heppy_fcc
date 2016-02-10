@@ -20,7 +20,7 @@ class StraightLinePropagator(Propagator):
 
     def propagate_one(self, particle, cylinder, dummy=None):
         line = StraightLine(particle.p4(), particle.vertex) 
-        particle.set_path( line )
+        particle.set_path( line ) # TODO 
         theta = line.udir.Theta()
         if line.udir.Z():
             destz = cylinder.z if line.udir.Z() > 0. else -cylinder.z
