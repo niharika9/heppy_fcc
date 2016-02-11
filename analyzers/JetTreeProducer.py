@@ -1,3 +1,5 @@
+'''some module doc'''
+
 from heppy.framework.analyzer import Analyzer
 from heppy.statistics.tree import Tree
 from heppy_fcc.analyzers.ntuple import *
@@ -5,6 +7,7 @@ from heppy_fcc.analyzers.ntuple import *
 from ROOT import TFile
 
 class JetTreeProducer(Analyzer):
+    '''Some class doc'''
 
     def beginLoop(self, setup):
         super(JetTreeProducer, self).beginLoop(setup)

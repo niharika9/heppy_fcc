@@ -1,28 +1,32 @@
 from heppy.framework.analyzer import Analyzer
 from heppy.utils.deltar import matchObjectCollection, deltaR
-from heppy_fcc.particles.isolation import Circle, Isolation
+from heppy_fcc.particles.isolation import IsolationComputer, IsolationInfo
+
+
+pdgids = [211, 22, 130]
 
 class LeptonAnalyzer(Analyzer):
 
     def beginLoop(self, setup):
         super(LeptonAnalyzer, self).beginLoop(setup)
-        self.iso_cone = Circle(0.4)
-    
+        # now using same isolation definition for all pdgids
+        self.iso_computers = dict()
+        for pdgid in pdgids:
+            self.iso_computers[pdgid] = IsolationComputer(
+                [self.cfg_ana.iso_area],
+                label='iso{pdgid}'.format(pdgid=str(pdgid))
+            )
+            
     def process(self, event):
-        particles = getattr(event, self.cfg_ana.particles)            
-        sel_leptons = [ptc for ptc in particles if self.sel_lepton(ptc)]
-        pdgids = [211, 22, 130]
-        for lepton in sel_leptons:
+        particles = getattr(event, self.cfg_ana.particles)
+        leptons = getattr(event, self.cfg_ana.leptons)
+        for lepton in leptons:
+            isosum = IsolationInfo('all', lepton)
             for pdgid in pdgids:
-                self.set_isolation(lepton, particles, pdgid)
-        setattr(event, self.instance_label, sel_leptons)
-                
-    def sel_lepton(self, ptc):
-        if abs(ptc.pdgid()) == self.cfg_ana.pdgid:
-            return True
-
-    def set_isolation(self, lepton, particles, pdgid):
-        sel_ptcs = [ptc for ptc in particles if ptc.pdgid()==pdgid]
-        iso = Isolation(lepton, sel_ptcs, [self.iso_cone], label=str(pdgid))
-        setattr(lepton, 'iso_{pdgid}'.format(pdgid=pdgid), iso)
+                sel_ptcs = [ptc for ptc in particles if ptc.pdgid()==pdgid]
+                iso = self.iso_computers[pdgid].compute(lepton, sel_ptcs)
+                isosum += iso 
+                setattr(lepton, 'iso_{pdgid}'.format(pdgid=pdgid), iso)
+            setattr(lepton, 'iso'.format(pdgid=pdgid), isosum)
         
+  

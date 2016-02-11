@@ -4,14 +4,23 @@ from heppy.utils.deltar import deltaR
 import math
 
 class PFObject(object):
+    '''Base class for all particle flow objects (tracks, clusters, etc).
+    Particle flow objects of different types can be linked together
+    forming graphs called "blocks". 
 
+    attributes: 
+    linked : list of PFObjects linked to this one 
+    locked : already used in the particle flow algorithm 
+    block_label : label of the block the PFObject belongs to. The block label is a unique identifier for the block.
+    ''' 
+    
     def __init__(self):
         self.linked = []
         self.locked = False
         self.block_label = None
 
     def accept(self, visitor):
-        '''Called by visitors, such as FloodFill.'''
+        '''Called by visitors, such as FloodFill. See pfalgo.floodfill'''
         notseen = visitor.visit(self)
         if notseen:
             for elem in self.linked:
@@ -98,7 +107,14 @@ class SmearedCluster(Cluster):
 
         
 class Track(PFObject):
+    '''Determines the trajectory in space and time of a particle (charged or neutral).
 
+    attributes: 
+    - p3 : momentum in 3D space (px, py, pz) 
+    - charge : particle charge 
+    - path : contains the trajectory parameters and points  
+    '''
+    
     def __init__(self, p3, charge, path, particle=None):
         super(Track, self).__init__()
         self.p3 = p3
