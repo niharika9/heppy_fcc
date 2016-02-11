@@ -87,8 +87,9 @@ if __name__ == '__main__':
         if hasattr(ana, 'display'):
             simulation = ana
     display = getattr(simulation, 'display', None)
-    simulator = simulation.simulator
-    detector = simulator.detector
+    simulator = getattr(simulation, 'simulator', None)
+    if simulator: 
+        detector = simulator.detector
     if iev is not None:
         process(iev)
     else:
